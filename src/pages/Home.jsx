@@ -1,6 +1,7 @@
 import React from 'react';
-import Card from '../components/Card';
 import styled from "styled-components";
+import Card from '../components/Card';
+import Carousel from '../components/Carousel';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../imgs/example.png'
@@ -22,6 +23,9 @@ export default function Home() {
 
     return (
         <div>
+            {/* 캐러셀 */}
+            <Carousel />
+
             <CardsContainer>
                 <Card
                     title="포트폴리오 이름"
