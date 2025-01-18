@@ -1,9 +1,17 @@
 import React from 'react';
 import Card from '../components/Card';
+import Filter from '../components/Filter';
 import styled from "styled-components";
 
 // 대체 이미지 사진 사용
 import exampleImg from '../imgs/example.png'
+
+// Home 전체 컴포넌트 감싸는 컨테이너
+const HomeContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`;
 
 // 카드 컴포넌트 배치할 컨테이너
 const CardsContainer = styled.div`
@@ -21,7 +29,8 @@ const CardsContainer = styled.div`
 export default function Home() {
 
     return (
-        <div>
+        <HomeContainer>
+            <Filter />
             <CardsContainer>
                 <Card
                     title="포트폴리오 이름"
@@ -31,6 +40,6 @@ export default function Home() {
                     likes={567}
                 />
             </CardsContainer>
-        </div>
+        </HomeContainer>
     )
 }
