@@ -31,6 +31,8 @@ const Slide = styled.div`
 // 점들 (순서 표시)
 const DotsContainer = styled.div`
     display: flex;
+    align-items: center;
+    gap: 8px;
     justify-content: center;
     position: absolute;
     bottom: 16px; // 캐러셀 하단에서 16px 위에 배치
@@ -45,7 +47,8 @@ const Dot = styled.button`
     border-radius: 50%;
     width: 8px;
     height: 8px;
-    margin: 0 8px;
+    padding: 0px;
+    margin: 0px;
     cursor: pointer;
     transition: background-color 0.3s;
 
@@ -54,7 +57,7 @@ const Dot = styled.button`
     }
 `;
 
-const images = [example, example, example, example];
+const images = [example, example, example, example, example];
 
 export default function Carousel() {
     const [currentIndex, setCurrentIndex] = useState(0);
