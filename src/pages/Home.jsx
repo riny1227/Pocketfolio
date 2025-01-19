@@ -2,9 +2,17 @@ import React from 'react';
 import styled from "styled-components";
 import Card from '../components/Card';
 import Carousel from '../components/Carousel';
+import Filter from '../components/Filter';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../imgs/example.png'
+
+// Home 전체 컴포넌트 감싸는 컨테이너
+const HomeContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`;
 
 // 카드 컴포넌트 배치할 컨테이너
 const CardsContainer = styled.div`
@@ -22,9 +30,12 @@ const CardsContainer = styled.div`
 export default function Home() {
 
     return (
-        <div>
+        <HomeContainer>
             {/* 캐러셀 */}
             <Carousel />
+
+            {/* 필터 */}
+            <Filter />
 
             <CardsContainer>
                 <Card
@@ -35,6 +46,6 @@ export default function Home() {
                     likes={567}
                 />
             </CardsContainer>
-        </div>
+        </HomeContainer>
     )
 }
