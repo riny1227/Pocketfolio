@@ -3,13 +3,11 @@ import styled from "styled-components";
 
 // 카드 컴포넌트 컨테이너
 const CardContainer = styled.div`
+    display: flex;
     width: 288px;
-    height: 236px;
     flex-direction: column;
-    justify-content: flex-start;
     align-items: flex-start;
     gap: 8px;
-    display: inline-flex;
 `;
 
 // 상단 썸네일 컨테이너
@@ -60,7 +58,7 @@ const PortfolioInfoContainer = styled.div`
 const PortfolioName = styled.div`
     color: white;
     font-size: 16px;
-    font-family: 'Pretendard';
+    font-family: 'Pretendard-SemiBold';
     font-weight: 600;
     line-height: 24px;
     word-wrap: break-word;
@@ -103,7 +101,7 @@ const UserInfo = styled.div`
     span {
         color: #222222;
         font-size: 14px;
-        font-family: 'Pretendard';
+        font-family: 'Pretendard-SemiBold';
         font-weight: 600;
         line-height: 22px;
         word-wrap: break-word;
@@ -132,7 +130,7 @@ const ViewsInfo = styled.div`
     span {
         color: #222222;
         font-size: 12px;
-        font-family: 'Pretendard';
+        font-family: 'Pretendard-Regular';
         font-weight: 400;
         line-height: 20px;
         word-wrap: break-word;
@@ -154,7 +152,7 @@ const LikesInfo = styled.div`
     span {
         color: #222222;
         font-size: 12px;
-        font-family: 'Pretendard';
+        font-family: 'Pretendard-Regular';
         font-weight: 400;
         line-height: 20px;
         word-wrap: break-word;

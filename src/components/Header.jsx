@@ -58,7 +58,7 @@ const SearchInput = styled.input`
     background: transparent;
     outline: none;
     width: 100%;
-    font-family: Pretendard;
+    font-family: 'Pretendard-Regular';
     font-size: 14px;
     font-weight: 400;
     line-height: 22px;
@@ -67,7 +67,7 @@ const SearchInput = styled.input`
     &::placeholder {
         color: #909090;
         font-feature-settings: 'liga' off, 'clig' off;
-        font-family: Pretendard;
+        font-family: 'Pretendard-Regular';
         font-size: 14px;
         font-style: normal;
         font-weight: 400;
@@ -92,7 +92,7 @@ const SearchIcon = styled.button`
 const ArticleText = styled.span`
     white-space: nowrap;
     color: #222;
-    font-family: Pretendard;
+    font-family: 'Pretendard-SemiBold';
     font-size: 18px;
     font-style: normal;
     font-weight: 600;
@@ -117,7 +117,7 @@ const SignContainer = styled.div`
 const SignUpText = styled.span`
     white-space: nowrap;
     color: #222;
-    font-family: Pretendard;
+    font-family: 'Pretendard-SemiBold';
     font-size: 18px;
     font-weight: 600;
     line-height: 24px;
@@ -137,7 +137,7 @@ const LogInButton = styled.button`
     border-radius: 28px;
     background: #EFEFEF;
     color: #222;
-    font-family: Pretendard;
+    font-family: 'Pretendard-SemiBold';
     font-size: 18px;
     font-weight: 600;
     line-height: 24px;
@@ -166,7 +166,7 @@ const WriteButton = styled.button`
     border-radius: 28px;
     background: #EFEFEF;
     color: #222;
-    font-family: Pretendard;
+    font-family: 'Pretendard-SemiBold';
     font-size: 18px;
     font-weight: 600;
     line-height: 24px;
