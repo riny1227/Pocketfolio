@@ -18,7 +18,7 @@ const RightButtonContainer = styled.div`
     gap: 16px;
 `;
 
-// 드롭다운 버튼 (직군 선택, 정렬)
+// 드롭다운 버튼 (직군 선택, 정렬 등)
 const DropdownButton = styled.button`
     padding: 12px 32px;
     border-radius: 50px;
@@ -71,7 +71,7 @@ const FilterCount = styled.div`
 
 // 상세 필터 목록 컨테이너 (필터 버튼 클릭하면 보이고 다시 클릭하면 사라짐)
 const DetailFilterContainer = styled.div`
-    display: ${({ visible }) => (visible ? 'flex' : 'none')}; /* 상태에 따라 표시/숨김 */
+    display: ${({ visible }) => (visible ? 'flex' : 'none')}; /* 상태에 따라 표시 or 숨김 */
     width: 1280px;
     height: 126px;
     align-items: center;
@@ -95,9 +95,9 @@ const FilterOptionName = styled.span`
     color: #222222;
 `;
 
-// 상세 필터 검색바 (태그, 기업, 색상 등)
+// 상세 필터 검색바 (태그, 기업 등)
 const FilterOptionInputBar = styled.input`
-    width: 284px;
+    width: 389px;
     // ****패딩 임시 설정****
     padding: 20px 24px 20px 50px;
     display: flex;
@@ -118,7 +118,7 @@ const FilterOptionInputBar = styled.input`
 
 // 상세 필터 날짜 드롭다운 (날짜)
 const FilterDateDropdown = styled.button`
-    width: 284px;
+    width: 389px;
     padding: 20px 16px 20px 24px;
     display: flex;
     justify-content: space-between;
@@ -157,7 +157,6 @@ export default function Filter() {
     const [filters, setFilters] = useState({
         tag: "",
         company: "",
-        color: "",
         date: "",
     });
 
@@ -238,22 +237,6 @@ export default function Filter() {
                         <FilterOptionIcon>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M3 21H21M9 8H10M9 12H10M9 16H10M14 8H15M14 12H15M14 16H15M5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </FilterOptionIcon>
-                    </div>
-                </FilterOptionWrapper>
-
-                {/* 색상 필터 */}
-                <FilterOptionWrapper>
-                    <FilterOptionName>색상</FilterOptionName>
-                    <div style={{ position: 'relative' }}>
-                        <FilterOptionInputBar 
-                        value={filters.color}
-                        onChange={(e) => handleFilterChange("color", e.target.value)}
-                        />
-                        <FilterOptionIcon>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M17.5 12C17.1022 12 16.7206 11.842 16.4393 11.5607C16.158 11.2794 16 10.8978 16 10.5C16 10.1022 16.158 9.72064 16.4393 9.43934C16.7206 9.15804 17.1022 9 17.5 9C17.8978 9 18.2794 9.15804 18.5607 9.43934C18.842 9.72064 19 10.1022 19 10.5C19 10.8978 18.842 11.2794 18.5607 11.5607C18.2794 11.842 17.8978 12 17.5 12ZM14.5 8C14.1022 8 13.7206 7.84196 13.4393 7.56066C13.158 7.27936 13 6.89782 13 6.5C13 6.10218 13.158 5.72064 13.4393 5.43934C13.7206 5.15804 14.1022 5 14.5 5C14.8978 5 15.2794 5.15804 15.5607 5.43934C15.842 5.72064 16 6.10218 16 6.5C16 6.89782 15.842 7.27936 15.5607 7.56066C15.2794 7.84196 14.8978 8 14.5 8ZM9.5 8C9.10218 8 8.72064 7.84196 8.43934 7.56066C8.15804 7.27936 8 6.89782 8 6.5C8 6.10218 8.15804 5.72064 8.43934 5.43934C8.72064 5.15804 9.10218 5 9.5 5C9.89782 5 10.2794 5.15804 10.5607 5.43934C10.842 5.72064 11 6.10218 11 6.5C11 6.89782 10.842 7.27936 10.5607 7.56066C10.2794 7.84196 9.89782 8 9.5 8ZM6.5 12C6.10218 12 5.72064 11.842 5.43934 11.5607C5.15804 11.2794 5 10.8978 5 10.5C5 10.1022 5.15804 9.72064 5.43934 9.43934C5.72064 9.15804 6.10218 9 6.5 9C6.89782 9 7.27936 9.15804 7.56066 9.43934C7.84196 9.72064 8 10.1022 8 10.5C8 10.8978 7.84196 11.2794 7.56066 11.5607C7.27936 11.842 6.89782 12 6.5 12ZM12 3C9.61305 3 7.32387 3.94821 5.63604 5.63604C3.94821 7.32387 3 9.61305 3 12C3 14.3869 3.94821 16.6761 5.63604 18.364C7.32387 20.0518 9.61305 21 12 21C12.3978 21 12.7794 20.842 13.0607 20.5607C13.342 20.2794 13.5 19.8978 13.5 19.5C13.5 19.11 13.35 18.76 13.11 18.5C12.88 18.23 12.73 17.88 12.73 17.5C12.73 17.1022 12.888 16.7206 13.1693 16.4393C13.4506 16.158 13.8322 16 14.23 16H16C17.3261 16 18.5979 15.4732 19.5355 14.5355C20.4732 13.5979 21 12.3261 21 11C21 6.58 16.97 3 12 3Z" fill="#222222"/>
                             </svg>
                         </FilterOptionIcon>
                     </div>
