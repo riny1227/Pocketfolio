@@ -20,7 +20,7 @@ const SlideContainer = styled.div`
 const Slide = styled.div`
     width: 100%;
     flex-shrink: 0;
-    height: 320px; // 고정된 높이 설정
+    height: 240px; // 고정된 높이 설정
     img {
         width: 100%;
         height: 100%; // 부모의 높이에 맞춤
