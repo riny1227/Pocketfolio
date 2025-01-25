@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import example from '../imgs/example.png';
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
+import exampleImage from '../imgs/example.png';
 import "react-datepicker/dist/react-datepicker.css"; // CSS 파일 import
 import { registerLocale, setDefaultLocale } from "react-datepicker";
 import ko from "date-fns/locale/ko"; // 한국어 로케일 import
@@ -533,16 +533,50 @@ const MemoInput = styled.input`
 export default function WritePortfolio() {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null); 
+    const [imagePreview, setImagePreview] = useState(exampleImage); // 기본값으로 예시 이미지
+    const [fileName, setFileName] = useState(''); // 파일 이름 상태 추가
+
+    // 파일 업로드 핸들러
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result); // 이미지 미리보기 URL 설정
+            };
+            reader.readAsDataURL(file); // 파일을 Data URL로 읽기
+        }
+    };
+
+    // 파일 이름 핸들러
+    const handleFileUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFileName(file.name); // 파일 이름 설정
+        }
+    };
     
     return (
         // 포트폴리오 작성 컨테이너 
         <WritePortfolioContainer>
             
-            {/* 표지 이미지 */}
-            <ThumbnailImage src={example} alt="표지 이미지"/>
+            {/* 이미지 미리보기 */}
+            <ThumbnailImage 
+            src={imagePreview} 
+            alt="Thumbnail" />
 
             {/* 표지 이미지 업로드 버튼 */}
-            <ImageUploadButton>표지 이미지 업로드</ImageUploadButton>
+            <ImageUploadButton>
+                <label htmlFor="file-input" style={{cursor: 'pointer'}}>표지 이미지 업로드</label>
+                <input
+                id="file-input"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                style={{ display: 'none' }} // 파일 선택 버튼 숨기기
+                />
+            </ImageUploadButton>
+
 
             {/* 포트폴리오 업로드 + 게시하기 버튼 컨테이너 */}
             <UploadContainer>
@@ -637,8 +671,17 @@ export default function WritePortfolio() {
                 <FileContainer>
                     <ContentText>첨부 파일</ContentText>
                     <UploadFileContainer>
-                        <FileUploadText>첨부파일 업로드</FileUploadText>
-                        <UploadButton>파일 첨부</UploadButton>
+                        <FileUploadText>{fileName || '첨부파일 업로드'}</FileUploadText> {/* 업로드한 파일 이름 표시 */}
+                        <UploadButton>
+                            <label htmlFor="file-upload" style={{cursor: 'pointer'}}>파일 첨부</label>
+                            <input
+                                id="file-upload"
+                                type="file"
+                                accept="*/*"
+                                onChange={handleFileUpload}
+                                style={{ display: 'none' }} // 파일 선택 버튼 숨기기
+                            />
+                        </UploadButton>
                     </UploadFileContainer>
                 </FileContainer>
 
