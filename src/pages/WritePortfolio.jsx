@@ -16,13 +16,12 @@ const WritePortfolioContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 102px;
-    margin-bottom: 100px;
 `;
 
 // 표지 이미지
 const ThumbnailImage = styled.img`
     width: 100%;
+    margin-top: 102px;
     height: 240px;
     object-fit: cover; // 이미지 비율 유지하면서 컨테이너 채우기
 `;
@@ -42,11 +41,15 @@ const ImageUploadButton = styled.button`
     color: #FFF;
     text-align: center;
     font-feature-settings: 'liga' off, 'clig' off;
+<<<<<<< HEAD:src/components/WritePortfolio.jsx
     font-family: Pretendard;
+=======
+    font-family: 'Pretendard-SemiBold';
+>>>>>>> 64fdc8a59d7db3406c2a4fe15ac456d2fa7749e4:src/pages/WritePortfolio.jsx
     font-size: 16px;
     font-style: normal;
     font-weight: 600;
-    line-height: 24px; /* 150% */
+    line-height: 24px;
 
     position: absolute; /* 버튼을 이미지 위에 올리기 */
 
