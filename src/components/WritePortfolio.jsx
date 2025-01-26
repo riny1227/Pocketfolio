@@ -35,14 +35,13 @@ const ImageUploadButton = styled.button`
     align-items: flex-start;
     gap: 10px;
     border-radius: 4px;
-    border: 1px solid var(--, #9E9E9E);
+    border: 1px solid #9E9E9E;
     background: #636363;
 
-    color: var(--Gray-Gray0, #FFF);
+    /* 버튼 텍스트 */
+    color: #FFF;
     text-align: center;
     font-feature-settings: 'liga' off, 'clig' off;
-
-    /* Body/Body2:SemiBold */
     font-family: Pretendard;
     font-size: 16px;
     font-style: normal;
@@ -90,14 +89,13 @@ const PortfolioUploadButton = styled.button`
     justify-content: center;
     align-items: center;
     border-radius: 10px;
-    background: var(--, #E0E0E0);
+    background: #E0E0E0;
     border: none;
 
+    // 버튼 텍스트
     color: #888893;
     text-align: center;
     font-feature-settings: 'liga' off, 'clig' off;
-
-    /* Body/Body1:SemiBold */
     font-family: Pretendard;
     font-size: 18px;
     font-style: normal;
@@ -116,22 +114,22 @@ const ContentContainer = styled.div`
     align-items: flex-start;
     gap: 32px;
     border-radius: 12px;
-    border: 1px solid var(--Neutral-grayscale-80, #E7E7E7);
-    background: var(--Neutral-Static-Static-100, #FFF);
+    border: 1px solid  #E7E7E7;
+    background: #FFF;
 `;
 
 // 제목 컨테이너
 const TitleContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 64px;
+    gap: 60px;
     align-self: stretch;
     width: 100%;
 `;
 
 // 제목, 기간, 역할 ... 텍스트
 const ContentText = styled.div`
-    color: var(--Neutral-grayscale-30, #4C4F56);
+    color: #4C4F56;
     font-feature-settings: 'liga' off, 'clig' off;
 
     /* Body/Body1:SemiBold */
@@ -152,7 +150,7 @@ const TitleInput = styled.input`
     gap: 54px;
     flex: 1 0 0;
     padding-left: 16px;
-    border-radius: 4px;
+    border-radius: 8px;
     border: 1px solid #E7E7E7;
     font-family: Pretendard;
     font-size: 16px;
@@ -175,7 +173,7 @@ const PeriodContainer = styled.div`
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    gap: 64px;
+    gap: 60px;
     align-self: stretch;
     width: 100%;
 `;
@@ -197,10 +195,10 @@ const StyledDatePickerWrapper = styled.div`
 
 // DatePicker 스타일
 const StyledDatePicker = styled(DatePicker)`
-    width: 211px;
+    width: 197px;
     height: 56px;
     padding-left: 16px;
-    border-radius: 4px;
+    border-radius: 8px;
     border: 1px solid #E7E7E7;
     font-family: Pretendard;
     font-size: 16px;
@@ -230,7 +228,7 @@ const IconStyle = styled.svg`
 
 // ~ 텍스트 스타일
 const TildeText = styled.span`
-    color: var(--Neutral-grayscale-45, #989BA2);
+    color: #989BA2;
 
     /* Small/Semibold 20 */
     font-family: "Pretendard Variable";
@@ -248,7 +246,7 @@ const TildeText = styled.span`
 const RoleContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 64px;
+    gap: 60px;
     align-self: stretch;
     width: 100%;
 `;
@@ -261,7 +259,7 @@ const RoleInput = styled.input`
     gap: 54px;
     flex: 1 0 0;
     padding-left: 16px;
-    border-radius: 4px;
+    border-radius: 8px;
     border: 1px solid #E7E7E7;
     font-family: Pretendard;
     font-size: 16px;
@@ -282,7 +280,7 @@ const RoleInput = styled.input`
 const JobContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 64px;
+    gap: 60px;
     align-self: stretch;
     width: 100%;
 `;
@@ -292,7 +290,7 @@ const JobInputContainer = styled.div`
     display: flex;
     align-items: center;
     position: relative;
-    width: 480px;
+    width: 475px;
 `;
 
 // 직군 입력 필드 스타일
@@ -305,7 +303,7 @@ const JobInput = styled.input`
     flex: 1 0 0;
     padding-left: 16px;
     padding-right: 44px;
-    border-radius: 4px;
+    border-radius: 8px;
     border: 1px solid #E7E7E7;
     font-family: Pretendard;
     font-size: 16px;
@@ -337,7 +335,7 @@ const SearchIconStyle = styled.svg`
 const CompanyContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 22px;
+    gap: 18px;
     align-self: stretch;
     width: 100%;
 `;
@@ -347,7 +345,7 @@ const CompanyInputContainer = styled.div`
     display: flex;
     align-items: center;
     position: relative;
-    width: 480px;
+    width: 475px;
 `;
 
 // 기업명 검색 필드 스타일
@@ -360,7 +358,7 @@ const CompanyInput = styled.input`
     flex: 1 0 0;
     padding-left: 16px;
     padding-right: 44px;
-    border-radius: 4px;
+    border-radius: 8px;
     border: 1px solid #E7E7E7;
     font-family: Pretendard;
     font-size: 16px;
@@ -381,7 +379,7 @@ const CompanyInput = styled.input`
 const FileContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 22px;
+    gap: 18px;
     align-self: stretch;
     width: 100%;
 `;
@@ -434,7 +432,7 @@ const UploadButton = styled.button`
 const URLContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 66px;
+    gap: 62px;
     align-self: stretch;
     width: 100%;
 `;
@@ -466,7 +464,7 @@ const URLInput = styled.input`
     align-items: center;
     flex: 1 0 0;
     padding-left: 56px;
-    border-radius: 4px;
+    border-radius: 8px;
     border: 1px solid #E7E7E7;
     font-family: Pretendard;
     font-size: 16px;
@@ -487,11 +485,11 @@ const URLInput = styled.input`
 const SimpleMemoContainer = styled.div`
     display: flex;
     align-items: flex-start;
-    gap: 22px;
+    gap: 18px;
     align-self: stretch;
 `;
 
-// 간단설명 입력 필드 컨테이너너
+// 간단설명 입력 필드 컨테이너
 const MemoInputContainer = styled.div`
     height: 130px;
     display: flex;
@@ -500,9 +498,9 @@ const MemoInputContainer = styled.div`
     gap: 2px;
     flex: 1 0 0;
     align-self: stretch;
-    border-radius: var(--Radius-Small-8, 8px);
-    border: 1px solid var(--Neutral-grayscale-80, #E7E7E7);
-    background: var(--Neutral-Static-Static-100, #FFF);
+    border-radius: 8px;
+    border: 1px solid  #E7E7E7;
+    background: #FFF;
     position: relative; /* Placeholder 위치를 위한 설정 */
 `;
 
@@ -511,7 +509,7 @@ const MemoInput = styled.input`
     background: transparent;
     border: none;
     outline: none;
-    color: var(--Neutral-grayscale-30, #4C4F56);
+    color: #4C4F56;
 
     /* Xsmall/Regular 16 */
     font-family: "Pretendard Variable", sans-serif;
@@ -526,7 +524,7 @@ const MemoInput = styled.input`
         position: absolute;
         top: 12px;
         transform: translateY(-50%);
-        color: var(--Neutral-grayscale-30, #4C4F56);
+        color: #4C4F56;
     }
 `;
 
