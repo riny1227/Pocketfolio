@@ -20,9 +20,9 @@ const RightButtonContainer = styled.div`
 
 // 드롭다운 버튼 (직군 선택, 정렬 등)
 const DropdownButton = styled.button`
-    padding: 12px 32px;
+    padding: ${({ clicked }) => (clicked ? '11px 31px' : '12px 32px' )}; /* 상태에 따라 표시 or 숨김 */
     border-radius: 50px;
-    border: none;
+    border: ${({ clicked }) => (clicked ? '1px solid #6C6C6C' : 'none')}; /* 상태에 따라 표시 or 숨김 */
     cursor: pointer;
     background-color: #EFEFEF;
 
@@ -149,21 +149,36 @@ const FilterOptionIcon = styled.div`
 `;
 
 export default function Filter() {
-    // 상세 필터 목록 표시 state -> true일 때 보임, false일 때 안보임
-    const [isFilterVisible, setFilterVisible] = useState(false);
-
     // 각 상세 필터 값 저장하는 state
-    // *****추후 드롭다운 등 디자인 확정되면 수정 필요함*****
     const [filters, setFilters] = useState({
         tag: "",
         company: "",
         date: "",
     });
+    
+    // 상세 필터 목록 표시 state -> true일 때 보임, false일 때 안보임
+    const [isFilterVisible, setFilterVisible] = useState(false);
+
+    // 직무선택 드롭다운 표시 state -> true일 때 보임, false일 때 안보임
+    const [isJopSelectorVisible, setJopSelectorVisible] = useState(false);
+
+    // 정렬 드롭다운 표시 state -> true일 때 보임, false일 때 안보임
+    const [isSortVisible, setSortVisible] = useState(false);
 
     // 필터 버튼 클릭하면 상세 필터 목록 나타나거나 사라지도록 하는 함수
     const clickFilterButton = () => {
         setFilterVisible((prevState) => !prevState);
     };
+
+    // 직무선택 버튼 클릭하면 버튼 디자인 변경하고 정렬 드롭다운 보여주는 함수
+    const clickJobSelectorButton = () => {
+        setJopSelectorVisible((prevState) => !prevState);
+    }
+
+    // 정렬 버튼 클릭하면 버튼 디자인 변경하고 정렬 드롭다운 보여주는 함수
+    const clickSortButton = () => {
+        setSortVisible((prevState) => !prevState);
+    }
 
     // 상세 필터 state 값을 관리하는 함수
     // *****추후 드롭다운 등 디자인 확정되면 수정 필요함*****
@@ -182,28 +197,40 @@ export default function Filter() {
         <>
             <FilterContainer>
                 {/* 직군 선택 드롭다운 버튼 */}
-                <DropdownButton>직군 선택
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M18 9L12 15L6 9" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                <DropdownButton clicked={isJopSelectorVisible} onClick={clickJobSelectorButton}>직군 선택
+                    {isJopSelectorVisible ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M6 15L12 9L18 15" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 9L12 15L6 9" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    )}
                 </DropdownButton>
                 <RightButtonContainer>
                     {/* 필터 버튼 */}
                     <FilterButton onClick={clickFilterButton}>
                         {filterCount > 0 ? (
-                                <FilterCount>{filterCount}</FilterCount>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <path d="M21.25 12H8.895M4.534 12H2.75M4.534 12C4.534 11.4218 4.76368 10.8673 5.17251 10.4585C5.58134 10.0497 6.13583 9.82001 6.714 9.82001C7.29217 9.82001 7.84666 10.0497 8.25549 10.4585C8.66432 10.8673 8.894 11.4218 8.894 12C8.894 12.5782 8.66432 13.1327 8.25549 13.5415C7.84666 13.9503 7.29217 14.18 6.714 14.18C6.13583 14.18 5.58134 13.9503 5.17251 13.5415C4.76368 13.1327 4.534 12.5782 4.534 12ZM21.25 18.607H15.502M15.502 18.607C15.502 19.1853 15.2718 19.7404 14.8628 20.1494C14.4539 20.5583 13.8993 20.788 13.321 20.788C12.7428 20.788 12.1883 20.5573 11.7795 20.1485C11.3707 19.7397 11.141 19.1852 11.141 18.607M15.502 18.607C15.502 18.0287 15.2718 17.4746 14.8628 17.0657C14.4539 16.6567 13.8993 16.427 13.321 16.427C12.7428 16.427 12.1883 16.6567 11.7795 17.0655C11.3707 17.4743 11.141 18.0288 11.141 18.607M11.141 18.607H2.75M21.25 5.39301H18.145M13.784 5.39301H2.75M13.784 5.39301C13.784 4.81484 14.0137 4.26035 14.4225 3.85152C14.8313 3.44269 15.3858 3.21301 15.964 3.21301C16.2503 3.21301 16.5338 3.2694 16.7983 3.37896C17.0627 3.48851 17.3031 3.64909 17.5055 3.85152C17.7079 4.05395 17.8685 4.29427 17.9781 4.55876C18.0876 4.82325 18.144 5.10673 18.144 5.39301C18.144 5.67929 18.0876 5.96277 17.9781 6.22726C17.8685 6.49175 17.7079 6.73207 17.5055 6.93451C17.3031 7.13694 17.0627 7.29751 16.7983 7.40707C16.5338 7.51663 16.2503 7.57301 15.964 7.57301C15.3858 7.57301 14.8313 7.34333 14.4225 6.93451C14.0137 6.52568 13.784 5.97118 13.784 5.39301Z" stroke="#222222" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"/>
-                                </svg>
+                            <FilterCount>{filterCount}</FilterCount>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M21.25 12H8.895M4.534 12H2.75M4.534 12C4.534 11.4218 4.76368 10.8673 5.17251 10.4585C5.58134 10.0497 6.13583 9.82001 6.714 9.82001C7.29217 9.82001 7.84666 10.0497 8.25549 10.4585C8.66432 10.8673 8.894 11.4218 8.894 12C8.894 12.5782 8.66432 13.1327 8.25549 13.5415C7.84666 13.9503 7.29217 14.18 6.714 14.18C6.13583 14.18 5.58134 13.9503 5.17251 13.5415C4.76368 13.1327 4.534 12.5782 4.534 12ZM21.25 18.607H15.502M15.502 18.607C15.502 19.1853 15.2718 19.7404 14.8628 20.1494C14.4539 20.5583 13.8993 20.788 13.321 20.788C12.7428 20.788 12.1883 20.5573 11.7795 20.1485C11.3707 19.7397 11.141 19.1852 11.141 18.607M15.502 18.607C15.502 18.0287 15.2718 17.4746 14.8628 17.0657C14.4539 16.6567 13.8993 16.427 13.321 16.427C12.7428 16.427 12.1883 16.6567 11.7795 17.0655C11.3707 17.4743 11.141 18.0288 11.141 18.607M11.141 18.607H2.75M21.25 5.39301H18.145M13.784 5.39301H2.75M13.784 5.39301C13.784 4.81484 14.0137 4.26035 14.4225 3.85152C14.8313 3.44269 15.3858 3.21301 15.964 3.21301C16.2503 3.21301 16.5338 3.2694 16.7983 3.37896C17.0627 3.48851 17.3031 3.64909 17.5055 3.85152C17.7079 4.05395 17.8685 4.29427 17.9781 4.55876C18.0876 4.82325 18.144 5.10673 18.144 5.39301C18.144 5.67929 18.0876 5.96277 17.9781 6.22726C17.8685 6.49175 17.7079 6.73207 17.5055 6.93451C17.3031 7.13694 17.0627 7.29751 16.7983 7.40707C16.5338 7.51663 16.2503 7.57301 15.964 7.57301C15.3858 7.57301 14.8313 7.34333 14.4225 6.93451C14.0137 6.52568 13.784 5.97118 13.784 5.39301Z" stroke="#222222" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"/>
+                            </svg>
                         )}
                         필터
                     </FilterButton>
                     {/* 정렬 드롭다운 버튼 */}
-                    <DropdownButton>인기순
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M18 9L12 15L6 9" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                    <DropdownButton clicked={isSortVisible} onClick={clickSortButton}>인기순
+                        {isSortVisible ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M6 15L12 9L18 15" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M18 9L12 15L6 9" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        )}
                     </DropdownButton>
                 </RightButtonContainer>
             </FilterContainer>
