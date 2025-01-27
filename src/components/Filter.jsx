@@ -18,13 +18,21 @@ const RightButtonContainer = styled.div`
     gap: 16px;
 `;
 
-// 드롭다운 버튼 (직군 선택, 정렬 등)
-const DropdownButton = styled.button`
-    padding: ${({ clicked }) => (clicked ? '11px 31px' : '12px 32px' )}; /* 상태에 따라 표시 or 숨김 */
+// 토글 버튼 + 드롭다운 감싸는 컨테이너
+const ToggleDropdownWrapper = styled.div`
+    display: inline-block;
+    position: relative;
+`;
+
+// 토글 버튼 (직군 선택, 정렬 등)
+const ToggleButton = styled.button`
+    padding: ${({ isClicked }) => (isClicked ? '11px 31px' : '12px 32px' )}; /* 상태에 따라 표시 or 숨김 */
     border-radius: 50px;
-    border: ${({ clicked }) => (clicked ? '1px solid #6C6C6C' : 'none')}; /* 상태에 따라 표시 or 숨김 */
+    border: ${({ isClicked }) => (isClicked ? '1px solid #6C6C6C' : 'none')}; /* 상태에 따라 표시 or 숨김 */
     cursor: pointer;
     background-color: #EFEFEF;
+    outline: none;
+    position: relative;
 
     display: flex;
     gap: 8px;
@@ -43,6 +51,7 @@ const FilterButton = styled.button`
     border: none;
     cursor: pointer;
     background-color: #EFEFEF;
+    outline: none;
 
     display: flex;
     gap: 8px;
@@ -128,6 +137,7 @@ const FilterDateDropdown = styled.button`
     border: none;
     cursor: pointer;
     background-color: #ECECEC;
+    outline: none;
 
     font-family: 'Pretendard-Regular';
     font-size: 18px;
@@ -148,22 +158,124 @@ const FilterOptionIcon = styled.div`
     transform: translateY(-50%);
 `;
 
+/* ----------직무선택 드롭다운 style---------- */
+// 드롭다운 전체
+const JobDropdown = styled.div`\
+    display: ${({ isClicked }) => (isClicked ? 'flex' : 'none')};
+    flex-direction: column;
+    justify-content: space-between;
+
+    position: absolute;
+    top: 56px;
+    z-index: 1000;
+
+    width: 196px;
+    height: 234px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.15);
+    background-color: #FFF;
+    padding: 16px;
+    box-sizing: border-box;
+`;
+
+const JopSelectorLabel = styled.label`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    user-select: none; /* 라벨 속 텍스트 선택 방지 */
+
+    font-family: 'Pretendard-Regular';
+    font-size: 14px;
+    line-height: 22px;
+    color: #000;
+    font-feature-settings: 'liga' off, 'clig' off;
+`;
+
+const JopSelectorParent = styled.input.attrs({ type: "checkbox" })`
+    margin: 0;
+    
+    appearance: none; /* 기본 체크박스 스타일 제거 */
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    border: 1px solid #6C6C6C;
+    box-sizing: border-box;
+
+    &:hover {
+    border-color: #1570ef;
+    }
+
+    &:checked {
+    border: none;
+    background-color: #1570ef;
+    position: relative;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 10px;
+        height: 10px;
+        transform: translate(-50%, -50%);
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5L4 9L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat center;
+        background-size: contain;
+        }
+    }
+`;
+
+const JopSelectorChild = styled.input.attrs({ type: "checkbox" })`
+    margin: 0 0 0 24px;
+
+    appearance: none; /* 기본 체크박스 스타일 제거 */
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    border: 1px solid #6C6C6C;
+
+    &:hover {
+    border-color: #1570ef;
+    }
+
+    &:checked {
+    border: none;
+    background-color: #1570ef;
+    position: relative;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 10px;
+        height: 10px;
+        transform: translate(-50%, -50%);
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5L4 9L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat center;
+        background-size: contain;
+        }
+    }
+`;
+
 export default function Filter() {
-    // 각 상세 필터 값 저장하는 state
+    // 직군선택 드롭다운 표시 -> true일 때 보임, false일 때 안보임
+    const [isJopSelectorVisible, setJopSelectorVisible] = useState(false);
+
+    // 선택된 직군들 저장
+    const [selectedJobs, setSelectedJobs] = useState([]);
+
+    // 정렬 드롭다운 표시 -> true일 때 보임, false일 때 안보임
+    const [isSortVisible, setSortVisible] = useState(false);
+
+    // 상세 필터 목록 표시 -> true일 때 보임, false일 때 안보임
+    const [isFilterVisible, setFilterVisible] = useState(false);
+
+    // 각 상세 필터 값 저장
     const [filters, setFilters] = useState({
         tag: "",
         company: "",
         date: "",
     });
-    
-    // 상세 필터 목록 표시 state -> true일 때 보임, false일 때 안보임
-    const [isFilterVisible, setFilterVisible] = useState(false);
-
-    // 직무선택 드롭다운 표시 state -> true일 때 보임, false일 때 안보임
-    const [isJopSelectorVisible, setJopSelectorVisible] = useState(false);
-
-    // 정렬 드롭다운 표시 state -> true일 때 보임, false일 때 안보임
-    const [isSortVisible, setSortVisible] = useState(false);
 
     // 필터 버튼 클릭하면 상세 필터 목록 나타나거나 사라지도록 하는 함수
     const clickFilterButton = () => {
@@ -174,6 +286,21 @@ export default function Filter() {
     const clickJobSelectorButton = () => {
         setJopSelectorVisible((prevState) => !prevState);
     }
+
+    // 직군 선택 버튼 텍스트 업데이트하는 함수
+    const getButtonLabel = () => {
+    if (selectedJobs.length === 0) return "직군 선택";
+    if (selectedJobs.length === 1) return selectedJobs[0];
+    return `${selectedJobs[0]} 외 ${selectedJobs.length - 1}`;
+    };
+
+    // 체크박스 클릭에 따라 선택된 직군들 목록 수정하는 함수
+    const handleCheckboxChange = (job) => {
+    setSelectedJobs((prev) =>
+        prev.includes(job) ? prev.filter((item) => item !== job) : [...prev, job]
+        );
+    };
+
 
     // 정렬 버튼 클릭하면 버튼 디자인 변경하고 정렬 드롭다운 보여주는 함수
     const clickSortButton = () => {
@@ -196,18 +323,44 @@ export default function Filter() {
     return (
         <>
             <FilterContainer>
-                {/* 직군 선택 드롭다운 버튼 */}
-                <DropdownButton clicked={isJopSelectorVisible} onClick={clickJobSelectorButton}>직군 선택
-                    {isJopSelectorVisible ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M6 15L12 9L18 15" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M18 9L12 15L6 9" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    )}
-                </DropdownButton>
+                {/* 직군선택 */}
+                <ToggleDropdownWrapper>
+                    {/* 직군선택 토글 버튼 */}
+                    <ToggleButton isClicked={isJopSelectorVisible} onClick={clickJobSelectorButton}>{getButtonLabel()}
+                        {isJopSelectorVisible ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M6 15L12 9L18 15" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M18 9L12 15L6 9" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        )}
+                    </ToggleButton>
+                    <JobDropdown isClicked={isJopSelectorVisible}>
+                        <JopSelectorLabel>
+                            <JopSelectorParent onChange={() => handleCheckboxChange("개발자")} />개발자
+                        </JopSelectorLabel>
+                        <JopSelectorLabel>
+                            <JopSelectorChild onChange={() => handleCheckboxChange("프론트엔드")} />프론트엔드
+                        </JopSelectorLabel>
+                        <JopSelectorLabel>
+                            <JopSelectorChild onChange={() => handleCheckboxChange("백엔드")} />백엔드
+                        </JopSelectorLabel>
+                        <JopSelectorLabel>
+                            <JopSelectorChild onChange={() => handleCheckboxChange("게임")} />게임
+                        </JopSelectorLabel>
+                        <JopSelectorLabel>
+                            <JopSelectorParent onChange={() => handleCheckboxChange("디자이너")} />디자이너
+                        </JopSelectorLabel>
+                        <JopSelectorLabel>
+                            <JopSelectorChild onChange={() => handleCheckboxChange("UX/UI")} />UX/UI
+                        </JopSelectorLabel>
+                        <JopSelectorLabel>
+                            <JopSelectorChild onChange={() => handleCheckboxChange("로고")} />로고
+                        </JopSelectorLabel>
+                    </JobDropdown>
+                </ToggleDropdownWrapper>
                 <RightButtonContainer>
                     {/* 필터 버튼 */}
                     <FilterButton onClick={clickFilterButton}>
@@ -220,18 +373,20 @@ export default function Filter() {
                         )}
                         필터
                     </FilterButton>
-                    {/* 정렬 드롭다운 버튼 */}
-                    <DropdownButton clicked={isSortVisible} onClick={clickSortButton}>인기순
-                        {isSortVisible ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M6 15L12 9L18 15" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M18 9L12 15L6 9" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        )}
-                    </DropdownButton>
+                    <ToggleDropdownWrapper>
+                        {/* 정렬 드롭다운의 토글 버튼 */}
+                        <ToggleButton isClicked={isSortVisible} onClick={clickSortButton}>인기순
+                            {isSortVisible ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 15L12 9L18 15" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M18 9L12 15L6 9" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            )}
+                        </ToggleButton>
+                    </ToggleDropdownWrapper>
                 </RightButtonContainer>
             </FilterContainer>
 
