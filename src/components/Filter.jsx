@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
-// 직군 목록
+// 직군 선택 목록
 const jobHierarchy = {
     개발자: ["프론트엔드", "백엔드", "게임"],
     디자이너: ["UX/UI", "로고"],
 };
+
+// 정렬 목록
+const sortHierarchy = ['인기순', '최신순', '좋아요순', '조회순'];
 
 // Filter 컴포넌트 컨테이너
 const FilterContainer = styled.div`
@@ -164,9 +167,9 @@ const FilterOptionIcon = styled.div`
     transform: translateY(-50%);
 `;
 
-/* ----------직무선택 드롭다운 style---------- */
-// 드롭다운 전체
-const JobDropdown = styled.div`\
+/* ------------직무선택 드롭다운 style------------ */
+// 직무선택 드롭다운 전체
+const JobDropdown = styled.div`
     display: ${({ isClicked }) => (isClicked ? 'flex' : 'none')};
     flex-direction: column;
     justify-content: space-between;
@@ -251,6 +254,47 @@ const JobParentCheckbox = styled(JobCheckbox)`
     }
 `;
 
+/* ------------정렬 드롭다운 style------------ */
+// 직무선택 드롭다운 전체
+const SortDropdown = styled.div`
+    display: ${({ isClicked }) => (isClicked ? 'flex' : 'none')};
+    flex-direction: column;
+    justify-content: space-between;
+
+    position: absolute;
+    top: 56px;
+    z-index: 1000;
+
+    width: 138px;
+    height: 144px;
+    padding: 8px 0;
+    border-radius: 8px;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.15);
+    background-color: #FFF;
+    box-sizing: border-box;
+`;
+
+const SortSelector = styled.button`
+    padding: 5px 10px;
+    border: none;
+    outline: none;
+    background-color: #fff;
+    cursor: pointer;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-family: 'Pretendard-Regular';
+    font-size: 14px;
+    line-height: 22px;
+    color: #222222;
+
+    &:hover {
+        background-color: #eee;
+    }
+`;
+
 export default function Filter() {
     // 직군선택 드롭다운 표시 -> true일 때 보임, false일 때 안보임
     const [isJopVisible, setJopVisible] = useState(false);
@@ -263,6 +307,9 @@ export default function Filter() {
 
     // 정렬 드롭다운 표시 -> true일 때 보임, false일 때 안보임
     const [isSortVisible, setSortVisible] = useState(false);
+
+    // 선택된 정렬 방식 저장
+    const [selectedSort, setSelectedSort] = useState(sortHierarchy[0]);
 
     // 상세 필터 목록 표시 -> true일 때 보임, false일 때 안보임
     const [isFilterVisible, setFilterVisible] = useState(false);
@@ -283,13 +330,6 @@ export default function Filter() {
     const clickJobButton = () => {
         setJopVisible((prevState) => !prevState);
     }
-
-    // checkbox 클릭에 따라 선택된 직군들 목록 수정하는 함수
-    const handleCheckboxChange = (job) => {
-    setSelectedJobs((prev) =>
-        prev.includes(job) ? prev.filter((item) => item !== job) : [...prev, job]
-        );
-    };
 
     // 직군 선택 시 checkbox 선택 상태 실시간 업데이트
     useEffect(() => {
@@ -342,6 +382,12 @@ export default function Filter() {
     const clickSortButton = () => {
         setSortVisible((prevState) => !prevState);
     }
+
+    // 정렬 드롭다운에서 새 정렬 방식 선택 관리하는 함수
+    const handleSortSelect = (sortOption) => {
+        setSelectedSort(sortOption);
+        setSortVisible(false); // 선택 후 드롭다운 닫기
+    };
 
     // 상세 필터 state 값을 관리하는 함수
     // *****추후 드롭다운 등 디자인 확정되면 수정 필요함*****
@@ -408,7 +454,7 @@ export default function Filter() {
                     </FilterButton>
                     <ToggleDropdownWrapper>
                         {/* 정렬 드롭다운의 토글 버튼 */}
-                        <ToggleButton isClicked={isSortVisible} onClick={clickSortButton}>인기순
+                        <ToggleButton isClicked={isSortVisible} onClick={clickSortButton}>{selectedSort}
                             {isSortVisible ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                     <path d="M6 15L12 9L18 15" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -419,6 +465,13 @@ export default function Filter() {
                                 </svg>
                             )}
                         </ToggleButton>
+                        <SortDropdown isClicked={isSortVisible}>
+                            {sortHierarchy.map((sortOption) => (
+                                <SortSelector key={sortOption} onClick={() => handleSortSelect(sortOption)}>
+                                    {sortOption}
+                                </SortSelector>
+                            ))}
+                        </SortDropdown>
                     </ToggleDropdownWrapper>
                 </RightButtonContainer>
             </FilterContainer>
