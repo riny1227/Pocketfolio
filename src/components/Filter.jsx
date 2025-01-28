@@ -1,5 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+
+// 직군 목록
+const jobHierarchy = {
+    개발자: ["프론트엔드", "백엔드", "게임"],
+    디자이너: ["UX/UI", "로고"],
+};
 
 // Filter 컴포넌트 컨테이너
 const FilterContainer = styled.div`
@@ -178,7 +184,7 @@ const JobDropdown = styled.div`\
     box-sizing: border-box;
 `;
 
-const JopSelectorLabel = styled.label`
+const JobLabel = styled.label`
     display: flex;
     align-items: center;
     gap: 8px;
@@ -192,7 +198,7 @@ const JopSelectorLabel = styled.label`
     font-feature-settings: 'liga' off, 'clig' off;
 `;
 
-const JopSelectorParent = styled.input.attrs({ type: "checkbox" })`
+const JobCheckbox = styled.input.attrs({ type: "checkbox" })`
     margin: 0;
     
     appearance: none; /* 기본 체크박스 스타일 제거 */
@@ -225,44 +231,35 @@ const JopSelectorParent = styled.input.attrs({ type: "checkbox" })`
     }
 `;
 
-const JopSelectorChild = styled.input.attrs({ type: "checkbox" })`
-    margin: 0 0 0 24px;
+const JobParentCheckbox = styled(JobCheckbox)`
+    &.indeterminate {
+        border: none;
+        background-color: #1570ef;
+        position: relative;
 
-    appearance: none; /* 기본 체크박스 스타일 제거 */
-    width: 16px;
-    height: 16px;
-    border-radius: 2px;
-    border: 1px solid #6C6C6C;
-
-    &:hover {
-    border-color: #1570ef;
-    }
-
-    &:checked {
-    border: none;
-    background-color: #1570ef;
-    position: relative;
-
-    &::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 10px;
-        height: 10px;
-        transform: translate(-50%, -50%);
-        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5L4 9L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat center;
-        background-size: contain;
+        &::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            transform: translate(-50%, -50%);
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="2" viewBox="0 0 10 2" fill="none"><path d="M1 1H9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat center;
+            background-size: contain;
         }
     }
 `;
 
 export default function Filter() {
     // 직군선택 드롭다운 표시 -> true일 때 보임, false일 때 안보임
-    const [isJopSelectorVisible, setJopSelectorVisible] = useState(false);
+    const [isJopVisible, setJopVisible] = useState(false);
 
     // 선택된 직군들 저장
     const [selectedJobs, setSelectedJobs] = useState([]);
+
+    // 부모 input(개발자, 디자이너) 상태 저장 - checked, indeterminate, unchecked
+    const [parentState, setParentState] = useState([]);
 
     // 정렬 드롭다운 표시 -> true일 때 보임, false일 때 안보임
     const [isSortVisible, setSortVisible] = useState(false);
@@ -283,24 +280,63 @@ export default function Filter() {
     };
 
     // 직무선택 버튼 클릭하면 버튼 디자인 변경하고 정렬 드롭다운 보여주는 함수
-    const clickJobSelectorButton = () => {
-        setJopSelectorVisible((prevState) => !prevState);
+    const clickJobButton = () => {
+        setJopVisible((prevState) => !prevState);
     }
 
-    // 직군 선택 버튼 텍스트 업데이트하는 함수
-    const getButtonLabel = () => {
-    if (selectedJobs.length === 0) return "직군 선택";
-    if (selectedJobs.length === 1) return selectedJobs[0];
-    return `${selectedJobs[0]} 외 ${selectedJobs.length - 1}`;
-    };
-
-    // 체크박스 클릭에 따라 선택된 직군들 목록 수정하는 함수
+    // checkbox 클릭에 따라 선택된 직군들 목록 수정하는 함수
     const handleCheckboxChange = (job) => {
     setSelectedJobs((prev) =>
         prev.includes(job) ? prev.filter((item) => item !== job) : [...prev, job]
         );
     };
 
+    // 직군 선택 시 checkbox 선택 상태 실시간 업데이트
+    useEffect(() => {
+        const newParentState = {};
+        
+        Object.keys(jobHierarchy).forEach((parent) => {
+            const children = jobHierarchy[parent]; // 부모에 해당하는 자식 배열 가져오기
+            const selectedChildren = children.filter((child) => selectedJobs[child]); // 체크된 자식 필터링
+        
+            if (selectedChildren.length === children.length) {
+                newParentState[parent] = "checked"; // 모든 자식이 체크되었으면 부모도 체크됨
+            } else if (selectedChildren.length > 0) {
+                newParentState[parent] = "indeterminate"; // 일부 자식만 체크되었으면 '-' 상태 (부분 체크)
+            } else {
+                newParentState[parent] = "unchecked"; // 모든 자식이 체크 해제되었으면 부모도 체크 해제
+            }
+            });
+            
+        setParentState(newParentState);
+    }, [selectedJobs]); 
+
+    // 직군 선택 시 부모 checkbox 선택 관리하는 함수
+    const handleParentChange = (parent) => {
+        const newState = parentState[parent] === "checked" ? false : true; // 부모 checkbox가 checked면 체크 해제, indeterminate 또는 unchecked면 체크
+        const updatedChildren = {};
+
+        jobHierarchy[parent].forEach((child) => { // 부모 checkbox 상태 변경에 따라 자식 checkbox도 변경
+            updatedChildren[child] = newState;
+        });
+        setSelectedJobs((prev) => ({ ...prev, ...updatedChildren })); // 선택된 직군들 목록에 반영
+    };
+
+    // 직군 선택 시 자식 checkbox 선택 관리하는 함수
+    const handleChildChange = (child, parent) => {
+        setSelectedJobs((prev) => ({
+            ...prev,
+            [child]: !prev[child],
+        }));
+    };
+
+    // 직군 선택 시 버튼 텍스트 관리하는 함수
+    const getButtonLabel = () => {
+        const selected = Object.keys(selectedJobs).filter((key) => selectedJobs[key]);
+        if (selected.length === 0) return "직군 선택";
+        if (selected.length === 1) return selected[0];
+        return `${selected[0]} 외 ${selected.length - 1}`;
+    };
 
     // 정렬 버튼 클릭하면 버튼 디자인 변경하고 정렬 드롭다운 보여주는 함수
     const clickSortButton = () => {
@@ -326,8 +362,8 @@ export default function Filter() {
                 {/* 직군선택 */}
                 <ToggleDropdownWrapper>
                     {/* 직군선택 토글 버튼 */}
-                    <ToggleButton isClicked={isJopSelectorVisible} onClick={clickJobSelectorButton}>{getButtonLabel()}
-                        {isJopSelectorVisible ? (
+                    <ToggleButton isClicked={isJopVisible} onClick={clickJobButton}>{getButtonLabel()}
+                        {isJopVisible ? (
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M6 15L12 9L18 15" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
@@ -337,28 +373,25 @@ export default function Filter() {
                             </svg>
                         )}
                     </ToggleButton>
-                    <JobDropdown isClicked={isJopSelectorVisible}>
-                        <JopSelectorLabel>
-                            <JopSelectorParent onChange={() => handleCheckboxChange("개발자")} />개발자
-                        </JopSelectorLabel>
-                        <JopSelectorLabel>
-                            <JopSelectorChild onChange={() => handleCheckboxChange("프론트엔드")} />프론트엔드
-                        </JopSelectorLabel>
-                        <JopSelectorLabel>
-                            <JopSelectorChild onChange={() => handleCheckboxChange("백엔드")} />백엔드
-                        </JopSelectorLabel>
-                        <JopSelectorLabel>
-                            <JopSelectorChild onChange={() => handleCheckboxChange("게임")} />게임
-                        </JopSelectorLabel>
-                        <JopSelectorLabel>
-                            <JopSelectorParent onChange={() => handleCheckboxChange("디자이너")} />디자이너
-                        </JopSelectorLabel>
-                        <JopSelectorLabel>
-                            <JopSelectorChild onChange={() => handleCheckboxChange("UX/UI")} />UX/UI
-                        </JopSelectorLabel>
-                        <JopSelectorLabel>
-                            <JopSelectorChild onChange={() => handleCheckboxChange("로고")} />로고
-                        </JopSelectorLabel>
+                    <JobDropdown isClicked={isJopVisible}>
+                    {Object.keys(jobHierarchy).map((parent) => (
+                        <div key={parent} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '8px' }}>
+                            <JobLabel>
+                                <JobParentCheckbox
+                                    className={parentState[parent] === "indeterminate" ? "indeterminate" : ""}
+                                    checked={parentState[parent] === "checked"}
+                                    onChange={() => handleParentChange(parent)}
+                                />
+                                {parent}
+                            </JobLabel>
+                            {jobHierarchy[parent].map((child) => (
+                            <JobLabel key={child} style={{ marginLeft: "24px" }}>
+                                <JobCheckbox checked={!!selectedJobs[child]} onChange={() => handleChildChange(child, parent)} />
+                                {child}
+                            </JobLabel>
+                            ))}
+                        </div>
+                    ))}
                     </JobDropdown>
                 </ToggleDropdownWrapper>
                 <RightButtonContainer>
