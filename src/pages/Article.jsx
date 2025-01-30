@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from "styled-components";
-import Carousel from '../components/Carousel';
+import Carousel from '../components/share/Carousel';
 import ArticleCard from '../components/ArticleCard';
 
 // 대체 이미지 사용
@@ -46,12 +46,12 @@ const CardItem = styled.div`
 export default function Article() {
 
     const articles = [
-        { title: "아티클 1", content: "아티클 내용 부분", date: "2025.01.01", name: "1"},
-        { title: "아티클 2", content: "본문 일부글이 조금 2줄정도 보이게 일종의 미리보기 본문 일부글이 조금 2줄정도 보이게 일종의 미리보기", date: "2025.02.01", name: "홍길동"},
-        { title: "아티클 3", content: "아티클 내용 부분", date: "2025.01.01", name: "1"},
-        { title: "아티클 4", content: "본문 일부글이 조금 2줄정도 보이게 일종의 미리보기 본문 일부글이 조금 2줄정도 보이게 일종의 미리보기", date: "2025.02.01", name: "홍길동"},
-        { title: "아티클 5", content: "아티클 내용 부분", date: "2025.01.01", name: "1"},
-        { title: "아티클 6", content: "본문 일부글이 조금 2줄정도 보이게 일종의 미리보기 본문 일부글이 조금 2줄정도 보이게 일종의 미리보기", date: "2025.02.01", name: "홍길동"},
+        { id: 1, title: "아티클 1", content: "아티클 내용 부분", date: "2025.01.01", name: "1"},
+        { id: 2, title: "아티클 2", content: "본문 일부글이 조금 2줄정도 보이게 일종의 미리보기 본문 일부글이 조금 2줄정도 보이게 일종의 미리보기", date: "2025.02.01", name: "홍길동"},
+        { id: 3, title: "아티클 3", content: "아티클 내용 부분", date: "2025.01.01", name: "1"},
+        { id: 4, title: "아티클 4", content: "본문 일부글이 조금 2줄정도 보이게 일종의 미리보기 본문 일부글이 조금 2줄정도 보이게 일종의 미리보기", date: "2025.02.01", name: "홍길동"},
+        { id: 5, title: "아티클 5", content: "아티클 내용 부분", date: "2025.01.01", name: "1"},
+        { id: 6, title: "아티클 6", content: "본문 일부글이 조금 2줄정도 보이게 일종의 미리보기 본문 일부글이 조금 2줄정도 보이게 일종의 미리보기", date: "2025.02.01", name: "홍길동"},
     ];
 
     return (
@@ -63,9 +63,10 @@ export default function Article() {
 
             {/* 아티클 */}
             <CardsContainer>
-                {articles.map((article, index) => (
-                    <CardItem key={index}>
+                {articles.map((article) => (
+                    <CardItem key={article.id}>
                         <ArticleCard
+                            id={article.id}
                             title={article.title}
                             image={exampleImg}
                             content={article.content}

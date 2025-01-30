@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from "styled-components";
-import Card from '../components/Card';
-import Carousel from '../components/Carousel';
+import Card from '../components/share/Card';
+import Carousel from '../components/share/Carousel';
 import Filter from '../components/Filter';
 
 // 대체 이미지 사진 사용

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from "styled-components";
-import Card from '../components/Card';
+import Card from '../components/share/Card';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../imgs/example.png'
