@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from "styled-components";
-import Card from '../components/Card';
-import Carousel from '../components/Carousel';
+import Card from '../components/share/Card';
+import Carousel from '../components/share/Carousel';
 import Filter from '../components/Filter';
 
 // 대체 이미지 사진 사용
@@ -33,6 +33,8 @@ const CardItem = styled.div`
 `;
 
 export default function Home() {
+    // 호버 모드
+    const [hoverMode, setHoverMode] = useState("home");
 
     const cards = [
         { title: "포트폴리오 1", name: "1", views: 1234, likes: 567 },
@@ -61,6 +63,7 @@ export default function Home() {
                             name={card.name}
                             views={card.views}
                             likes={card.likes}
+                            hoverMode={hoverMode}
                         />
                     </CardItem>
                 ))}

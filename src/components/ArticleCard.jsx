@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 
 // 카드 컴포넌트 컨테이너
@@ -105,9 +106,15 @@ const ArticleBottomText = styled.div`
     color: #8E8E8E;
 `;
 
-export default function ArticleCard ({ image, title, content, date, name  }){
+export default function ArticleCard ({ id, image, title, content, date, name  }){
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate(`/article/${id}`); // 특정 경로로 이동
+    };
+
     return (
-        <CardContainer>
+        <CardContainer onClick={handleClick}>
             {/* 상단 부분 */}
             <ImageContainer>
                 <img src={image} alt={`${name}'s image`} />

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import logo from '../imgs/logo.png';
+import logo from '../../imgs/logo.png';
 
 // 헤더 컨테이너
 const HeaderContainer = styled.div`

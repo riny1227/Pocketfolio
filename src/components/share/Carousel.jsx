@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import example from '../imgs/example.png';
+import example from '../../imgs/example.png';
 
 // 캐러셀 컨테이너
 const CarouselContainer = styled.div`

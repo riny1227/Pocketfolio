@@ -5,15 +5,15 @@ import Card from '../components/share/Card';
 // 대체 이미지 사진 사용
 import exampleImg from '../imgs/example.png'
 
-// Mypage 전체 컴포넌트 감싸는 컨테이너
-const MypageContainer = styled.div`
+// UserProfile 전체 컴포넌트 감싸는 컨테이너
+const UserProfileContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
 `;
 
 // 마이페이지 커버
-const MypageCover = styled.div`
+const UserProfileCover = styled.div`
     width: 100%;
     margin: 0 auto;
     overflow: hidden;
@@ -28,7 +28,7 @@ const MypageCover = styled.div`
 `;
 
 // 프로필+내용 컨테이너
-const MypageItemContainer = styled.div`
+const UserProfileItemContainer = styled.div`
     display: flex;
     padding: 35px 0px 62px 24px;
     justify-content: flex-end;
@@ -37,7 +37,7 @@ const MypageItemContainer = styled.div`
 `;
 
 // 프로필(왼쪽) 컨테이너
-const MypageLeftContainer = styled.div`
+const UserProfileLeftContainer = styled.div`
     display: flex;
     width: 293px;
     height: 462px;
@@ -140,8 +140,18 @@ const Number = styled.div`
     line-height: 24px;
 `;
 
-// 프로필정보 편집 버튼
-const EditButton = styled.button`
+// 팔로우&채팅 버튼
+const ButtonWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    align-self: stretch;
+`;
+
+// 팔로우 버튼
+const FollowButton = styled.button`
     display: flex;
     width: 213px;
     height: 44px;
@@ -178,8 +188,46 @@ const EditButton = styled.button`
     }
 `;
 
+// 채팅하기 버튼
+const ChatButton = styled.button`
+    display: flex;
+    width: 213px;
+    height: 44px;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    border-radius: 50px;
+    border: 1px solid #8E8E8E;
+    background: #FFF;
+
+    div{
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    svg{
+        width: 24px;
+        height: 24px;   
+    }
+
+    span{
+        color: #000;
+        font-feature-settings: 'liga' off, 'clig' off;
+        font-family: 'Pretendard-Regular';
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px;
+    }
+
+    &:hover {
+        background-color:rgb(145, 145, 145);
+    }
+`;
+
 // 내용(오른쪽) 컨테이너
-const MypageRightContainer = styled.div`
+const UserProfileRightContainer = styled.div`
     display: flex;
     width: 936px;
     flex-direction: column;
@@ -264,7 +312,7 @@ const CardItem = styled.div`
   box-sizing: border-box;
 `;
 
-export default function Mypage() {
+export default function UserProfile() {
     // name 변수 선언
     const [name, setName] = useState("RIM YOURI"); // 임시 이름 설정
     // 팔로워, 팔로잉 변수 선언
@@ -281,35 +329,17 @@ export default function Mypage() {
         { title: "포트폴리오 2", name: "2", views: 5678, likes: 890 },
     ];
 
-    const bookmarkCards = [
-        { title: "북마크 1", name: "1", views: 3456, likes: 123 },
-        { title: "북마크 2", name: "2", views: 7890, likes: 456 },
-    ];
-
-    const likedCards = [
-        { title: "좋아요 1", name: "1", views: 2345, likes: 678 },
-        { title: "좋아요 2", name: "2", views: 5678, likes: 890 },
-    ];
-
-    // 탭에 따른 카드 데이터 선택
-    const cards =
-    activeTab === "portfolio"
-        ? portfolioCards
-        : activeTab === "bookmark"
-        ? bookmarkCards
-        : likedCards;
-
     return (
-        <MypageContainer>
+        <UserProfileContainer>
             {/* 상단 마이페이지 커버 */}
-            <MypageCover>
+            <UserProfileCover>
                 <img src={exampleImg} />
-            </MypageCover>
+            </UserProfileCover>
 
             {/* 마이페이지 내용 부분 */}
-            <MypageItemContainer>
+            <UserProfileItemContainer>
                 {/* 마이페이지 좌측 프로필 부분 */}
-                <MypageLeftContainer>
+                <UserProfileLeftContainer>
                     <ProfileContainer>
                         {/* 프로필 이미지+이름 */}
                         <Profile>
@@ -335,20 +365,30 @@ export default function Mypage() {
                                     <Number>{following}</Number>
                                 </FollowItem>
                             </FollowContainer>
-                            <EditButton>
-                                <div>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                        <path d="M12 5V19M5 12H12H19" stroke="#222222" stroke-width="2"/>
-                                    </svg>
-                                    <span>프로필정보 편집하기</span> 
-                                </div>
-                            </EditButton>
+                            <ButtonWrapper>
+                                <FollowButton>
+                                    <div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <path d="M12 5V19M5 12H12H19" stroke="#222222" stroke-width="2"/>
+                                        </svg>
+                                        <span>팔로우</span> 
+                                    </div>
+                                </FollowButton>
+                                <ChatButton>
+                                    <div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <path d="M15.25 11.5V4.75C15.25 4.55109 15.171 4.36032 15.0303 4.21967C14.8897 4.07902 14.6989 4 14.5 4H4.75C4.55109 4 4.36032 4.07902 4.21967 4.21967C4.07902 4.36032 4 4.55109 4 4.75V15.25L7 12.25H14.5C14.6989 12.25 14.8897 12.171 15.0303 12.0303C15.171 11.8897 15.25 11.6989 15.25 11.5ZM18.25 7H16.75V13.75H7V15.25C7 15.4489 7.07902 15.6397 7.21967 15.7803C7.36032 15.921 7.55109 16 7.75 16H16L19 19V7.75C19 7.55109 18.921 7.36032 18.7803 7.21967C18.6397 7.07902 18.4489 7 18.25 7Z" fill="#4E4E4E"/>
+                                        </svg>
+                                        <span>채팅하기</span>
+                                    </div>
+                                </ChatButton>
+                            </ButtonWrapper>
                         </ProfileEditContainer>
                     </ProfileContainer>
-                </MypageLeftContainer>
+                </UserProfileLeftContainer>
 
                 {/* 마이페이지 우측 내용 부분 */}
-                <MypageRightContainer>
+                <UserProfileRightContainer>
                     {/* 상단 탭 부분 */}
                     <Tabs>
                         <Tap
@@ -360,29 +400,11 @@ export default function Mypage() {
                                 <span className="countText">{portfolioCards.length}</span>
                             </div>
                         </Tap>
-                        <Tap
-                            active={activeTab === "bookmark"}
-                            onClick={() => setActiveTab("bookmark")}
-                        >
-                            <span>북마크</span>
-                            <div className="count">
-                                <span className="countText">{bookmarkCards.length}</span>
-                            </div>
-                        </Tap>
-                        <Tap
-                            active={activeTab === "likes"}
-                            onClick={() => setActiveTab("likes")}
-                        >
-                            <span>좋아요</span>
-                            <div className="count">
-                                <span className="countText">{likedCards.length}</span>
-                            </div>
-                        </Tap>
                     </Tabs>
                     <Line/>
-                    {/* 각 탭에 대한 카드컴포넌트 */}
+                    {/* 카드 컴포넌트 */}
                     <CardsContainer>
-                    {cards.map((card, index) => (
+                    {portfolioCards.map((card, index) => (
                         <CardItem key={index}>
                             <Card
                                 title={card.title}
@@ -395,8 +417,8 @@ export default function Mypage() {
                         </CardItem>
                     ))}
                     </CardsContainer>
-                </MypageRightContainer>
-            </MypageItemContainer>
-        </MypageContainer>
+                </UserProfileRightContainer>
+            </UserProfileItemContainer>
+        </UserProfileContainer>
     )
 }
