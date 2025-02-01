@@ -28,24 +28,19 @@ const ThumbnailImage = styled.img`
 
 // 표지 이미지 업로드 버튼
 const ImageUploadButton = styled.button`
-    display: inline-flex;
-    padding: 12px 16px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    border-radius: 4px;
-    border: 1px solid #9E9E9E;
-    background: #636363;
+    display: flex;
+    padding: 12px 32px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    border: none;
+    background: #DCEAFD;
 
     /* 버튼 텍스트 */
-    color: #FFF;
+    color: #1570EF;
     text-align: center;
     font-feature-settings: 'liga' off, 'clig' off;
-<<<<<<< HEAD:src/components/WritePortfolio.jsx
     font-family: Pretendard;
-=======
-    font-family: 'Pretendard-SemiBold';
->>>>>>> 64fdc8a59d7db3406c2a4fe15ac456d2fa7749e4:src/pages/WritePortfolio.jsx
     font-size: 16px;
     font-style: normal;
     font-weight: 600;
@@ -53,11 +48,8 @@ const ImageUploadButton = styled.button`
 
     position: absolute; /* 버튼을 이미지 위에 올리기 */
 
-    /* 버튼 상하좌우 여백 설정 */
-    margin-top: 44px;
-    margin-left: 1203px;
-    margin-right: 80px;
-    margin-bottom: 148px;
+    top: 146px;
+    right: 104px;
 
     cursor: pointer;
 `;
@@ -74,7 +66,7 @@ const UploadContainer = styled.div`
 
 // 포트폴리오 업로드 텍스트
 const UploadText = styled.div`
-    color: #000;
+    color: #222;
     font-feature-settings: 'liga' off, 'clig' off;
 
     /* Title/Title3 */
@@ -91,12 +83,12 @@ const PortfolioUploadButton = styled.button`
     padding: 16px 32px;
     justify-content: center;
     align-items: center;
-    border-radius: 10px;
-    background: #E0E0E0;
+    border-radius: 12px;
+    background: #1570EF;
     border: none;
 
     // 버튼 텍스트
-    color: #888893;
+    color: #FFF;
     text-align: center;
     font-feature-settings: 'liga' off, 'clig' off;
     font-family: Pretendard;
@@ -117,7 +109,7 @@ const ContentContainer = styled.div`
     align-items: flex-start;
     gap: 32px;
     border-radius: 12px;
-    border: 1px solid  #E7E7E7;
+    border: 1px solid #E6E6E6;
     background: #FFF;
 `;
 
@@ -132,7 +124,7 @@ const TitleContainer = styled.div`
 
 // 제목, 기간, 역할 ... 텍스트
 const ContentText = styled.div`
-    color: #4C4F56;
+    color: #464646;
     font-feature-settings: 'liga' off, 'clig' off;
 
     /* Body/Body1:SemiBold */
@@ -154,19 +146,19 @@ const TitleInput = styled.input`
     flex: 1 0 0;
     padding-left: 16px;
     border-radius: 8px;
-    border: 1px solid #E7E7E7;
+    border: 1px solid #E6E6E6;
     font-family: Pretendard;
     font-size: 16px;
     font-weight: 400;
     color: #989BA2;
 
     &:focus {
-        color: #000;
+        color: #222;
     }
 
     /* 포커스를 벗어난 후에도 텍스트 색상을 검은색으로 유지 */
     &:not(:focus):valid {
-        color: #000;
+        color: #222;
     }
 `;
 
@@ -202,19 +194,19 @@ const StyledDatePicker = styled(DatePicker)`
     height: 56px;
     padding-left: 16px;
     border-radius: 8px;
-    border: 1px solid #E7E7E7;
+    border: 1px solid #E6E6E6;
     font-family: Pretendard;
     font-size: 16px;
     font-weight: 400;
     color: #989BA2;
 
     &:focus {
-        color: #000;
+        color: #222;
     }
 
     /* 포커스를 벗어난 후에도 텍스트 색상을 검은색으로 유지 */
     &:not(:focus):valid {
-        color: #000;
+        color: #222;
     }
 `;
 
@@ -225,13 +217,13 @@ const IconStyle = styled.svg`
     width: 24px;
     height: 24px;
     fill: none;
-    stroke: #989BA2;
+    stroke: #464646;
     cursor: pointer;
 `;
 
 // ~ 텍스트 스타일
 const TildeText = styled.span`
-    color: #989BA2;
+    color: #464646;
 
     /* Small/Semibold 20 */
     font-family: "Pretendard Variable";
@@ -263,7 +255,7 @@ const RoleInput = styled.input`
     flex: 1 0 0;
     padding-left: 16px;
     border-radius: 8px;
-    border: 1px solid #E7E7E7;
+    border: 1px solid #E6E6E6;
     font-family: Pretendard;
     font-size: 16px;
     font-weight: 400;
@@ -362,7 +354,7 @@ const CompanyInput = styled.input`
     padding-left: 16px;
     padding-right: 44px;
     border-radius: 8px;
-    border: 1px solid #E7E7E7;
+    border: 1px solid #E6E6E6;
     font-family: Pretendard;
     font-size: 16px;
     font-weight: 400;
@@ -391,14 +383,15 @@ const FileContainer = styled.div`
 const UploadFileContainer = styled.div`
     display: flex;
     width: 100%;
-    height: 32px;
-    padding: 14px 20px;
+    height: 26px;
+    padding: 16px 20px;
     align-items: center;
     gap: 12px;
     flex: 1 0 0;
     border-radius: 8px;
-    border: 1px solid #E7E7E7;
+    border: 1px solid #E6E6E6;
     background: #FFF;
+    position: relative;
 `;
 
 // "첨부파일 업로드" 텍스트
@@ -415,19 +408,18 @@ const FileUploadText = styled.span`
 
 // 업로드 버튼 스타일
 const UploadButton = styled.button`
-    display: flex;
-    height: 32px;
-    margin-right: 0px;
-    padding: 12px 16px;
-    align-items: center;
+    display: absolute;
+    width: 36px;
+    height: 36px;
+    top: 10px;
+    right: 10px;
+    padding: 6px;
     justify-content: center;
+    align-items: center;
+    position: absolute;
     border-radius: 4px;
-    background: #E0E0E0;
     border: none;
-    font-family: Pretendard;
-    font-size: 16px;
-    font-weight: 600;
-    color: #888893;
+    background: #E8F1FD;
     cursor: pointer;
 `;
 
@@ -674,7 +666,12 @@ export default function WritePortfolio() {
                     <UploadFileContainer>
                         <FileUploadText>{fileName || '첨부파일 업로드'}</FileUploadText> {/* 업로드한 파일 이름 표시 */}
                         <UploadButton>
-                            <label htmlFor="file-upload" style={{cursor: 'pointer'}}>파일 첨부</label>
+                            <label htmlFor="file-upload" style={{cursor: 'pointer'}}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M17 9L12 4M12 4L7 9M12 4L12 17" stroke="#1570EF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M6 20H18" stroke="#1570EF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </label>
                             <input
                                 id="file-upload"
                                 type="file"
