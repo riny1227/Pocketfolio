@@ -10,6 +10,9 @@ const jobHierarchy = {
 // 정렬 목록
 const sortHierarchy = ['인기순', '최신순', '좋아요순', '조회순'];
 
+// 날짜 목록
+const dateHierarchy = ['1주일', '1개월', '6개월', '1년', '3년'];
+
 // Filter 컴포넌트 컨테이너
 const FilterContainer = styled.div`
     width: 1280px;
@@ -35,9 +38,9 @@ const ToggleDropdownWrapper = styled.div`
 
 // 토글 버튼 (직군 선택, 정렬 등)
 const ToggleButton = styled.button`
-    padding: ${({ isClicked }) => (isClicked ? '11px 31px' : '12px 32px' )}; /* 상태에 따라 표시 or 숨김 */
+    padding: ${({ $isClicked }) => ($isClicked ? '11px 31px' : '12px 32px' )}; /* 상태에 따라 표시 or 숨김 */
     border-radius: 50px;
-    border: ${({ isClicked }) => (isClicked ? '1px solid #6C6C6C' : 'none')}; /* 상태에 따라 표시 or 숨김 */
+    border: ${({ $isClicked }) => ($isClicked ? '1px solid #6C6C6C' : 'none')}; /* 상태에 따라 표시 or 숨김 */
     cursor: pointer;
     background-color: #EFEFEF;
     outline: none;
@@ -89,7 +92,7 @@ const FilterCount = styled.div`
 
 // 상세 필터 목록 컨테이너 (필터 버튼 클릭하면 보이고 다시 클릭하면 사라짐)
 const DetailFilterContainer = styled.div`
-    display: ${({ visible }) => (visible ? 'flex' : 'none')}; /* 상태에 따라 표시 or 숨김 */
+    display: ${({ $visible }) => ($visible ? 'flex' : 'none')}; /* 상태에 따라 표시 or 숨김 */
     width: 1280px;
     height: 126px;
     align-items: center;
@@ -113,45 +116,27 @@ const FilterOptionName = styled.span`
     color: #222222;
 `;
 
-// 상세 필터 검색바 (태그, 기업 등)
+// 상세 필터 검색바 (태그, 기업, 날짜 등)
 const FilterOptionInputBar = styled.input`
     width: 389px;
-    // ****패딩 임시 설정****
-    padding: 20px 24px 20px 50px;
+    padding: 19px 23px 19px 47px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
     border-radius: 8px;
-    border: none;
+    border: 1px solid ${({ $isClicked }) => ($isClicked ? '#6C6C6C' : 'transparent')}; /* 상태에 따라 표시 or 숨김 */
     outline: none;
     background-color: #ECECEC;
-
-    // ****폰트 임시 설정****
-    font-family: 'Pretendard-Regular';
-    font-size: 18px;
-    line-height: 24px;
-    color: #222222;
-`;
-
-// 상세 필터 날짜 드롭다운 (날짜)
-const FilterDateDropdown = styled.button`
-    width: 389px;
-    padding: 20px 16px 20px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-sizing: border-box;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    background-color: #ECECEC;
-    outline: none;
 
     font-family: 'Pretendard-Regular';
     font-size: 18px;
     line-height: 24px;
     color: #222222;
+
+    &::placeholder {
+    color: #222222;
+    } 
 `;
 
 // 상세 필터 검색바 내부 아이콘
@@ -167,10 +152,64 @@ const FilterOptionIcon = styled.div`
     transform: translateY(-50%);
 `;
 
+// 상세 필터 검색바 토글 아이콘
+const FilterOptionToggleIcon = styled.div`
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+`;
+
+// 날짜 드롭다운
+const DateDropdown = styled.div`
+    display: ${({ $isClicked }) => ($isClicked ? 'flex' : 'none')};
+    flex-direction: column;
+    justify-content: space-between;
+
+    position: absolute;
+    top: 72px;
+    z-index: 1000;
+
+    width: 100%;
+    height: 256px;
+    padding: 8px 0;
+    border-radius: 8px;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.15);
+    background-color: #FFF;
+    box-sizing: border-box;
+`;
+
+// 날짜 드롭다운 옵션 (1주일, 1개월 등등)
+const DateSelector = styled.button`
+    padding: 12px 24px;
+    border: none;
+    outline: none;
+    background-color: #fff;
+    cursor: pointer;
+
+    display: flex;
+    // justify-content: center;
+    align-items: center;
+
+    font-family: 'Pretendard-Regular';
+    font-size: 16px;
+    line-height: 24px;
+    color: #222222;
+
+    &:hover {
+        background-color: #eee;
+    }
+`;
+
 /* ------------직무선택 드롭다운 style------------ */
 // 직무선택 드롭다운 전체
 const JobDropdown = styled.div`
-    display: ${({ isClicked }) => (isClicked ? 'flex' : 'none')};
+    display: ${({ $isClicked }) => ($isClicked ? 'flex' : 'none')};
     flex-direction: column;
     justify-content: space-between;
 
@@ -257,7 +296,7 @@ const JobParentCheckbox = styled(JobCheckbox)`
 /* ------------정렬 드롭다운 style------------ */
 // 직무선택 드롭다운 전체
 const SortDropdown = styled.div`
-    display: ${({ isClicked }) => (isClicked ? 'flex' : 'none')};
+    display: ${({ $isClicked }) => ($isClicked ? 'flex' : 'none')};
     flex-direction: column;
     justify-content: space-between;
 
@@ -320,6 +359,12 @@ export default function Filter() {
         company: "",
         date: "",
     });
+
+    // 기업 드롭다운 표시 -> true일 때 보임, false일 때 안보임
+    const [isCompanyVisible, setCompanyVisible] = useState(false);
+
+    // 날짜 드롭다운 표시 -> true일 때 보임, false일 때 안보임
+    const [isDateVisible, setDateVisible] = useState(false);
 
     // 필터 버튼 클릭하면 상세 필터 목록 나타나거나 사라지도록 하는 함수
     const clickFilterButton = () => {
@@ -390,7 +435,6 @@ export default function Filter() {
     };
 
     // 상세 필터 state 값을 관리하는 함수
-    // *****추후 드롭다운 등 디자인 확정되면 수정 필요함*****
     const handleFilterChange = (key, value) => {
         setFilters((prevFilters) => ({
             ...prevFilters,
@@ -399,8 +443,21 @@ export default function Filter() {
     };
 
     // 적용된 필터 개수 계산 (빈 값은 카운트X)
-    // *****추후 드롭다운 등 디자인 확정되면 수정 필요함*****
     const filterCount = Object.values(filters).filter((value) => value !== "").length;
+
+    // 날짜 input 클릭하면 드롭다운 보여주는 함수
+    const clickDateInput = () => {
+        setDateVisible((prevState) => !prevState);
+    }
+
+    // 날짜 옵션 선택 시 처리하는 함수
+    const handleDateSelect = (dateOption) => {
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            date: dateOption,
+        }));
+        setDateVisible(false); // 옵션 선택 후 드롭다운 닫기
+    };
 
     return (
         <>
@@ -408,7 +465,7 @@ export default function Filter() {
                 {/* 직군선택 */}
                 <ToggleDropdownWrapper>
                     {/* 직군선택 토글 버튼 */}
-                    <ToggleButton isClicked={isJopVisible} onClick={clickJobButton}>{getButtonLabel()}
+                    <ToggleButton $isClicked={isJopVisible} onClick={clickJobButton}>{getButtonLabel()}
                         {isJopVisible ? (
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M6 15L12 9L18 15" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -419,7 +476,7 @@ export default function Filter() {
                             </svg>
                         )}
                     </ToggleButton>
-                    <JobDropdown isClicked={isJopVisible}>
+                    <JobDropdown $isClicked={isJopVisible}>
                     {Object.keys(jobHierarchy).map((parent) => (
                         <div key={parent} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '8px' }}>
                             <JobLabel>
@@ -454,7 +511,7 @@ export default function Filter() {
                     </FilterButton>
                     <ToggleDropdownWrapper>
                         {/* 정렬 드롭다운의 토글 버튼 */}
-                        <ToggleButton isClicked={isSortVisible} onClick={clickSortButton}>{selectedSort}
+                        <ToggleButton $isClicked={isSortVisible} onClick={clickSortButton}>{selectedSort}
                             {isSortVisible ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                     <path d="M6 15L12 9L18 15" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -465,7 +522,7 @@ export default function Filter() {
                                 </svg>
                             )}
                         </ToggleButton>
-                        <SortDropdown isClicked={isSortVisible}>
+                        <SortDropdown $isClicked={isSortVisible}>
                             {sortHierarchy.map((sortOption) => (
                                 <SortSelector key={sortOption} onClick={() => handleSortSelect(sortOption)}>
                                     {sortOption}
@@ -477,7 +534,7 @@ export default function Filter() {
             </FilterContainer>
 
             {/* 필터 버튼 클릭하면 보이는 상세 필터 */}
-            <DetailFilterContainer visible={isFilterVisible}>
+            <DetailFilterContainer $visible={isFilterVisible}>
                 {/* 태그 필터 */}
                 <FilterOptionWrapper>
                     <FilterOptionName>태그</FilterOptionName>
@@ -499,7 +556,9 @@ export default function Filter() {
                     <FilterOptionName>기업</FilterOptionName>
                     <div style={{ position: 'relative' }}>
                         <FilterOptionInputBar 
+                        placeholder="선택"
                         value={filters.company}
+                        // onClick={clickCompanyInput}
                         onChange={(e) => handleFilterChange("company", e.target.value)}
                         />
                         <FilterOptionIcon>
@@ -507,17 +566,55 @@ export default function Filter() {
                                 <path d="M3 21H21M9 8H10M9 12H10M9 16H10M14 8H15M14 12H15M14 16H15M5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </FilterOptionIcon>
+                        <FilterOptionToggleIcon>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="8" viewBox="0 0 15 8" fill="none">
+                                <path d="M13.6666 1L7.66663 7L1.66663 1" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </FilterOptionToggleIcon>
                     </div>
                 </FilterOptionWrapper>
 
                 {/* 날짜 필터 */}
                 <FilterOptionWrapper>
                     <FilterOptionName>날짜</FilterOptionName>
-                    <FilterDateDropdown>전체
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M18 9L12 15L6 9" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </FilterDateDropdown>
+                    <div style={{ position: 'relative' }}>
+                        <FilterOptionInputBar 
+                        readOnly
+                        placeholder="선택"
+                        value={filters.date}
+                        $isClicked={isDateVisible}
+                        onClick={clickDateInput}
+                        style={{ cursor: 'pointer' }}
+                        />
+                        <FilterOptionIcon>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 18 20" fill="none">
+                                <path d="M16 18H2V7H16M13 0V2H5V0H3V2H2C0.89 2 0 2.89 0 4V18C0 18.5304 0.210714 19.0391 0.585786 19.4142C0.960859 19.7893 1.46957 20 2 20H16C16.5304 20 17.0391 19.7893 17.4142 19.4142C17.7893 19.0391 18 18.5304 18 18V4C18 3.46957 17.7893 2.96086 17.4142 2.58579C17.0391 2.21071 16.5304 2 16 2H15V0M14 11H9V16H14V11Z" fill="#222222"/>
+                            </svg>
+                        </FilterOptionIcon>
+                        {isDateVisible ? (
+                            <FilterOptionToggleIcon>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 15L12 9L18 15" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </FilterOptionToggleIcon>
+                            ) : (
+                            <FilterOptionToggleIcon>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M18 9L12 15L6 9" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </FilterOptionToggleIcon>
+                        )}
+                        <DateDropdown $isClicked={isDateVisible}>
+                            {dateHierarchy.map((dateOption) => (
+                                <DateSelector 
+                                    key={dateOption}
+                                    onClick={() => handleDateSelect(dateOption)}
+                                >
+                                    {dateOption}
+                                </DateSelector>
+                            ))}
+                        </DateDropdown>
+                    </div>
                 </FilterOptionWrapper>
             </DetailFilterContainer>
         </>
