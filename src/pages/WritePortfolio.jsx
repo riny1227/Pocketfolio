@@ -126,9 +126,7 @@ const TitleContainer = styled.div`
 const ContentText = styled.div`
     color: #464646;
     font-feature-settings: 'liga' off, 'clig' off;
-
-    /* Body/Body1:SemiBold */
-    font-family: Pretendard;
+    font-family: 'Pretendard-SemiBold';
     font-size: 18px;
     font-style: normal;
     font-weight: 600;

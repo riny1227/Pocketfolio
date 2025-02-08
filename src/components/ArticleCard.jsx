@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 
@@ -28,23 +28,19 @@ const ImageContainer = styled.div`
 
 // 북마크 아이콘
 const BookmarkIcon = styled.div`
-    position: absolute;
     display: flex;
-    width: 24px;
-    height: 24px;
-    right: 8px;
-    top: 160px;
-    padding: 4px;
+    position: absolute;
+    top: 16px;
+    right: 12px;
     justify-content: center;
     align-items: center;
     flex-shrink: 0;
-    border-radius: 15px;
-    background: #FFF;
-    
+
     svg {
-        width: 16px;
-        height: 16px;
+        width: 24px;
+        height: 24px;
         cursor: pointer;
+        fill: ${(props) => (props.active ? "#1570EF" : "#909090")}; /* props에서 active를 받아 처리 */
     }
 `;
 
@@ -108,20 +104,43 @@ const ArticleBottomText = styled.div`
 
 export default function ArticleCard ({ id, image, title, content, date, name  }){
     const navigate = useNavigate();
+    const [isBookmarked, setIsBookmarked] = useState(false);
 
     const handleClick = () => {
         navigate(`/article/${id}`); // 특정 경로로 이동
     };
 
     return (
-        <CardContainer onClick={handleClick}>
+        <CardContainer>
             {/* 상단 부분 */}
-            <ImageContainer>
+            <ImageContainer onClick={handleClick}>
                 <img src={image} alt={`${name}'s image`} />
-                <BookmarkIcon>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M5.018 13.894C4.574 14.1827 4 13.848 4 13.3013V2.628C4 2.28133 4.224 2 4.5 2H11.5C11.776 2 12 2.28133 12 2.628V13.3013C12 13.848 11.426 14.1827 10.982 13.8947L8.35133 12.1867C8.24698 12.1181 8.12485 12.0816 8 12.0816C7.87515 12.0816 7.75302 12.1181 7.64867 12.1867L5.018 13.894Z" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                <BookmarkIcon
+                    active={isBookmarked}
+                    onClick={(e) => {
+                        e.stopPropagation(); // 북마크가 눌려도 상세페이지로 이동하지 않도록
+                        setIsBookmarked(prev => !prev);
+                    }}
+                >
+                    {isBookmarked ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+                            <path 
+                                fillRule="evenodd" 
+                                clipRule="evenodd" 
+                                d="M8.66663 2C7.00977 2 5.66663 3.34315 5.66663 5V21C5.66663 21.3466 5.84608 21.6684 6.14089 21.8507C6.43571 22.0329 6.80385 22.0494 7.11384 21.8944L12.6666 19.118L18.2194 21.8944C18.5294 22.0494 18.8975 22.0329 19.1924 21.8507C19.4872 21.6684 19.6666 21.3466 19.6666 21V5C19.6666 3.34315 18.3235 2 16.6666 2H8.66663Z" 
+                                fill="#1570EF"
+                            />
+                        </svg>
+                    ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path 
+                                fillRule="evenodd" 
+                                clipRule="evenodd" 
+                                d="M5 5C5 3.34315 6.34315 2 8 2H16C17.6569 2 19 3.34315 19 5V21C19 21.3466 18.8205 21.6684 18.5257 21.8507C18.2309 22.0329 17.8628 22.0494 17.5528 21.8944L12 19.118L6.44721 21.8944C6.13723 22.0494 5.76909 22.0329 5.47427 21.8507C5.17945 21.6684 5 21.3466 5 21V5ZM8 4C7.44772 4 7 4.44772 7 5V19.382L11.5528 17.1056C11.8343 16.9648 12.1657 16.9648 12.4472 17.1056L17 19.382V5C17 4.44772 16.5523 4 16 4H8Z" 
+                                fill="#909090"
+                            />
+                        </svg>
+                    )}
                 </BookmarkIcon>
             </ImageContainer>
 
