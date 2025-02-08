@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 import Card from '../components/share/Card';
 
@@ -40,13 +41,13 @@ const MypageItemContainer = styled.div`
 const MypageLeftContainer = styled.div`
     display: flex;
     width: 293px;
-    height: 462px;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     border-radius: 16px;
     opacity: 0.8;
-    background: #D5D5D5;
+    background: #F8F8F8;
+    border: 1px solid #D5D5D5;
 `;
 
 // 프로필 내부 컨테이너
@@ -56,6 +57,7 @@ const ProfileContainer = styled.div`
     align-items: flex-start;
     gap: 8px;
     align-self: stretch;
+    margin-top: 53px;
 `;
 
 // 프로필 이미지+이름 컨테이너
@@ -150,7 +152,7 @@ const EditButton = styled.button`
     gap: 6px;
     border-radius: 50px;
     border: none;
-    background: #C1C1C1;
+    background: #1570EF;
 
     div{
         display: flex;
@@ -164,7 +166,7 @@ const EditButton = styled.button`
     }
 
     span{
-        color: #000;
+        color: #fff;
         font-feature-settings: 'liga' off, 'clig' off;
         font-family: 'Pretendard-Regular';
         font-size: 18px;
@@ -172,10 +174,39 @@ const EditButton = styled.button`
         font-weight: 400;
         line-height: 24px;
     }
+`;
 
-    &:hover {
-        background-color:rgb(145, 145, 145);
-    }
+// 프로필정보 보여주는 컨테이너
+const ProfileBottomContainer = styled.div`
+    display: flex;
+    width: 213px;
+    padding: 66px 40px 105px 40px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    align-self: stretch;
+`;
+
+// 프로필정보 상단 부분
+const ProfileTopText = styled.text`
+    color: #222;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: 'Pretendard-SemiBold';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px;
+`;
+
+// 프로필정보 하단 부분
+const ProfileBottomText = styled.text`
+    color:  #464646;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: 'Pretendard-Regular';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
 `;
 
 // 내용(오른쪽) 컨테이너
@@ -227,7 +258,7 @@ const Tap = styled.div`
         align-items: center;
         gap: 10px;
         border-radius: 16px;
-        background: ${(props) => (props.active ? "#000" : "#717680")};
+        background: ${(props) => (props.active ? "#1570EF" : "#717680")};
     }
 
     .countText{
@@ -265,6 +296,7 @@ const CardItem = styled.div`
 `;
 
 export default function Mypage() {
+    const navigate = useNavigate();
     // name 변수 선언
     const [name, setName] = useState("RIM YOURI"); // 임시 이름 설정
     // 팔로워, 팔로잉 변수 선언
@@ -338,11 +370,18 @@ export default function Mypage() {
                             <EditButton>
                                 <div>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                        <path d="M12 5V19M5 12H12H19" stroke="#222222" stroke-width="2"/>
+                                        <path d="M5 16L4 20L8 19L19.5858 7.41421C20.3668 6.63316 20.3668 5.36683 19.5858 4.58579L19.4142 4.41421C18.6332 3.63316 17.3668 3.63317 16.5858 4.41421L5 16Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5 16L4 20L8 19L18 9L15 6L5 16Z" fill="white"/>
+                                        <path d="M15 6L18 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M13 20H21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
-                                    <span>프로필정보 편집하기</span> 
+                                    <span onClick={() => navigate('/mypage/:id')}>프로필정보 편집하기</span> 
                                 </div>
                             </EditButton>
+                            <ProfileBottomContainer>
+                                <ProfileTopText>소개</ProfileTopText>
+                                <ProfileBottomText>어제의 나보다 오늘의 내가 1%로라도 더 나은 사람이기를..</ProfileBottomText>
+                            </ProfileBottomContainer>
                         </ProfileEditContainer>
                     </ProfileContainer>
                 </MypageLeftContainer>
@@ -374,9 +413,6 @@ export default function Mypage() {
                             onClick={() => setActiveTab("likes")}
                         >
                             <span>좋아요</span>
-                            <div className="count">
-                                <span className="countText">{likedCards.length}</span>
-                            </div>
                         </Tap>
                     </Tabs>
                     <Line/>
