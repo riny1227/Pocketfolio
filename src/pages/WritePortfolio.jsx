@@ -57,7 +57,7 @@ const ImageUploadButton = styled.button`
 // 포트폴리오 업로드 + 게시하기 버튼 컨테이너
 const UploadContainer = styled.div`
     display: flex;
-    width: 1280px;
+    width: 1330px;
     justify-content: space-between;
     align-items: center;
     margin-top: 40px;
@@ -128,13 +128,9 @@ const TitleContainer = styled.div`
 const ContentText = styled.div`
     color: #464646;
     font-feature-settings: 'liga' off, 'clig' off;
-<<<<<<< HEAD
 
     /* Body/Body1:SemiBold */
     font-family: 'Pretendard-semibold';
-=======
-    font-family: 'Pretendard-SemiBold';
->>>>>>> 1d7810ebdb65f5c981dfc1d51c05da9417c22ac1
     font-size: 18px;
     font-style: normal;
     font-weight: 600;
