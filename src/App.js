@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Article from './pages/Article';
 import ArticleDetail from './pages/ArticleDetail';
 import Mypage from './pages/Mypage';
+import MyPageDetail from './pages/MypageDetail';
 import UserProfile from './pages/UserProfile';
 import WritePortfolio from './pages/WritePortfolio';
 import PortfolioDetail from './pages/PortfolioDetail';
@@ -24,6 +25,7 @@ function App() {
           <Route path="/article/:id" element={<ArticleDetail />} />
           {/* 마이페이지 */}
           <Route path="/mypage" element={<Mypage />} />
+          <Route path="/mypage/:id" element={<MyPageDetail />} />
           {/* 사용자 프로필 페이지 */}
           <Route path="/user/:id" element={<UserProfile />} />
           <Route path="/userprofile" element={<UserProfile />} />
