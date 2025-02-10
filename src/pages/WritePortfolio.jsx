@@ -5,6 +5,7 @@ import exampleImage from '../imgs/example.png';
 import "react-datepicker/dist/react-datepicker.css"; // CSS 파일 import
 import { registerLocale, setDefaultLocale } from "react-datepicker";
 import ko from "date-fns/locale/ko"; // 한국어 로케일 import
+import InputAndDropdown from "../components/share/InputAndDropdown";
 
 // 한국어 로케일 등록
 registerLocale("ko", ko);
@@ -122,6 +123,7 @@ const TitleContainer = styled.div`
     gap: 24px;
     align-self: stretch;
     width: 100%;
+    height: 56px;
 `;
 
 // 제목, 기간, 역할 ... 텍스트
@@ -142,17 +144,18 @@ const ContentText = styled.div`
 // 제목 입력
 const TitleInput = styled.input`
     display: flex;
-    height: 56px;
+    height: 55px;
     align-items: center;
     gap: 54px;
     flex: 1 0 0;
-    padding-left: 16px;
+    padding: 0px 20px;
     border-radius: 8px;
-    border: 1px solid #E6E6E6;
+    border: 1px solid #d5d5d5;
     font-family: 'Pretendard-regular';
     font-size: 16px;
+    line-height: 24px;
     font-weight: 400;
-    color: #989BA2;
+    color: #909090;
 
     &:focus {
         color: #222;
@@ -173,6 +176,7 @@ const PeriodContainer = styled.div`
     gap: 24px;
     align-self: stretch;
     width: 100%;
+    height: 56px;
 `;
 
 // DatePicker 스타일을 위한 컨테이너
@@ -192,15 +196,15 @@ const StyledDatePickerWrapper = styled.div`
 
 // DatePicker 스타일
 const StyledDatePicker = styled(DatePicker)`
-    width: 197px;
-    height: 56px;
-    padding-left: 16px;
+    width: 221px;
+    height: 55px;
+    padding: 0px 20px;
     border-radius: 8px;
-    border: 1px solid #E6E6E6;
+    border: 1px solid #d5d5d5;
     font-family: 'Pretendard-regular';
     font-size: 16px;
     font-weight: 400;
-    color: #989BA2;
+    color: #909090;
 
     &:focus {
         color: #222;
@@ -219,7 +223,7 @@ const IconStyle = styled.svg`
     width: 24px;
     height: 24px;
     fill: none;
-    stroke: #464646;
+    stroke: #b1b1b1;
     cursor: pointer;
 `;
 
@@ -246,30 +250,31 @@ const RoleContainer = styled.div`
     gap: 24px;
     align-self: stretch;
     width: 100%;
+    height: 56px;
 `;
 
 // 역할 입력
 const RoleInput = styled.input`
     display: flex;
-    height: 56px;
+    height: 55px;
     align-items: center;
     gap: 54px;
     flex: 1 0 0;
-    padding-left: 16px;
+    padding: 0px 20px;
     border-radius: 8px;
-    border: 1px solid #E6E6E6;
+    border: 1px solid #d5d5d5;
     font-family: 'Pretendard-regular';
     font-size: 16px;
     font-weight: 400;
-    color: #989BA2;
+    color: #909090;
 
     &:focus {
-        color: #000;
+        color: #222;
     }
 
     /* 포커스를 벗어난 후에도 텍스트 색상을 검은색으로 유지 */
     &:not(:focus):valid {
-        color: #000;
+        color: #222;
     }
 `;
 
@@ -288,90 +293,12 @@ const JobContainer = styled.div`
     width: 100%;
 `;
 
-// 직군명 검색 필드 + 아이콘 컨테이너
-const JobInputContainer = styled.div`
-    display: flex;
-    align-items: center;
+const JobWrapper = styled.div`
     position: relative;
-    width: 475px;
-`;
-
-// 직군 입력 필드 스타일
-const JobInput = styled.input`
-    display: flex;
-    height: 56px;
-    width: 100%;
-    align-items: center;
-    gap: 54px;
-    flex: 1 0 0;
-    padding-left: 16px;
-    padding-right: 44px;
-    border-radius: 8px;
-    border: 1px solid #E7E7E7;
-    font-family: 'Pretendard-regular';
-    font-size: 16px;
-    font-weight: 400;
-    color: #989BA2;
-
-    &:focus {
-        color: #000;
+    
+    input::placeholder {
+        position: absolute;
     }
-
-    /* 포커스를 벗어난 후에도 텍스트 색상을 검은색으로 유지 */
-    &:not(:focus):valid {
-        color: #000;
-    }
-`;
-
-// 직군 선택 드롭 다운 
-const JobDropdown = styled.ul`
-    display: ${({ isVisible }) => (isVisible ? 'flex' : 'none')};
-    width: 530px;
-    flex-direction: column;
-    align-items: flex-start;
-    position: absolute;
-    left: 0px;
-    top: calc(100%);
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.08);
-    padding: 8px 0;
-    list-style: none;
-    max-height: 216px;
-    overflow-y: auto;
-    z-index: 10;
-
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
-
-    &::-webkit-scrollbar {
-        display: none; /* Chrome, Safari */
-    }
-`;
-
-// 직군
-const JobDropdownItem = styled.li`
-    width: 100%;
-    display: flex;
-    padding: 8px 20px;
-    align-items: center;
-    gap: 10px;
-    align-self: stretch;
-    background: #FFF;
-
-    &:hover {
-        background: #f8f8f8;
-    }
-
-    color: #000;
-    font-feature-settings: 'liga' off, 'clig' off;
-
-    /* Body/Body2:Regular */
-    font-family: "Pretendard-regular";
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 24px; /* 150% */
 `;
 
 // 검색 아이콘 스타일
@@ -381,7 +308,7 @@ const SearchIconStyle = styled.svg`
     width: 24px;
     height: 24px;
     fill: none;
-    stroke: #989BA2;
+    stroke: #b1b1b1;
     cursor: pointer;
 `;
 
@@ -399,33 +326,33 @@ const CompanyInputContainer = styled.div`
     display: flex;
     align-items: center;
     position: relative;
-    width: 475px;
+    width: 561px;
 `;
 
 // 기업명 검색 필드 스타일
 const CompanyInput = styled.input`
     display: flex;
-    height: 56px;
+    height: 53px;
     width: 100%;
     align-items: center;
     gap: 54px;
     flex: 1 0 0;
-    padding-left: 16px;
+    padding-left: 20px;
     padding-right: 44px;
     border-radius: 8px;
-    border: 1px solid #E6E6E6;
+    border: 1px solid #d5d5d5;
     font-family: 'Pretendard-regular';
     font-size: 16px;
     font-weight: 400;
-    color: #989BA2;
+    color: #909090;
 
     &:focus {
-        color: #000;
+        color: #222;
     }
 
     /* 포커스를 벗어난 후에도 텍스트 색상을 검은색으로 유지 */
     &:not(:focus):valid {
-        color: #000;
+        color: #222;
     }
 `;
 
@@ -436,32 +363,33 @@ const FileContainer = styled.div`
     gap: 24px;
     align-self: stretch;
     width: 100%;
+    height: 56px;
 `;
 
 // 첨부 파일 업로드 + 버튼 컨테이너
 const UploadFileContainer = styled.div`
     display: flex;
     width: 100%;
-    height: 26px;
+    height: 23px;
     padding: 16px 20px;
     align-items: center;
     gap: 12px;
     flex: 1 0 0;
     border-radius: 8px;
-    border: 1px solid #E6E6E6;
+    border: 1px solid #d5d5d5;
     background: #FFF;
     position: relative;
 `;
 
 // "첨부파일 업로드" 텍스트
 const FileUploadText = styled.span`
-    color: #989BA2;
+    color: #909090;
     width: 1020px;
     font-family: "Pretendard-regular";
     font-size: 16px;
     font-style: normal;
     font-weight: 400;
-    line-height: 26px; /* 162.5% */
+    line-height: 24px; /* 162.5% */
     letter-spacing: -0.096px;
 `;
 
@@ -489,6 +417,7 @@ const URLContainer = styled.div`
     gap: 24px;
     align-self: stretch;
     width: 100%;
+    height: 56px;
 `;
 
 // 아이콘 + URL
@@ -514,24 +443,24 @@ const URLIcon = styled.svg`
 const URLInput = styled.input`
     display: flex;
     width: 100%;
-    height: 56px;
+    height: 53px;
     align-items: center;
     flex: 1 0 0;
     padding-left: 56px;
     border-radius: 8px;
-    border: 1px solid #E7E7E7;
+    border: 1px solid #d5d5d5;
     font-family: "Pretendard-regular";
     font-size: 16px;
     font-weight: 400;
-    color: #989BA2;
+    color: #909090;
 
     &:focus {
-        color: #000;
+        color: #222;
     }
 
     /* 포커스를 벗어난 후에도 텍스트 색상을 검은색으로 유지 */
     &:not(:focus):valid {
-        color: #000;
+        color: #222;
     }
 `;
 
@@ -545,15 +474,15 @@ const SimpleMemoContainer = styled.div`
 
 // 간단설명 입력 필드 컨테이너
 const MemoInputContainer = styled.div`
-    height: 130px;
+    height: 180px;
     display: flex;
-    padding: 12px 16px;
+    padding: 16px 20px;
     align-items: flex-start;
     gap: 2px;
     flex: 1 0 0;
     align-self: stretch;
     border-radius: 8px;
-    border: 1px solid  #E7E7E7;
+    border: 1px solid  #d5d5d5;
     background: #FFF;
     position: relative; /* Placeholder 위치를 위한 설정 */
 `;
@@ -564,7 +493,7 @@ const MemoInput = styled.input`
     background: transparent;
     border: none;
     outline: none;
-    color: #4C4F56;
+    color: #222;
 
     /* Xsmall/Regular 16 */
     font-family: "Pretendard-regular";
@@ -579,7 +508,7 @@ const MemoInput = styled.input`
         position: absolute;
         top: 12px;
         transform: translateY(-50%);
-        color: #4C4F56;
+        color: #909090;
     }
 `;
 
@@ -588,14 +517,13 @@ export default function WritePortfolio() {
     const [endDate, setEndDate] = useState(null); 
     const [imagePreview, setImagePreview] = useState(exampleImage); // 기본값으로 예시 이미지
     const [fileName, setFileName] = useState(''); // 파일 이름 상태 추가
-    const [title, setTitle] = useState('');
+    const [title, setTitle] = useState(''); 
     const [role, setRole] = useState('');
-    const [job, setJob] = useState('');
+    const [job, setJob] = useState(''); // 직군 상태 추가
     const [company, setCompany] = useState('');
     const [url, setUrl] = useState('');
     const [memo, setMemo] = useState('');
     const [isFormComplete, setIsFormComplete] = useState(false);
-    const [isDropdownVisible, setDropdownVisible] = useState(false);
 
     useEffect(() => {
         // 모든 필드가 채워졌는지 확인
@@ -617,27 +545,6 @@ export default function WritePortfolio() {
             reader.readAsDataURL(file); // 파일을 Data URL로 읽기
         }
     };
-
-    // 파일 이름 핸들러
-    // const handleFileUpload = (e) => {
-    //     const file = e.target.files[0];
-    //     if (file) {
-    //         setFileName(file.name); // 파일 이름 설정
-    //     }
-    // };
-
-    // 입력값에 따라 필터링된 직군 리스트 생성
-    const filteredOptions = jobOptions.filter((option) => option.includes(job));
-
-    const handleInputChange = (e) => {
-        setJob(e.target.value);
-        setDropdownVisible(true);
-    }
-
-    const handleSelect = (option) => {
-        setJob(option);
-        setDropdownVisible(false);
-    }
     
     return (
         // 포트폴리오 작성 컨테이너 
@@ -727,29 +634,27 @@ export default function WritePortfolio() {
                 {/* 직군 컨테이너 */}
                 <JobContainer>
                     <ContentText style={{ marginRight: '3ch' }}>직군</ContentText>
-                    <JobInputContainer>
-                        <JobInput
-                            type="text"
+                    <JobWrapper>
+                        <InputAndDropdown 
+                            readOnly={false}
                             placeholder="직군명 검색"
                             value={job}
-                            onChange={handleInputChange}
-                            onFocus={() => setDropdownVisible(true)}
-                            onBlur={() => setTimeout(() => setDropdownVisible(false), 200)}
+                            setValue={setJob}
+                            width="561px"
+                            data={jobOptions}
+                            iconSvg={null}
+                            hasToggle={false} // 토글 버튼 활성화
+                            placeholderSize="16px"  // placeholder 크기를 16px로 설정
+                            fontSize="16px"
+                            height="56px"  // height 값을 56px로 설정
                         />
-                        <JobDropdown isVisible={isDropdownVisible && filteredOptions.length > 0}>
-                            {filteredOptions.map((option, index) => (
-                                <JobDropdownItem key={index} onMouseDown={() => handleSelect(option)}>
-                                    {option}
-                                </JobDropdownItem>
-                            ))}
-                        </JobDropdown>
-                        <SearchIconStyle>
+                        <IconStyle style={{top: "16px"}}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M21 21L15.0001 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="#989BA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
-                        </SearchIconStyle>
-                    </JobInputContainer>               
-                </JobContainer>
+                        </IconStyle>
+                    </JobWrapper>
+                </JobContainer>               
 
                 {/* 지원 기업 컨테이너 */}
                 <CompanyContainer>
