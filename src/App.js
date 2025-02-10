@@ -24,6 +24,7 @@ function App() {
           <Route path="/article/:id" element={<ArticleDetail />} />
           {/* 마이페이지 */}
           <Route path="/mypage" element={<Mypage />} />
+          {/* 마이페이지 프로필편집 페이지 */}
           <Route path="/mypage/:id" element={<MyPageDetail />} />
           {/* 사용자 프로필 페이지 */}
           <Route path="/user/:id" element={<UserProfile />} />

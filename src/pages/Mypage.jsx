@@ -297,6 +297,8 @@ const CardItem = styled.div`
 
 export default function Mypage() {
     const navigate = useNavigate();
+    // 사용자 ID 변수 선언
+    const userId = 1;
     // name 변수 선언
     const [name, setName] = useState("RIM YOURI"); // 임시 이름 설정
     // 팔로워, 팔로잉 변수 선언
@@ -375,7 +377,7 @@ export default function Mypage() {
                                         <path d="M15 6L18 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                         <path d="M13 20H21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
-                                    <span onClick={() => navigate('/mypage/:id')}>프로필정보 편집하기</span> 
+                                    <span onClick={() => navigate(`/mypage/${userId}`)}>프로필정보 편집하기</span> 
                                 </div>
                             </EditButton>
                             <ProfileBottomContainer>
