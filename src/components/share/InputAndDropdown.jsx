@@ -9,7 +9,7 @@ const InputDropdownContainer = styled.div`
 // input 태그
 const StyledInput = styled.input`
     width: ${({ $width }) => $width || '100px'}; /* 기본값 389px */
-    height: 64px;
+    height: ${({ $height }) => $height || '64px'};
     padding-left: ${({ $hasIcon }) => ($hasIcon ? '48px' : '16px')}; /* **********디자인 확정 후 다시 수정 예정********** */
     display: flex;
     justify-content: space-between;
@@ -22,12 +22,13 @@ const StyledInput = styled.input`
     cursor: pointer;
 
     font-family: 'Pretendard-Regular';
-    font-size: 18px;
+    font-size: ${({ $fontSize }) => $fontSize || '18px'};
     line-height: 24px;
     color: #000;
 
     &::placeholder {
-    color: #909090;
+        color: #909090;
+        font-size: ${({ $placeholderSize }) => $placeholderSize || '18px'};
     } 
 `;
 
@@ -123,7 +124,7 @@ const DropdownSelector = styled.button`
     hasToggle - 디자인 중에 토글 버튼이 없는게 있던데 그거 만들 때 false 값 주세요 그외에는 X
 */
 
-export default function InputAndDropdown ({ readOnly, placeholder, value, setValue, width, data, iconSvg, backIcon = false, hasToggle = true }){
+export default function InputAndDropdown ({ readOnly, placeholder, value, setValue, width, data, iconSvg, backIcon = false, hasToggle = true, placeholderSize, height, fontSize }){
     // 드롭다운 표시 -> true일 때 보임, false일 때 안보임
     const [isVisible, setVisible] = useState(false);
 
@@ -161,32 +162,33 @@ export default function InputAndDropdown ({ readOnly, placeholder, value, setVal
     };
 
     return (
-        <InputDropdownContainer>
-                <InputDropdownContainer>
-                    <StyledInput 
-                        readOnly={isReadOnly}
-                        placeholder={placeholder}
-                        value={value}
-                        $isClicked={isVisible}
-                        $width={width}
-                        $hasIcon={!!iconSvg}
-                        onClick={clickInput}
-                        onChange={handleInputReadOnlyFalse}
-                    />
-                    {iconSvg && <StyledInputIcon $backIcon={backIcon}>{iconSvg}</StyledInputIcon>}
-                    {/* *************토글 아이콘 색상 -> 디자인 확정 후 다시 수정 예정************* */}
-                    {hasToggle && (
-                        <ToggleIcon>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                {isVisible ? (
-                                    <path d="M6 15L12 9L18 15" stroke="#222222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                ) : (
-                                    <path d="M18 9L12 15L6 9" stroke="#222222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                )}
-                            </svg>
-                        </ToggleIcon>
-                    )}
-                </InputDropdownContainer>
+            <InputDropdownContainer>
+                <StyledInput 
+                    readOnly={isReadOnly}
+                    placeholder={placeholder}
+                    value={value}
+                    $isClicked={isVisible}
+                    $width={width}
+                    $hasIcon={!!iconSvg}
+                    $placeholderSize={placeholderSize}  // placeholder 크기 설정
+                    $height={height}  // height 값 설정
+                    $fontSize={fontSize}  // 입력 텍스트 폰트 크기
+                    onClick={clickInput}
+                    onChange={handleInputReadOnlyFalse}
+                />
+                {iconSvg && <StyledInputIcon $backIcon={backIcon}>{iconSvg}</StyledInputIcon>}
+                {/* *************토글 아이콘 색상 -> 디자인 확정 후 다시 수정 예정************* */}
+                {hasToggle && (
+                    <ToggleIcon>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            {isVisible ? (
+                                <path d="M6 15L12 9L18 15" stroke="#222222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            ) : (
+                                <path d="M18 9L12 15L6 9" stroke="#222222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            )}
+                        </svg>
+                    </ToggleIcon>
+                )}
             <DropdownWrapper $isClicked={isVisible}>
                 {data?.map((option) => (
                     <DropdownSelector 
