@@ -166,8 +166,8 @@ const WriteButton = styled.button`
 // 채팅 아이콘
 const ChatIcon = styled.button`
     display: flex;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     background: none; 
     border: none;
     align-items: center; /* 세로 정렬 */
@@ -179,8 +179,8 @@ const ChatIcon = styled.button`
 // 알림 아이콘
 const BellIcon = styled.button`
     display: flex;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     background: none; 
     border: none;
     align-items: center; /* 세로 정렬 */
@@ -192,8 +192,8 @@ const BellIcon = styled.button`
 // 프로필 아이콘
 const ProfileIcon = styled.button`
     display: flex;
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     padding: 8px;
     justify-content: center;
     align-items: center;
