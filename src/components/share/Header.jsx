@@ -127,19 +127,15 @@ const LogInButton = styled.button`
     justify-content: center;
     align-items: center;
     border-radius: 28px;
-    background: #EFEFEF;
+    background: #fdfdfd;
     color: #222;
     font-family: 'Pretendard-SemiBold';
     font-size: 18px;
     font-weight: 600;
     line-height: 24px;
-    border: none;
+    border: 1px solid #D5D5D5;
     cursor: pointer;
     white-space: nowrap; /* 줄바꿈 방지 */
-
-    &:hover {
-        background: #E0E0E0;
-    }
 `;
 
 // 포트폴리오 작성 + 채팅 아이콘 + 알림 + 프로필 컨테이너
@@ -156,19 +152,15 @@ const WriteButton = styled.button`
     justify-content: center;
     align-items: center;
     border-radius: 28px;
-    background: #EFEFEF;
+    background: #fdfdfd;
     color: #222;
     font-family: 'Pretendard-SemiBold';
     font-size: 18px;
     font-weight: 600;
     line-height: 24px;
-    border: none;
+    border: 1px solid #D5D5D5;
     cursor: pointer;
     white-space: nowrap; /* 줄바꿈 방지 */
-
-    &:hover {
-        background: #E0E0E0;
-    }
 `;
 
 // 채팅 아이콘

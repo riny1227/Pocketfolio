@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
 import Card from '../components/share/Card';
 import Carousel from '../components/share/Carousel';
 import Filter from '../components/Filter';
@@ -72,6 +71,20 @@ const CloseButton = styled.button`
     z-index: 1001;
 `;
 
+// 모달창 헤더 컨테이너 
+const ModalHeaderContainer = styled.div`
+    position: fixed;
+    width: 100%;
+    height: 96px;
+    display: inline-flex;
+    padding: 16px 104px;
+    justify-content: center;
+    align-items: center;
+    gap: 697px;
+    border-bottom: 1px solid #D5D5D5;
+    background: #FFF;
+    box-sizing: border-box;
+`;
 
 export default function Home() {
     // 호버 모드
@@ -130,7 +143,7 @@ export default function Home() {
                             </svg>
                         </CloseButton>
                     <ModalContainer onClick={(e) => e.stopPropagation()}>
-                        
+                        <ModalHeaderContainer>헤더</ModalHeaderContainer>
                     </ModalContainer>
                 </ModalOverlay>
             )}

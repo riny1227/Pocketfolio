@@ -143,7 +143,8 @@ const ContentText = styled.div`
 // 제목 입력
 const TitleInput = styled.input`
     display: flex;
-    height: 55px;
+    height: 56px;
+    box-sizing: border-box;
     align-items: center;
     gap: 54px;
     flex: 1 0 0;
@@ -195,7 +196,8 @@ const StyledDatePickerWrapper = styled.div`
 // DatePicker 스타일
 const StyledDatePicker = styled(DatePicker)`
     width: 221px;
-    height: 55px;
+    height: 56px;
+    box-sizing: border-box;
     padding: 0px 20px;
     border-radius: 8px;
     border: 1px solid #d5d5d5;
@@ -253,7 +255,8 @@ const RoleContainer = styled.div`
 // 역할 입력
 const RoleInput = styled.input`
     display: flex;
-    height: 55px;
+    height: 56px;
+    box-sizing: border-box;
     align-items: center;
     gap: 54px;
     flex: 1 0 0;
@@ -327,7 +330,8 @@ const CompanyInputContainer = styled.div`
 // 기업명 검색 필드 스타일
 const CompanyInput = styled.input`
     display: flex;
-    height: 53px;
+    height: 56px;
+    box-sizing: border-box;
     width: 100%;
     align-items: center;
     gap: 54px;
@@ -364,7 +368,8 @@ const FileContainer = styled.div`
 const UploadFileContainer = styled.div`
     display: flex;
     width: 100%;
-    height: 23px;
+    height: 56px;
+    box-sizing: border-box;
     padding: 16px 20px;
     align-items: center;
     gap: 12px;
@@ -437,7 +442,8 @@ const URLIcon = styled.svg`
 const URLInput = styled.input`
     display: flex;
     width: 100%;
-    height: 53px;
+    height: 56px;
+    box-sizing: border-box;
     align-items: center;
     flex: 1 0 0;
     padding-left: 56px;
@@ -468,7 +474,8 @@ const SimpleMemoContainer = styled.div`
 
 // 간단설명 입력 필드 컨테이너
 const MemoInputContainer = styled.div`
-    height: 180px;
+    height: 248px;
+    box-sizing: border-box;
     display: flex;
     padding: 16px 20px;
     align-items: flex-start;
