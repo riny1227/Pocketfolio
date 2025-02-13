@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from "./components/share/Header";
 import Footer from "./components/share/Footer";
 import Home from "./pages/Home";
+import SignUp from "./pages/SignUp";
 import Article from './pages/Article';
 import ArticleDetail from './pages/ArticleDetail';
 import Mypage from './pages/Mypage';
@@ -19,6 +20,8 @@ function App() {
         <Routes>
           {/* 메인 페이지 */}
           <Route path="/" element={<Home />} />
+          {/* 회원가입 */}
+          <Route path="/signup" element={<SignUp />} />
           {/* 아티클 */}
           <Route path="/article" element={<Article />} />
           {/* 아티클 상세 페이지 */}
