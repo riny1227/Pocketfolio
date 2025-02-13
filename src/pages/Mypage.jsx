@@ -6,6 +6,9 @@ import Card from '../components/share/Card';
 // 대체 이미지 사진 사용
 import exampleImg from '../imgs/example.png'
 
+// PortfolioDetailModal 불러오기
+import PortfolioDetailModal from '../components/share/PortfolioDetailModal';
+
 // Mypage 전체 컴포넌트 감싸는 컨테이너
 const MypageContainer = styled.div`
     display: flex;
@@ -291,8 +294,9 @@ const CardsContainer = styled.div`
 
 // 카드 아이템 스타일
 const CardItem = styled.div`
-  flex: 0 0 calc((100% - 2 * 24px) / 3); /* 3개씩 배치되도록 계산 */
-  box-sizing: border-box;
+    flex: 0 0 calc((100% - 2 * 24px) / 3); /* 3개씩 배치되도록 계산 */
+    box-sizing: border-box;
+    cursor: pointer;
 `;
 
 export default function Mypage() {
@@ -309,6 +313,9 @@ export default function Mypage() {
     // 호버 모드
     const [hoverMode, setHoverMode] = useState("mypage");
 
+    // 카드 선택 
+        const [selectedCard, setSelectedCard] = useState(null);
+
     // 샘플 데이터
     const portfolioCards = [
         { title: "포트폴리오 1", name: "1", views: 1234, likes: 567 },
@@ -324,6 +331,16 @@ export default function Mypage() {
         { title: "좋아요 1", name: "1", views: 2345, likes: 678 },
         { title: "좋아요 2", name: "2", views: 5678, likes: 890 },
     ];
+
+    const handleCardClick = (card) => {
+        setSelectedCard(card);
+        document.body.style.overflow = 'hidden'; // 배경 스크롤 비활성화
+    };
+
+    const closeModal = () => {
+        setSelectedCard(null);
+        document.body.style.overflow = 'auto'; // 배경 스크롤 활성화
+    };
 
     // 탭에 따른 카드 데이터 선택
     const cards =
@@ -421,7 +438,7 @@ export default function Mypage() {
                     {/* 각 탭에 대한 카드컴포넌트 */}
                     <CardsContainer>
                     {cards.map((card, index) => (
-                        <CardItem key={index}>
+                        <CardItem key={index} onClick={() => handleCardClick(card)}>
                             <Card
                                 title={card.title}
                                 image={exampleImg} // 예시 이미지 사용
@@ -433,6 +450,9 @@ export default function Mypage() {
                         </CardItem>
                     ))}
                     </CardsContainer>
+
+                    {/* 포트폴리오 상세 페이지 모달 */}
+                    {selectedCard && <PortfolioDetailModal card={selectedCard} onClose={closeModal} />}
                 </MypageRightContainer>
             </MypageItemContainer>
         </MypageContainer>
