@@ -9,6 +9,7 @@ import Mypage from './pages/Mypage';
 import MyPageDetail from './pages/MypageDetail';
 import UserProfile from './pages/UserProfile';
 import WritePortfolio from './pages/WritePortfolio';
+import PortfolioDetailModal from './components/share/PortfolioDetailModal';
 
 function App() {
   return (
