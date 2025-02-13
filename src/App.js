@@ -9,7 +9,7 @@ import Mypage from './pages/Mypage';
 import MyPageDetail from './pages/MypageDetail';
 import UserProfile from './pages/UserProfile';
 import WritePortfolio from './pages/WritePortfolio';
-import PortfolioDetail from './pages/PortfolioDetail';
+import PortfolioDetailModal from './components/share/PortfolioDetailModal';
 
 function App() {
   return (
@@ -31,8 +31,6 @@ function App() {
           <Route path="/userprofile" element={<UserProfile />} />
           {/* 포트폴리오 작성 페이지 */}
           <Route path="/write-portfolio" element={<WritePortfolio />} />
-          {/* 포트폴리오 상세 페이지 */}
-          <Route path="/detail-portfolio" element={<PortfolioDetail />} />
         </Routes>
         <Footer />
       </div>

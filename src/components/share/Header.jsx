@@ -127,19 +127,15 @@ const LogInButton = styled.button`
     justify-content: center;
     align-items: center;
     border-radius: 28px;
-    background: #EFEFEF;
+    background: #fdfdfd;
     color: #222;
     font-family: 'Pretendard-SemiBold';
     font-size: 18px;
     font-weight: 600;
     line-height: 24px;
-    border: none;
+    border: 1px solid #D5D5D5;
     cursor: pointer;
     white-space: nowrap; /* 줄바꿈 방지 */
-
-    &:hover {
-        background: #E0E0E0;
-    }
 `;
 
 // 포트폴리오 작성 + 채팅 아이콘 + 알림 + 프로필 컨테이너
@@ -156,26 +152,22 @@ const WriteButton = styled.button`
     justify-content: center;
     align-items: center;
     border-radius: 28px;
-    background: #EFEFEF;
+    background: #fdfdfd;
     color: #222;
     font-family: 'Pretendard-SemiBold';
     font-size: 18px;
     font-weight: 600;
     line-height: 24px;
-    border: none;
+    border: 1px solid #D5D5D5;
     cursor: pointer;
     white-space: nowrap; /* 줄바꿈 방지 */
-
-    &:hover {
-        background: #E0E0E0;
-    }
 `;
 
 // 채팅 아이콘
 const ChatIcon = styled.button`
     display: flex;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     background: none; 
     border: none;
     align-items: center; /* 세로 정렬 */
@@ -187,8 +179,8 @@ const ChatIcon = styled.button`
 // 알림 아이콘
 const BellIcon = styled.button`
     display: flex;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     background: none; 
     border: none;
     align-items: center; /* 세로 정렬 */
@@ -200,8 +192,8 @@ const BellIcon = styled.button`
 // 프로필 아이콘
 const ProfileIcon = styled.button`
     display: flex;
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     padding: 8px;
     justify-content: center;
     align-items: center;

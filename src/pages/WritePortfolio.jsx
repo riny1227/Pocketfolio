@@ -120,7 +120,6 @@ const ContentContainer = styled.div`
 const TitleContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 24px;
     align-self: stretch;
     width: 100%;
     height: 56px;
@@ -144,7 +143,8 @@ const ContentText = styled.div`
 // 제목 입력
 const TitleInput = styled.input`
     display: flex;
-    height: 55px;
+    height: 56px;
+    box-sizing: border-box;
     align-items: center;
     gap: 54px;
     flex: 1 0 0;
@@ -173,7 +173,6 @@ const PeriodContainer = styled.div`
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    gap: 24px;
     align-self: stretch;
     width: 100%;
     height: 56px;
@@ -197,7 +196,8 @@ const StyledDatePickerWrapper = styled.div`
 // DatePicker 스타일
 const StyledDatePicker = styled(DatePicker)`
     width: 221px;
-    height: 55px;
+    height: 56px;
+    box-sizing: border-box;
     padding: 0px 20px;
     border-radius: 8px;
     border: 1px solid #d5d5d5;
@@ -247,7 +247,6 @@ const TildeText = styled.span`
 const RoleContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 24px;
     align-self: stretch;
     width: 100%;
     height: 56px;
@@ -256,7 +255,8 @@ const RoleContainer = styled.div`
 // 역할 입력
 const RoleInput = styled.input`
     display: flex;
-    height: 55px;
+    height: 56px;
+    box-sizing: border-box;
     align-items: center;
     gap: 54px;
     flex: 1 0 0;
@@ -288,7 +288,6 @@ const jobOptions = ["프론트엔드 개발자", "백엔드 개발자", "게임 
 const JobContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 24px;
     align-self: stretch;
     width: 100%;
 `;
@@ -316,7 +315,6 @@ const SearchIconStyle = styled.svg`
 const CompanyContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 24px;
     align-self: stretch;
     width: 100%;
 `;
@@ -332,7 +330,8 @@ const CompanyInputContainer = styled.div`
 // 기업명 검색 필드 스타일
 const CompanyInput = styled.input`
     display: flex;
-    height: 53px;
+    height: 56px;
+    box-sizing: border-box;
     width: 100%;
     align-items: center;
     gap: 54px;
@@ -360,7 +359,6 @@ const CompanyInput = styled.input`
 const FileContainer = styled.div`
     display: flex;
     align-items: center;
-    gap: 24px;
     align-self: stretch;
     width: 100%;
     height: 56px;
@@ -370,7 +368,8 @@ const FileContainer = styled.div`
 const UploadFileContainer = styled.div`
     display: flex;
     width: 100%;
-    height: 23px;
+    height: 56px;
+    box-sizing: border-box;
     padding: 16px 20px;
     align-items: center;
     gap: 12px;
@@ -443,7 +442,8 @@ const URLIcon = styled.svg`
 const URLInput = styled.input`
     display: flex;
     width: 100%;
-    height: 53px;
+    height: 56px;
+    box-sizing: border-box;
     align-items: center;
     flex: 1 0 0;
     padding-left: 56px;
@@ -474,7 +474,8 @@ const SimpleMemoContainer = styled.div`
 
 // 간단설명 입력 필드 컨테이너
 const MemoInputContainer = styled.div`
-    height: 180px;
+    height: 248px;
+    box-sizing: border-box;
     display: flex;
     padding: 16px 20px;
     align-items: flex-start;
@@ -526,13 +527,13 @@ export default function WritePortfolio() {
     const [isFormComplete, setIsFormComplete] = useState(false);
 
     useEffect(() => {
-        // 모든 필드가 채워졌는지 확인
-        if (title && startDate && endDate && role && job && company && fileName && url && memo) {
+        // 모든 필드가 채워졌는지 확인(URL, 간단설명 제외)
+        if (title && startDate && endDate && role && job && company && fileName) {
             setIsFormComplete(true);
         } else {
             setIsFormComplete(false);
         }
-    }, [title, startDate, endDate, role, job, company, fileName, url, memo]);
+    }, [title, startDate, endDate, role, job, company, fileName]);
 
     // 파일 업로드 핸들러
     const handleImageUpload = (e) => {
@@ -579,7 +580,8 @@ export default function WritePortfolio() {
 
                 {/* 제목 컨테이너 */}
                 <TitleContainer>
-                    <ContentText style={{ marginRight: '3ch' }}>제목</ContentText>
+                    <ContentText style={{  }}>제목</ContentText>
+                    <ContentText style={{ color: '#1570EF', marginRight: '50px'}}>*</ContentText>
 
                     {/* 제목 입력 */}
                     <TitleInput placeholder="제목 입력" onChange={(e) => setTitle(e.target.value)} />
@@ -587,7 +589,8 @@ export default function WritePortfolio() {
 
                 {/* 기간 컨테이너 */}
                 <PeriodContainer>
-                    <ContentText style={{ marginRight: '3ch' }}>기간</ContentText>
+                    <ContentText style={{  }}>기간</ContentText>
+                    <ContentText style={{ color: '#1570EF', marginRight: '50px'}}>*</ContentText>
 
                     {/* 시작일과 완료일을 위한 DatePicker */}
                     <DatePickerContainer>
@@ -625,7 +628,8 @@ export default function WritePortfolio() {
 
                 {/* 역할 컨테이너 */}
                 <RoleContainer>
-                    <ContentText style={{ marginRight: '3ch' }}>역할</ContentText>
+                    <ContentText style={{  }}>역할</ContentText>
+                    <ContentText style={{ color: '#1570EF', marginRight: '50px'}}>*</ContentText>
 
                     {/* 역할 입력 */}
                     <RoleInput placeholder="역할 입력" onChange={(e) => setRole(e.target.value)} />
@@ -633,9 +637,10 @@ export default function WritePortfolio() {
 
                 {/* 직군 컨테이너 */}
                 <JobContainer>
-                    <ContentText style={{ marginRight: '3ch' }}>직군</ContentText>
+                    <ContentText style={{  }}>직군</ContentText>
+                    <ContentText style={{ color: '#1570EF', marginRight: '50px'}}>*</ContentText>
                     <JobWrapper>
-                        <InputAndDropdown 
+                        <InputAndDropdown
                             readOnly={false}
                             placeholder="직군명 검색"
                             value={job}
@@ -658,7 +663,8 @@ export default function WritePortfolio() {
 
                 {/* 지원 기업 컨테이너 */}
                 <CompanyContainer>
-                    <ContentText>지원 기업</ContentText>
+                    <ContentText style={{  }}>지원 기업</ContentText>
+                    <ContentText style={{ color: '#1570EF', marginRight: '15px'}}>*</ContentText>       
                     <CompanyInputContainer>
                         <CompanyInput placeholder="기업명 검색" onChange={(e) => setCompany(e.target.value)} />
                         <SearchIconStyle>
@@ -671,7 +677,8 @@ export default function WritePortfolio() {
 
                 {/* 첨부파일 컨테이너 */}
                 <FileContainer>
-                    <ContentText>첨부 파일</ContentText>
+                    <ContentText style={{  }}>첨부 파일</ContentText>
+                    <ContentText style={{ color: '#1570EF', marginRight: '15px'}}>*</ContentText>
                     <UploadFileContainer>
                         <FileUploadText>{fileName || '첨부파일 업로드'}</FileUploadText> {/* 업로드한 파일 이름 표시 */}
                         <UploadButton>
