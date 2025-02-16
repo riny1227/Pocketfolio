@@ -2,12 +2,10 @@ import React from 'react';
 import styled from "styled-components";
 import Carousel from '../components/share/Carousel';
 import ArticleCard from '../components/ArticleCard';
+import { useState, useEffect } from "react";
 
 // 대체 이미지 사용
 import exampleImg from '../imgs/example.png';
-
-// 아티클 mockdata 사용
-import articles from '../mockdata/Articles';
 
 // Article 전체 컴포넌트 감싸는 컨테이너
 const ArticleContainer = styled.div`
@@ -47,6 +45,27 @@ const CardItem = styled.div`
 `;
 
 export default function Article() {
+    const [articles, setArticles] = useState([]); // API에서 가져올 데이터 저장
+
+    // API에서 아티클 데이터 가져오기
+    const fetchArticles = async () => {
+        try {
+            const response = await fetch("/mockdata/Articles.json"); // public 폴더 내 mockdata 불러오기
+            if (!response.ok) {
+                throw new Error("(mock data) 아티클 데이터를 가져오는 데 실패했습니다.");
+            }
+            const data = await response.json();
+            setArticles(data);
+        } catch (error) {
+            console.error("(mock data) 아티클 목록 불러오기 오류:", error);
+        }
+    };
+
+    // ✅ 컴포넌트 마운트 시 데이터 불러오기
+    useEffect(() => {
+        fetchArticles();
+    }, []);
+
     return (
         <ArticleContainer>
             {/* 캐러셀 */}
@@ -54,7 +73,7 @@ export default function Article() {
 
             <ArticleTitle>아티클</ArticleTitle>
 
-            {/* 아티클 */}
+            {/* 로딩 중이면 메시지 표시 */}
             <CardsContainer>
                 {articles.map((article) => (
                     <CardItem key={article.id}>
@@ -70,5 +89,5 @@ export default function Article() {
                 ))}
             </CardsContainer>
         </ArticleContainer>
-    )
+    );
 }
