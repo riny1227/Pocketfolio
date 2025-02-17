@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 import Card from '../components/share/Card';
+import FollowersModal from '../components/share/FollowersModal';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../imgs/example.png'
@@ -338,9 +339,6 @@ export default function Mypage() {
     const userId = 1;
     // name 변수 선언
     const [name, setName] = useState("RIM YOURI"); // 임시 이름 설정
-    // 팔로워, 팔로잉 변수 선언
-    const [followers, setFollowers] = useState(0);
-    const [following, setFollowing] = useState(0);
     // 활성화된 탭 상태
     const [activeTab, setActiveTab] = useState("portfolio");
     // 호버 모드
@@ -397,7 +395,32 @@ export default function Mypage() {
                 card.id === id ? { ...card, isBookmarked: !card.isBookmarked } : card
             )
         );
-    };                    
+    };       
+    
+    // 샘플 데이터 팔로워&팔로잉
+    const [followers] = useState([
+        { id: 1, name: '이름이름이름이름이름이름이름이름' },
+        { id: 11, name: '이름2' },
+        { id: 12, name: '이름3' },
+      ]);
+
+    const [following] = useState([
+    { id: 1, name: '이름이름이름이름이름이름이름이름' },
+    { id: 2, name: '이름2' },
+    { id: 3, name: '이름55' },
+    ]);
+
+    const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열림 여부 상태
+    const [modalType, setModalType] = useState('followers'); // 'followers' or 'following'
+
+    const handleOpenModal = (type) => {
+        setModalType(type); // 모달 타입 설정 (팔로워 또는 팔로잉)
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
 
     return (
         <MypageContainer>
@@ -426,15 +449,16 @@ export default function Mypage() {
                         <ProfileEditContainer>
                             {/* 팔로워+팔로잉 영역 */}
                             <FollowContainer>
-                                <FollowItem>
+                                <FollowItem onClick={() => handleOpenModal('followers')}>
                                     <Label>팔로워</Label>
-                                    <Number>{followers}</Number>
+                                    <Number>{followers.length}</Number>
                                 </FollowItem>
-                                <FollowItem>
+                                <FollowItem onClick={() => handleOpenModal('following')}>
                                     <Label>팔로잉</Label>
-                                    <Number>{following}</Number>
+                                    <Number>{following.length}</Number>
                                 </FollowItem>
                             </FollowContainer>
+                            {/* 프로필정보 편집하기 버튼*/}
                             <EditButton>
                                 <div>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -517,6 +541,17 @@ export default function Mypage() {
                     {selectedCard && <PortfolioDetailModal card={selectedCard} onClose={closeModal} />}
                 </MypageRightContainer>
             </MypageItemContainer>
+
+            
+            {/* 팔로워 또는 팔로잉 모달 */}
+            {isModalOpen && (
+                <FollowersModal
+                    type={modalType}
+                    users={modalType === 'followers' ? followers : following}
+                    onClose={handleCloseModal}
+                    followedUsers={[1, 2, 3]}
+                />
+            )}
         </MypageContainer>
     )
 }
