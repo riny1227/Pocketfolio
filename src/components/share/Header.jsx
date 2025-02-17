@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import logo from '../../imgs/logo.png';
+import Chat from '../Chat';
 
 // 헤더 컨테이너
 const HeaderContainer = styled.div`
@@ -163,6 +164,12 @@ const WriteButton = styled.button`
     white-space: nowrap; /* 줄바꿈 방지 */
 `;
 
+// 채팅 아이콘 + 채팅창 감싸는 컨테이너
+const ChatWrapper = styled.div`
+    display: inline-block;
+    position: relative;
+`;
+
 // 채팅 아이콘
 const ChatIcon = styled.button`
     display: flex;
@@ -206,6 +213,7 @@ const ProfileIcon = styled.button`
 export default function Header() {
     const navigate = useNavigate();
     const [searchText, setSearchText] = useState('');
+    const [isChatOpen, setChatOpen] = useState(false);
 
     return (
         <HeaderContainer>
@@ -256,12 +264,23 @@ export default function Header() {
                 {/* 포트폴리오 작성 버튼 */}
                 <WriteButton onClick={() => navigate('/write-portfolio')}>포트폴리오 작성</WriteButton>
 
-                {/* 채팅 아이콘 */}
-                <ChatIcon>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M3.46197 4.66728C3.47465 4.66686 3.48737 4.66666 3.50012 4.66666H24.5001C24.7626 4.66666 25.0107 4.75461 25.2103 4.9077C25.31 4.98419 25.3976 5.07693 25.4688 5.18308C25.5672 5.32939 25.6334 5.49921 25.657 5.68235C25.6643 5.73783 25.6675 5.79352 25.6667 5.849V19.8333C25.6667 21.7663 24.0997 23.3333 22.1667 23.3333H5.83338C3.90038 23.3333 2.33337 21.7663 2.33337 19.8333V5.83333C2.33337 5.20174 2.83526 4.68737 3.46197 4.66728ZM4.66671 8.64983V19.8333C4.66671 20.4777 5.18904 21 5.83338 21H22.1667C22.811 21 23.3334 20.4777 23.3334 19.8333V8.64998L14.8251 17.1583C14.3695 17.6139 13.6308 17.6139 13.1752 17.1583L4.66671 8.64983Z" fill="#222222"/>
-                    </svg>
-                </ChatIcon>
+                <ChatWrapper>
+                    {/* 채팅 아이콘 클릭 시 채팅창이 열리고 닫히도록 토글 */}
+                    <ChatIcon onClick={() => setChatOpen(prev => !prev)}>
+                        {isChatOpen ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M3.46197 4.66728C3.47465 4.66686 3.48737 4.66666 3.50012 4.66666H24.5001C24.7626 4.66666 25.0107 4.75461 25.2103 4.9077C25.31 4.98419 25.3976 5.07693 25.4688 5.18308C25.5672 5.32939 25.6334 5.49921 25.657 5.68235C25.6643 5.73783 25.6675 5.79352 25.6667 5.849V19.8333C25.6667 21.7663 24.0997 23.3333 22.1667 23.3333H5.83338C3.90038 23.3333 2.33337 21.7663 2.33337 19.8333V5.83333C2.33337 5.20174 2.83526 4.68737 3.46197 4.66728ZM4.66671 8.64983V19.8333C4.66671 20.4777 5.18904 21 5.83338 21H22.1667C22.811 21 23.3334 20.4777 23.3334 19.8333V8.64998L14.8251 17.1583C14.3695 17.6139 13.6308 17.6139 13.1752 17.1583L4.66671 8.64983Z" fill="#1570EF"/>
+                            </svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M3.46197 4.66728C3.47465 4.66686 3.48737 4.66666 3.50012 4.66666H24.5001C24.7626 4.66666 25.0107 4.75461 25.2103 4.9077C25.31 4.98419 25.3976 5.07693 25.4688 5.18308C25.5672 5.32939 25.6334 5.49921 25.657 5.68235C25.6643 5.73783 25.6675 5.79352 25.6667 5.849V19.8333C25.6667 21.7663 24.0997 23.3333 22.1667 23.3333H5.83338C3.90038 23.3333 2.33337 21.7663 2.33337 19.8333V5.83333C2.33337 5.20174 2.83526 4.68737 3.46197 4.66728ZM4.66671 8.64983V19.8333C4.66671 20.4777 5.18904 21 5.83338 21H22.1667C22.811 21 23.3334 20.4777 23.3334 19.8333V8.64998L14.8251 17.1583C14.3695 17.6139 13.6308 17.6139 13.1752 17.1583L4.66671 8.64983Z" fill="#222222"/>
+                            </svg>
+                        )}
+                    </ChatIcon>
+
+                    {/* isChatOpen이 true일 때만 Chat 컴포넌트 표시 */}
+                    {isChatOpen && <Chat />}
+                </ChatWrapper>
 
                 {/* 알림 아이콘 */}
                 <BellIcon>
