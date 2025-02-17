@@ -7,7 +7,6 @@ export default function Footer() {
   return (
     <footer>
       <p>&copy; 2025 PocketFolio Footer</p>
-      <p onClick={() => navigate('/userprofile')}>UserProfile 확인용</p>
     </footer>
   );
 }

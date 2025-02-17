@@ -257,7 +257,7 @@ const UserNameText = styled.div`
     font-feature-settings: 'liga' off, 'clig' off;
 
     /* Title/Title2 */
-    font-family: 'Pretendard=bold';
+    font-family: 'Pretendard-bold';
     font-size: 32px;
     font-style: normal;
     font-weight: 700;
@@ -333,8 +333,16 @@ const SimilarPortfolioContainer = styled.div`
 `;
 
 const PortfolioDetailModal = ({ card, onClose }) => {
+
+    // 모달 아닌 부분 눌렀을 때, 닫히도록
+    const handleOverlayClick = (e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+    };
+
     return (
-        <ModalOverlay>
+        <ModalOverlay onClick={handleOverlayClick}>
             {/* 모달을 닫는 버튼 */}
             <CloseButton onClick={onClose}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">

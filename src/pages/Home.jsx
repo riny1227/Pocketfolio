@@ -43,14 +43,15 @@ export default function Home() {
     // 카드 선택 
     const [selectedCard, setSelectedCard] = useState(null);
 
-    const cards = [
-        { title: "포트폴리오 1", name: "1", views: 1234, likes: 567 },
-        { title: "포트폴리오 2", name: "2", views: 5678, likes: 890 },
-        { title: "포트폴리오 3", name: "3", views: 910, likes: 123 },
-        { title: "포트폴리오 4", name: "4", views: 1234, likes: 567 },
-        { title: "포트폴리오 5", name: "5", views: 5678, likes: 890 },
-        { title: "포트폴리오 6", name: "6", views: 910, likes: 123 },
-    ];
+    // 카드 데이터와 북마크 상태
+    const [cards, setCards] = useState([
+        { id: 1, title: "포트폴리오 1", name: "1", views: 1234, likes: 567, isBookmarked: false },
+        { id: 2, title: "포트폴리오 2", name: "2", views: 5678, likes: 890, isBookmarked: false },
+        { id: 3, title: "포트폴리오 3", name: "3", views: 910, likes: 123, isBookmarked: false },
+        { id: 4, title: "포트폴리오 4", name: "4", views: 1234, likes: 567, isBookmarked: false },
+        { id: 5, title: "포트폴리오 5", name: "5", views: 5678, likes: 890, isBookmarked: false },
+        { id: 6, title: "포트폴리오 6", name: "6", views: 910, likes: 123, isBookmarked: false },
+    ]);
 
     const handleCardClick = (card) => {
         setSelectedCard(card);
@@ -60,6 +61,15 @@ export default function Home() {
     const closeModal = () => {
         setSelectedCard(null);
         document.body.style.overflow = 'auto'; // 배경 스크롤 활성화
+    };
+
+    const handleBookmarkToggle = (id) => {
+        // 북마크 상태 토글
+        setCards(prevCards =>
+            prevCards.map(card =>
+                card.id === id ? { ...card, isBookmarked: !card.isBookmarked } : card
+            )
+        );
     };
 
     return (
@@ -81,6 +91,8 @@ export default function Home() {
                             views={card.views}
                             likes={card.likes}
                             hoverMode={hoverMode}
+                            isBookmarked={card.isBookmarked} // 북마크 상태 전달
+                            onBookmarkChange={() => handleBookmarkToggle(card.id)} // 북마크 상태 변경 함수 전달
                         />
                     </CardItem>
                 ))}
