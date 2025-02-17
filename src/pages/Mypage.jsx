@@ -385,12 +385,19 @@ export default function Mypage() {
 
     const handleBookmarkToggle = (id) => {
         // 북마크 상태 토글
-        setBookmarkedCards && setLikedCards(prevCards =>
+        setBookmarkedCards(prevCards =>
             prevCards.map(card =>
                 card.id === id ? { ...card, isBookmarked: !card.isBookmarked } : card
             )
         );
-    };
+        
+        // 좋아요 상태 토글
+        setLikedCards(prevCards =>
+            prevCards.map(card =>
+                card.id === id ? { ...card, isBookmarked: !card.isBookmarked } : card
+            )
+        );
+    };                    
 
     return (
         <MypageContainer>

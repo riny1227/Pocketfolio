@@ -159,6 +159,13 @@ const InfoLine = styled.div`
     background: #E7E7E7;
 `;
 
+// 학력상세 년도 wrapper
+const EducationPeriodWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+`;
+
 // 검색 부분 wrapper
 const InputWrapper = styled.div`
     margin-left: 92px;
@@ -174,7 +181,8 @@ const SearchIcon = (
 // DatePicker 스타일을 위한 컨테이너
 const DatePickerContainer = styled.div`
     display: flex;
-    width: auto;
+    align-items: center;
+    gap: 12px;
     position: relative;
 `;
 
@@ -183,12 +191,11 @@ const StyledDatePickerWrapper = styled.div`
     position: relative;  /* 아이콘 위치를 위해 상대적인 위치 설정 */
     display: flex;
     align-items: center;
-    width: 100%;
 `;
 
 // DatePicker 스타일
 const StyledDatePicker = styled(DatePicker)`
-    width: 234px;
+    width: 193px;
     height: 64px;
     padding: 0px 20px;
     border-radius: 8px;
@@ -221,24 +228,22 @@ const IconStyle = styled.svg`
 
 // ~ 텍스트 스타일
 const TildeText = styled.span`
+    width: 10px;
     color: #989BA2;
-    font-family: "Pretendard-Semibold";
+    font-family: 'Pretendard-SemiBold';
     font-size: 20px;
     font-style: normal;
     font-weight: 600;
-    line-height: 28px; /* 140% */
+    line-height: 28px;
     letter-spacing: -0.4px;
-    padding: 14px 12px;
-    display: flex;
-    align-items: center;
 `;
 
 // 활동명 입력 필드 스타일
 const StyledActivityInput = styled.input`
     flex: 1;
-    width: 564px;
+    width: 100%;
     margin-left: 15px;
-    max-width: 564px;  // 필요에 따라 조정 가능
+    max-width: 478px;  // 필요에 따라 조정 가능
     height: 64px;
     padding: 0 12px;
     border-radius: 8px;
@@ -274,7 +279,7 @@ const NumCount = styled.span`
 // 프로필 정보 저장 버튼
 const SubmitButton = styled.button`
     display: flex;
-    margin-top: 130px;
+    margin: 130px 0;
     padding: 16px 32px;
     justify-content: center;
     align-items: center;
@@ -282,18 +287,17 @@ const SubmitButton = styled.button`
     border-radius: 12px;
     background: ${({ disabled }) => (disabled ? '#E6E6E6' : '#1570EF')}; /* 활성화 여부에 따른 색상 변경 */
     cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};  /* 비활성화 상태에서는 클릭 불가 */
-`;
 
-// 버튼 내부 텍스트 스타일
-const ButtonText = styled.span`
-    color: ${({ disabled }) => (disabled ? '#909090' : '#FFF')};  /* 비활성화 시 텍스트 색상 변경 */
-    text-align: center;
-    font-feature-settings: 'liga' off, 'clig' off;
-    font-family: 'Pretendard-SemiBold';
-    font-size: 18px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: 24px;
+    span {
+        color: ${({ disabled }) => (disabled ? '#909090' : '#FFF')};  /* 비활성화 시 텍스트 색상 변경 */
+        text-align: center;
+        font-feature-settings: 'liga' off, 'clig' off;
+        font-family: 'Pretendard-SemiBold';
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px;
+    }
 `;
 
 export default function MypageDetail() {
@@ -369,21 +373,23 @@ export default function MypageDetail() {
                         <InfoLine/>
                         <ContentOneWrapper>
                             <ContentTitleText>학력상세</ContentTitleText>
-                            <InputAndDropdown 
-                                placeholder="년도" 
-                                value={selectedEducation} 
-                                setValue={setSelectedEducation} 
-                                data={years}
-                                width="235px"
-                            />
-                            <TildeText>~</TildeText>
-                            <InputAndDropdown 
-                                placeholder="년도" 
-                                value={selectedStatus} 
-                                setValue={setSelectedStatus} 
-                                data={endyears}
-                                width="235px"
-                            />
+                            <EducationPeriodWrapper>
+                                <InputAndDropdown 
+                                    placeholder="년도" 
+                                    value={selectedEducation} 
+                                    setValue={setSelectedEducation} 
+                                    data={years}
+                                    width="235px"
+                                />
+                                <TildeText>~</TildeText>
+                                <InputAndDropdown 
+                                    placeholder="년도" 
+                                    value={selectedStatus} 
+                                    setValue={setSelectedStatus} 
+                                    data={endyears}
+                                    width="235px"
+                                />
+                            </EducationPeriodWrapper>
                         </ContentOneWrapper>
                         <ContentOneWrapper>
                             <InputWrapper>
@@ -391,7 +397,7 @@ export default function MypageDetail() {
                                     placeholder="학교 찾아보기"
                                     iconSvg={SearchIcon}
                                     hasToggle={false}
-                                    width="502px"
+                                    width="504px"
                                 />
                             </InputWrapper>
                         </ContentOneWrapper>
@@ -473,7 +479,7 @@ export default function MypageDetail() {
 
             {/* 프로필 정보 저장하기 버튼 */}
             <SubmitButton disabled={isButtonDisabled}>
-                <ButtonText>프로필 정보 저장</ButtonText>
+                <span>프로필 정보 저장</span>
             </SubmitButton>
         </MypageDetailContainer>
     )
