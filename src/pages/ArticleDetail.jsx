@@ -1,12 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams } from 'react-router-dom';
 
 // 대체 이미지 사용
 import exampleImg from '../imgs/article_example.png';
-
-// 아티클 mockdata 사용
-import articles from '../mockdata/Articles.json';
 
 // ArticleDetail 전체 컴포넌트 감싸는 컨테이너
 const ArticleContainer = styled.div`
@@ -166,8 +163,18 @@ const ArticleContent = styled.div`
 const ArticleDetail = () => {
     const [isBookmarked, setIsBookmarked] = useState(false);
 
+    const [article, setArticle] = useState(null);
+
     const { id } = useParams();
-    const article = articles.find(a => a.id === Number(id)); // id를 숫자로 변환
+
+    useEffect(() => {
+        fetch('/mockdata/Articles.json')
+            .then((response) => response.json())
+            .then((data) => {
+                const foundArticle = data.find(a => a.id === Number(id)); // id로 아티클 찾기
+                setArticle(foundArticle);
+            });
+    }, [id]);
 
     if (!article) {
         return <div>Article not found.</div>;

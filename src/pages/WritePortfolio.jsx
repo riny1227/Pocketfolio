@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import DatePicker from "react-datepicker";
 import exampleImage from '../imgs/example.png';
 import "react-datepicker/dist/react-datepicker.css"; // CSS 파일 import
@@ -232,7 +232,7 @@ const TildeText = styled.span`
     color: #464646;
 
     /* Small/Semibold 20 */
-    font-family: "Pretendard-semibold";
+    font-family: "Pretendard-Semibold";
     font-size: 20px;
     font-style: normal;
     font-weight: 600;
@@ -516,6 +516,8 @@ const MemoInput = styled.input`
 export default function WritePortfolio() {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null); 
+    const startDateRef = useRef(null);
+    const endDateRef = useRef(null);
     const [imagePreview, setImagePreview] = useState(exampleImage); // 기본값으로 예시 이미지
     const [fileName, setFileName] = useState(''); // 파일 이름 상태 추가
     const [title, setTitle] = useState(''); 
@@ -597,14 +599,22 @@ export default function WritePortfolio() {
                         <StyledDatePickerWrapper>
                             {/* 시작일 */}
                             <StyledDatePicker
+                                ref={startDateRef}
                                 selected={startDate}
                                 onChange={(date) => setStartDate(date)}
                                 placeholderText="시작일"
                                 dateFormat="yyyy/MM/dd"
                                 locale="ko"
                             />
-                            <IconStyle xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M8 4H7.2002C6.08009 4 5.51962 4 5.0918 4.21799C4.71547 4.40973 4.40973 4.71547 4.21799 5.0918C4 5.51962 4 6.08009 4 7.2002V8M8 4H16M8 4V2M16 4H16.8002C17.9203 4 18.4796 4 18.9074 4.21799C19.2837 4.40973 19.5905 4.71547 19.7822 5.0918C20 5.5192 20 6.07899 20 7.19691V8M16 4V2M4 8V16.8002C4 17.9203 4 18.4801 4.21799 18.9079C4.40973 19.2842 4.71547 19.5905 5.0918 19.7822C5.5192 20 6.07899 20 7.19691 20H16.8031C17.921 20 18.48 20 18.9074 19.7822C19.2837 19.5905 19.5905 19.2842 19.7822 18.9079C20 18.4805 20 17.9215 20 16.8036V8M4 8H20M16 16H16.002L16.002 16.002L16 16.002V16ZM12 16H12.002L12.002 16.002L12 16.002V16ZM8 16H8.002L8.00195 16.002L8 16.002V16ZM16.002 12V12.002L16 12.002V12H16.002ZM12 12H12.002L12.002 12.002L12 12.002V12ZM8 12H8.002L8.00195 12.002L8 12.002V12Z" stroke="#989BA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <IconStyle
+                                onClick={() => startDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                            >
+                                <path d="M8 4H7.2C6.08 4 5.52 4 5.09 4.22C4.72 4.41 4.41 4.72 4.22 5.09C4 5.52 4 6.08 4 7.2V8M8 4H16M8 4V2M16 4H16.8C17.92 4 18.48 4 18.91 4.22C19.28 4.41 19.59 4.72 19.78 5.09C20 5.52 20 6.08 20 7.2V8M16 4V2M4 8V16.8C4 17.92 4 18.48 4.22 18.91C4.41 19.28 4.72 19.59 5.09 19.78C5.52 20 6.08 20 7.2 20H16.8C17.92 20 18.48 20 18.91 19.78C19.28 19.59 19.59 19.28 19.78 18.91C20 18.48 20 17.92 20 16.8V8M4 8H20" 
+                                    stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </IconStyle>
                         </StyledDatePickerWrapper>
 
@@ -613,14 +623,22 @@ export default function WritePortfolio() {
                         <StyledDatePickerWrapper>
                             {/* 완료일 */}
                             <StyledDatePicker
+                                ref={endDateRef}
                                 selected={endDate}
                                 onChange={(date) => setEndDate(date)}
                                 placeholderText="완료일"
                                 dateFormat="yyyy/MM/dd"
                                 locale="ko"
                             />
-                            <IconStyle xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M8 4H7.2002C6.08009 4 5.51962 4 5.0918 4.21799C4.71547 4.40973 4.40973 4.71547 4.21799 5.0918C4 5.51962 4 6.08009 4 7.2002V8M8 4H16M8 4V2M16 4H16.8002C17.9203 4 18.4796 4 18.9074 4.21799C19.2837 4.40973 19.5905 4.71547 19.7822 5.0918C20 5.5192 20 6.07899 20 7.19691V8M16 4V2M4 8V16.8002C4 17.9203 4 18.4801 4.21799 18.9079C4.40973 19.2842 4.71547 19.5905 5.0918 19.7822C5.5192 20 6.07899 20 7.19691 20H16.8031C17.921 20 18.48 20 18.9074 19.7822C19.2837 19.5905 19.5905 19.2842 19.7822 18.9079C20 18.4805 20 17.9215 20 16.8036V8M4 8H20M16 16H16.002L16.002 16.002L16 16.002V16ZM12 16H12.002L12.002 16.002L12 16.002V16ZM8 16H8.002L8.00195 16.002L8 16.002V16ZM16.002 12V12.002L16 12.002V12H16.002ZM12 12H12.002L12.002 12.002L12 12.002V12ZM8 12H8.002L8.00195 12.002L8 12.002V12Z" stroke="#989BA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <IconStyle
+                                onClick={() => endDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                            >
+                                <path d="M8 4H7.2C6.08 4 5.52 4 5.09 4.22C4.72 4.41 4.41 4.72 4.22 5.09C4 5.52 4 6.08 4 7.2V8M8 4H16M8 4V2M16 4H16.8C17.92 4 18.48 4 18.91 4.22C19.28 4.41 19.59 4.72 19.78 5.09C20 5.52 20 6.08 20 7.2V8M16 4V2M4 8V16.8C4 17.92 4 18.48 4.22 18.91C4.41 19.28 4.72 19.59 5.09 19.78C5.52 20 6.08 20 7.2 20H16.8C17.92 20 18.48 20 18.91 19.78C19.28 19.59 19.59 19.28 19.78 18.91C20 18.48 20 17.92 20 16.8V8M4 8H20" 
+                                    stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </IconStyle>
                         </StyledDatePickerWrapper>
                     </DatePickerContainer>

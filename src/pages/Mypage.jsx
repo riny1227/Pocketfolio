@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 import Card from '../components/share/Card';
+import FollowersModal from '../components/share/FollowersModal';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../imgs/example.png'
@@ -299,20 +300,52 @@ const CardItem = styled.div`
     cursor: pointer;
 `;
 
+// 포트폴리오 추가하기 카드
+const AddPortfolioCard = styled.div`
+    display: flex;
+    width: 288px;
+    height: 200px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
+    border-radius: 8px;
+    border: 1px dashed #717680;
+    background: #E8F1FD;
+    cursor: pointer;
+    
+    svg {
+        width: 33px;
+        height: 32px;
+    }
+
+    span {
+        color: #464646;
+        font-family: 'Pretendard-Regular';
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 22px;
+    }
+
+    &:hover{
+        background: #DCEAFD;
+    }
+`;
+
 export default function Mypage() {
     const navigate = useNavigate();
+    // 사용자 ID 변수 선언
+    const userId = 1;
     // name 변수 선언
     const [name, setName] = useState("RIM YOURI"); // 임시 이름 설정
-    // 팔로워, 팔로잉 변수 선언
-    const [followers, setFollowers] = useState(0);
-    const [following, setFollowing] = useState(0);
     // 활성화된 탭 상태
     const [activeTab, setActiveTab] = useState("portfolio");
     // 호버 모드
     const [hoverMode, setHoverMode] = useState("mypage");
 
     // 카드 선택 
-        const [selectedCard, setSelectedCard] = useState(null);
+    const [selectedCard, setSelectedCard] = useState(null);
 
     // 샘플 데이터
     const portfolioCards = [
@@ -320,15 +353,15 @@ export default function Mypage() {
         { title: "포트폴리오 2", name: "2", views: 5678, likes: 890 },
     ];
 
-    const bookmarkCards = [
-        { title: "북마크 1", name: "1", views: 3456, likes: 123 },
-        { title: "북마크 2", name: "2", views: 7890, likes: 456 },
-    ];
+    const [bookmarkedCards, setBookmarkedCards] = useState([
+        { id: 1, title: "북마크 1", name: "1", views: 3456, likes: 123, isBookmarked: false },
+        { id: 2, title: "북마크 2", name: "2", views: 7890, likes: 456, isBookmarked: false},
+    ]);
 
-    const likedCards = [
-        { title: "좋아요 1", name: "1", views: 2345, likes: 678 },
-        { title: "좋아요 2", name: "2", views: 5678, likes: 890 },
-    ];
+    const [likedCards, setLikedCards] = useState([
+        { id: 1, title: "좋아요 1", name: "1", views: 2345, likes: 678, isBookmarked: false },
+        { id: 2, title: "좋아요 2", name: "2", views: 5678, likes: 890, isBookmarked: false },
+    ]);
 
     const handleCardClick = (card) => {
         setSelectedCard(card);
@@ -339,14 +372,55 @@ export default function Mypage() {
         setSelectedCard(null);
         document.body.style.overflow = 'auto'; // 배경 스크롤 활성화
     };
-
+    
     // 탭에 따른 카드 데이터 선택
     const cards =
-    activeTab === "portfolio"
-        ? portfolioCards
-        : activeTab === "bookmark"
-        ? bookmarkCards
-        : likedCards;
+        activeTab === "portfolio"
+            ? portfolioCards
+            : activeTab === "bookmark"
+            ? bookmarkedCards
+            : likedCards;
+
+    const handleBookmarkToggle = (id) => {
+        // 북마크 상태 토글
+        setBookmarkedCards(prevCards =>
+            prevCards.map(card =>
+                card.id === id ? { ...card, isBookmarked: !card.isBookmarked } : card
+            )
+        );
+        
+        // 좋아요 상태 토글
+        setLikedCards(prevCards =>
+            prevCards.map(card =>
+                card.id === id ? { ...card, isBookmarked: !card.isBookmarked } : card
+            )
+        );
+    };       
+    
+    // 샘플 데이터 팔로워&팔로잉
+    const [followers] = useState([
+        { id: 1, name: '이름이름이름이름이름이름이름이름' },
+        { id: 11, name: '이름2' },
+        { id: 12, name: '이름3' },
+      ]);
+
+    const [following] = useState([
+    { id: 1, name: '이름이름이름이름이름이름이름이름' },
+    { id: 2, name: '이름2' },
+    { id: 3, name: '이름55' },
+    ]);
+
+    const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열림 여부 상태
+    const [modalType, setModalType] = useState('followers'); // 'followers' or 'following'
+
+    const handleOpenModal = (type) => {
+        setModalType(type); // 모달 타입 설정 (팔로워 또는 팔로잉)
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
 
     return (
         <MypageContainer>
@@ -375,15 +449,16 @@ export default function Mypage() {
                         <ProfileEditContainer>
                             {/* 팔로워+팔로잉 영역 */}
                             <FollowContainer>
-                                <FollowItem>
+                                <FollowItem onClick={() => handleOpenModal('followers')}>
                                     <Label>팔로워</Label>
-                                    <Number>{followers}</Number>
+                                    <Number>{followers.length}</Number>
                                 </FollowItem>
-                                <FollowItem>
+                                <FollowItem onClick={() => handleOpenModal('following')}>
                                     <Label>팔로잉</Label>
-                                    <Number>{following}</Number>
+                                    <Number>{following.length}</Number>
                                 </FollowItem>
                             </FollowContainer>
+                            {/* 프로필정보 편집하기 버튼*/}
                             <EditButton>
                                 <div>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -392,7 +467,7 @@ export default function Mypage() {
                                         <path d="M15 6L18 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                         <path d="M13 20H21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
-                                    <span onClick={() => navigate('/mypage/:id')}>프로필정보 편집하기</span> 
+                                    <span onClick={() => navigate(`/mypage/${userId}`)}>프로필정보 편집하기</span> 
                                 </div>
                             </EditButton>
                             <ProfileBottomContainer>
@@ -422,7 +497,7 @@ export default function Mypage() {
                         >
                             <span>북마크</span>
                             <div className="count">
-                                <span className="countText">{bookmarkCards.length}</span>
+                                <span className="countText">{bookmarkedCards.length}</span>
                             </div>
                         </Tap>
                         <Tap
@@ -435,24 +510,48 @@ export default function Mypage() {
                     <Line/>
                     {/* 각 탭에 대한 카드컴포넌트 */}
                     <CardsContainer>
-                    {cards.map((card, index) => (
-                        <CardItem key={index} onClick={() => handleCardClick(card)}>
-                            <Card
-                                title={card.title}
-                                image={exampleImg} // 예시 이미지 사용
-                                name={card.name}
-                                views={card.views}
-                                likes={card.likes}
-                                hoverMode={hoverMode}
-                            />
-                        </CardItem>
-                    ))}
+                        {activeTab === "portfolio" && (
+                            <CardItem>
+                                <AddPortfolioCard onClick={() => navigate('/write-portfolio')}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="33" height="32" viewBox="0 0 33 32" fill="none">
+                                        <path d="M16.5 0C7.668 0 0.5 7.168 0.5 16C0.5 24.832 7.668 32 16.5 32C25.332 32 32.5 24.832 32.5 16C32.5 7.168 25.332 0 16.5 0ZM24.5 16C24.5 16.8837 23.7837 17.6 22.9 17.6H18.1V22.4C18.1 23.2837 17.3837 24 16.5 24V24C15.6163 24 14.9 23.2837 14.9 22.4V17.6H10.1C9.21635 17.6 8.5 16.8837 8.5 16V16C8.5 15.1163 9.21634 14.4 10.1 14.4H14.9V9.6C14.9 8.71635 15.6163 8 16.5 8V8C17.3837 8 18.1 8.71634 18.1 9.6V14.4H22.9C23.7837 14.4 24.5 15.1163 24.5 16V16Z" fill="#1570EF"/>
+                                    </svg>
+                                    <span>포트폴리오 추가하기</span>
+                                </AddPortfolioCard>
+                            </CardItem>
+                        )}
+                        
+                        {cards.map((card, index) => (
+                            <CardItem key={index} onClick={() => handleCardClick(card)}>
+                                <Card
+                                    title={card.title}
+                                    image={exampleImg} // 예시 이미지 사용
+                                    name={card.name}
+                                    views={card.views}
+                                    likes={card.likes}
+                                    hoverMode={activeTab === "portfolio" ? "mypage" : "home"}
+                                    isBookmarked={card.isBookmarked} // 북마크 상태 전달
+                                    onBookmarkChange={() => handleBookmarkToggle(card.id)} // 북마크 상태 변경 함수 전달
+                                />
+                            </CardItem>
+                        ))}
                     </CardsContainer>
 
                     {/* 포트폴리오 상세 페이지 모달 */}
                     {selectedCard && <PortfolioDetailModal card={selectedCard} onClose={closeModal} />}
                 </MypageRightContainer>
             </MypageItemContainer>
+
+            
+            {/* 팔로워 또는 팔로잉 모달 */}
+            {isModalOpen && (
+                <FollowersModal
+                    type={modalType}
+                    users={modalType === 'followers' ? followers : following}
+                    onClose={handleCloseModal}
+                    followedUsers={[1, 2, 3]}
+                />
+            )}
         </MypageContainer>
     )
 }
