@@ -68,22 +68,12 @@ const ArticleTextIcon = styled.div`
 
 // 북마크 아이콘
 const BookmarkIcon = styled.div`
-    // display: flex;
-    // width: 28px;
-    // height: 29px;
-    // margin-left: auto;
-
     display: flex;
     width: 36px;
     height: 36px;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    
-    // svg {
-    //     width: 100%;
-    //     height: 100%;
-    // }
 `;
 
 // 아티클 상단 이름
