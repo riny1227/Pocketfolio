@@ -140,6 +140,7 @@ export default function InputAndDropdown ({ readOnly, placeholder, value, setVal
 
     // input 클릭하면 드롭다운 보여주거나 닫는 함수
     const clickInput = () => {
+        // if (!readOnly && value === "") return; // readOnly가 false이면서, value가 비어있으면 드롭다운 열리지 않음
         setVisible((prevState) => !prevState);
     }
 
@@ -177,14 +178,13 @@ export default function InputAndDropdown ({ readOnly, placeholder, value, setVal
                     onChange={handleInputReadOnlyFalse}
                 />
                 {iconSvg && <StyledInputIcon $backIcon={backIcon}>{iconSvg}</StyledInputIcon>}
-                {/* *************토글 아이콘 색상 -> 디자인 확정 후 다시 수정 예정************* */}
                 {hasToggle && (
                     <ToggleIcon>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                             {isVisible ? (
-                                <path d="M6 15L12 9L18 15" stroke="#222222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M6 15L12 9L18 15" stroke="#909090" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             ) : (
-                                <path d="M18 9L12 15L6 9" stroke="#222222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M18 9L12 15L6 9" stroke="#909090" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             )}
                         </svg>
                     </ToggleIcon>

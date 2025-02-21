@@ -157,7 +157,7 @@ export default function Chat() {
         try {
             const response = await fetch("/mockdata/Chats.json"); // 여기에 실제 API URL을 입력
             if (!response.ok) {
-                throw new Error("(mock data)  채팅 데이터를 가져오는 데 실패했습니다.");
+                throw new Error("(mock data) 채팅 데이터를 가져오는 데 실패했습니다.");
             }
             const data = await response.json();
             setChatList(data); // API 응답 데이터를 state에 저장

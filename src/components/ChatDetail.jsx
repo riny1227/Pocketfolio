@@ -214,8 +214,6 @@ export default function ChatDetail({ chatId, onBack }) {
     }
 
     let lastDate = null;
-    let lastSender = null;
-    let isFirstGroup = true; // 첫 번째 그룹인지 확인
 
     return (
         <ChatDetailContainer>
@@ -281,8 +279,6 @@ export default function ChatDetail({ chatId, onBack }) {
                     // 그룹의 마지막 요소인지 판단
                     const isLastMessage =
                         index === array.length - 1 || array[index + 1].sender !== message.sender;
-
-                    lastSender = message.sender;
 
                     return (
                         <div key={message.messageId}>
