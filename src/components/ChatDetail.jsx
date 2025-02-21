@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // Chat Detail 전체 컨테이너
 const ChatDetailContainer = styled.div`
@@ -75,7 +75,7 @@ const ChatAlarmIcon = styled.div`
 const MessageContainer = styled.div`
     flex-grow: 1;
     overflow-y: auto;
-    padding: 16px 24px;
+    padding: 0 24px 16px 24px;
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -123,12 +123,82 @@ const MessageBubble = styled.div`
     background-color: ${({ $isMe }) => ($isMe ? "#1570EF" : "#F8F8F8")};
     
     color: ${({ $isMe }) => ($isMe ? "#fff" : "#222")};
-    font-size: 12px;
     font-feature-settings: 'liga' off, 'clig' off;
     font-family: 'Pretendard-Regular';
     font-size: 12px;
     font-style: normal;
     line-height: 20px;
+`;
+
+// 첨부파일 메시지 하나
+const FileMessageBubble = styled.div`
+    display: flex;
+    max-width: 240px;
+    padding: 8px 16px;
+    border-radius: 16px;
+    word-wrap: break-word;
+    box-sizing: border-box;
+    background-color: ${({ $isMe }) => ($isMe ? "#1570EF" : "#F8F8F8")};
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    
+    color: ${({ $isMe }) => ($isMe ? "#fff" : "#222")};
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: 'Pretendard-Regular';
+    font-size: 14px;
+    font-style: normal;
+    line-height: 22px;
+`;
+
+// 첨부파일 보낼 때 첨부파일 채팅 안에 들어가는 아이콘 div
+const FileIcon = styled.div`
+    display: flex;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1/1;
+    border-radius: 20px;
+    background: #FFF;
+`;
+
+// 첨부파일 이름
+const FileName = styled.div`
+    color: ${({ $isMe }) => ($isMe ? "#fff" : "#222")};
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: 'Pretendard-Regular';
+    font-size: 14px;
+    font-style: normal;
+    line-height: 22px;
+`;
+
+const FileCapacity = styled.div`
+    color: ${({ $isMe }) => ($isMe ? "#E6E6E6" : "#909090")};
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: 'Pretendard-Regular';
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+`;
+
+// 사용자 프로필 사진 감싸는 **큰** div - 상대 채팅 왼쪽에 붙는 요소
+const BigAvatarWrapper = styled.div`
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+    margin-right: 8px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-color: #dceafd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* 검은색 라인 방지 */
 `;
 
 // 상세 채팅의 하단바(입력칸, 파일첨부)를 감싸는 컨테이너
@@ -183,11 +253,16 @@ const IconButton = styled.button`
     align-items: center;
     justify-content: center;
     padding: 0;
+    outline: none;
 `;
 
 export default function ChatDetail({ chatId, onBack }) {
-    const [chatDetailInfo, setChatDetailInfo] = useState(null); // api로 상세 채팅 정보(누구와의 채팅인지) 받아와서 이 곳에 저장
-    const [isAlarmOn, setAlarmOn] = useState(false);
+    const [chatDetailInfo, setChatDetailInfo] = useState(null);  // api로 상세 채팅 정보(누구와의 채팅인지) 받아와서 이 곳에 저장
+    const [isAlarmOn, setAlarmOn] = useState(false);  // 채팅 알림이 켜져 있는지 꺼져 있는지 여부 저장
+    const [messages, setMessages] = useState([]);  
+    const [inputMessage, setInputMessage] = useState("");
+    const fileInputRef = useRef(null);
+    const messagesEndRef = useRef(null);
 
     useEffect(() => {
         const fetchChatDetail = async () => {
@@ -198,6 +273,7 @@ export default function ChatDetail({ chatId, onBack }) {
                 }
                 const data = await response.json();
                 setChatDetailInfo(data);
+                setMessages(data.messages);
                 setAlarmOn(data.alarmOn);
             } catch (error) {
                 console.error("채팅 상세 데이터 불러오기 오류:", error);
@@ -209,11 +285,49 @@ export default function ChatDetail({ chatId, onBack }) {
         }
     }, [chatId]);
 
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
+    const formatFileSize = (size) => {
+        return size >= 1024 * 1024 
+            ? (size / (1024 * 1024)).toFixed(2) + " MB"
+            : (size / 1024).toFixed(2) + " KB";
+    };
+
+    const handleSendMessage = () => {
+        if (inputMessage.trim() !== "") {
+            const newMessage = {
+                messageId: messages.length + 1,
+                sender: "me",
+                content: inputMessage,
+                timestamp: new Date().toISOString(),
+            };
+            setMessages([...messages, newMessage]);
+            setInputMessage("");
+        }
+    };
+
+    const handleFileUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const newFileMessage = {
+                messageId: messages.length + 1,
+                sender: "me",
+                fileName: file.name,
+                fileSize: formatFileSize(file.size), // 파일 용량 포맷 적용
+                timestamp: new Date().toISOString(),
+            };
+            setMessages([...messages, newFileMessage]);
+        }
+    };
+
     if (!chatDetailInfo) {
         return <ChatDetailContainer>Loading...</ChatDetailContainer>;
     }
 
     let lastDate = null;
+
 
     return (
         <ChatDetailContainer>
@@ -259,55 +373,82 @@ export default function ChatDetail({ chatId, onBack }) {
             </TopWrapper>
 
             <MessageContainer>
-                {chatDetailInfo.messages.map((message, index, array) => {
+                {messages.map((message, index, array) => {
                     const messageDate = new Date(message.timestamp).toLocaleDateString("ko-KR", {
                         year: "numeric",
                         month: "long",
                         day: "numeric",
                     });
-
-                    // 날짜가 바뀌었을 때만 타임스탬프 추가
                     const showDate = messageDate !== lastDate;
                     lastDate = messageDate;
 
-                    // 그룹의 첫 번째 요소인지 판단
-                    const isFirst = index === 0 || array[index - 1].sender !== message.sender;
-
-                    // 메시지를 보낸 사람이 '나'인지 확인
                     const isMe = message.sender === "me";
-
-                    // 그룹의 마지막 요소인지 판단
-                    const isLastMessage =
-                        index === array.length - 1 || array[index + 1].sender !== message.sender;
+                    const isLastMessage = index === array.length - 1 || array[index + 1].sender !== message.sender;
+                    const hasAvatar = !isMe && isLastMessage;
 
                     return (
-                        <div key={message.messageId}>
-                            {showDate && <div style={{ display: "flex", justifyContent: "center" }}><Timestamp $isFirst={isFirst}>{messageDate}</Timestamp></div>}
-                            <MessageGroup $isMe={isMe} $isLastMessage={isLastMessage}>
-                                <MessageBubble $isMe={isMe}>
-                                    {message.content}
-                                </MessageBubble>
-                            </MessageGroup>
+                        <div key={message.messageId} style={{ display: "flex", flexDirection: "column" }}>
+                            {showDate && <Timestamp style={{ alignSelf: "center" }}>{messageDate}</Timestamp>}
+                            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: isMe ? "flex-end" : "flex-start" }}>
+                                {!isMe && (
+                                    <BigAvatarWrapper style={{ visibility: hasAvatar ? "visible" : "hidden" }}>
+                                        {chatDetailInfo.src ? (
+                                            <ChatDetailAvatar src={chatDetailInfo.src} alt="profile" /> // mockdata에서는 profileImage로 되어있는데 api 연결 전까지는 연동 X
+                                        ) : (
+                                            // 기본 프로필 아이콘
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M8 7C8 5.93913 8.42143 4.92172 9.17157 4.17157C9.92172 3.42143 10.9391 3 12 3C13.0609 3 14.0783 3.42143 14.8284 4.17157C15.5786 4.92172 16 5.93913 16 7C16 8.06087 15.5786 9.07828 14.8284 9.82843C14.0783 10.5786 13.0609 11 12 11C10.9391 11 9.92172 10.5786 9.17157 9.82843C8.42143 9.07828 8 8.06087 8 7ZM8 13C6.67392 13 5.40215 13.5268 4.46447 14.4645C3.52678 15.4021 3 16.6739 3 18C3 18.7956 3.31607 19.5587 3.87868 20.1213C4.44129 20.6839 5.20435 21 6 21H18C18.7956 21 19.5587 20.6839 20.1213 20.1213C20.6839 19.5587 21 18.7956 21 18C21 16.6739 20.4732 15.4021 19.5355 14.4645C18.5979 13.5268 17.3261 13 16 13H8Z" fill="#1570EF"/>
+                                            </svg>
+                                        )}
+                                    </BigAvatarWrapper>
+                                )}
+                                <MessageGroup $isMe={isMe} style={{ alignItems: isMe ? "flex-end" : "flex-start" }}>
+                                    {message.fileName ? (
+                                        <FileMessageBubble $isMe={isMe}>
+                                            <FileIcon>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M7 21C5.89543 21 5 20.1046 5 19V3H14L19 8V19C19 20.1046 18.1046 21 17 21H7Z" stroke="#1570EF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <path d="M13 3V9H19" stroke="#1570EF" stroke-width="2" stroke-linejoin="round"/>
+                                                </svg>
+                                            </FileIcon>
+                                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start' }}>
+                                                <FileName $isMe={isMe}>{message.fileName}</FileName>
+                                                <FileCapacity $isMe={isMe}>{message.fileSize}</FileCapacity>
+                                            </div>
+                                        </FileMessageBubble>
+                                    ) : (
+                                        <MessageBubble $isMe={isMe}>{message.content}</MessageBubble>
+                                    )}
+                                </MessageGroup>
+                            </div>
                         </div>
                     );
                 })}
+                <div ref={messagesEndRef} />
             </MessageContainer>
+
 
             <BottomWrapper>
                 <InputContainer>
                     {/* 텍스트 입력 칸 */}
-                    <StyledInput type="text" placeholder="메시지를 입력하세요" />
+                    <StyledInput 
+                        type="text" 
+                        placeholder="메시지를 입력하세요" 
+                        value={inputMessage} 
+                        onChange={(e) => setInputMessage(e.target.value)}
+                    />
 
                     <div style={{ display: "flex", gap: "4px" }}>
+                        <input type="file" style={{ display: "none" }} ref={fileInputRef} onChange={handleFileUpload} />
                         {/* 첨부파일 버튼 */}
-                        <IconButton>
+                        <IconButton onClick={() => fileInputRef.current.click()}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M7.5 6.75V18C7.5 21 9.75 22.5 12 22.5C14.25 22.5 16.5 21 16.5 18V4.5C16.5 2.25 15 1.5 13.5 1.5C12 1.5 10.5 2.25 10.5 4.5V17.25C10.5 18 11.25 18.75 12 18.75C12.75 18.75 13.5 18 13.5 17.25V6.75" stroke="#909090" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </IconButton>
 
                         {/* 채팅 보내기 버튼 */}
-                        <IconButton style={{ background: "#1570EF", width: "36px", height: "36px", borderRadius: "50%" }}>
+                        <IconButton onClick={handleSendMessage} style={{ background: "#1570EF", width: "36px", height: "36px", borderRadius: "50%" }}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M17.9909 6.01058L5.39895 10.5636L9.59394 12.9916L13.2929 9.29158C13.4806 9.10407 13.735 8.99878 14.0003 8.99888C14.2656 8.99897 14.5199 9.10444 14.7074 9.29208C14.895 9.47972 15.0002 9.73416 15.0001 9.99943C15.0001 10.2647 14.8946 10.5191 14.7069 10.7066L11.0069 14.4066L13.4369 18.6006L17.9909 6.01058ZM18.3139 3.76658C19.5089 3.33358 20.6669 4.49158 20.2339 5.68658L14.9519 20.2916C14.5179 21.4896 12.8819 21.6356 12.2429 20.5326L9.02594 14.9746L3.46794 11.7576C2.36494 11.1186 2.51095 9.48258 3.70895 9.04858L18.3139 3.76658Z" fill="white"/>
                             </svg>
@@ -317,4 +458,4 @@ export default function ChatDetail({ chatId, onBack }) {
             </BottomWrapper>
         </ChatDetailContainer>
     )
-}
+};
