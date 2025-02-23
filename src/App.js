@@ -12,6 +12,7 @@ import UserProfile from './pages/UserProfile';
 import WritePortfolio from './pages/WritePortfolio';
 import Login from './pages/Login';
 import PortfolioDetailModal from './components/share/PortfolioDetailModal';
+import FindPassword from './pages/FindPassword';
 
 function App() {
   return (
@@ -38,6 +39,8 @@ function App() {
           <Route path="/write-portfolio" element={<WritePortfolio />} />
           {/* 로그인 페이지 */}
           <Route path="/login" element={<Login />} />
+          {/* 비밀번호 찾기 페이지 */}
+          <Route path="/findpassword" element={<FindPassword />} />
         </Routes>
         <Footer />
       </div>

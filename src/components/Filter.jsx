@@ -12,7 +12,7 @@ const jobHierarchy = {
 const sortHierarchy = ['인기순', '최신순', '좋아요순', '조회순'];
 
 // 날짜 목록
-const dateHierarchy = ['1주일', '1개월', '6개월', '1년', '3년', '5년', '10년'];
+const dateHierarchy = ['1주일', '1개월', '6개월', '1년', '3년'];
 
 // Filter 컴포넌트 컨테이너
 const FilterContainer = styled.div`
@@ -64,10 +64,10 @@ const ToggleButton = styled.button`
 const FilterButton = styled.button`
     padding: 12px 32px;
     border-radius: 50px;
-    border: none;
-    cursor: pointer;
-    background-color: #EFEFEF;
+    border: 1px solid  #D5D5D5;
+    background-color: #fff;
     outline: none;
+    cursor: pointer;
 
     display: flex;
     gap: 8px;
@@ -87,11 +87,14 @@ const FilterCount = styled.div`
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background-color: #FFFFFF;
+    background-color: #1570EF;
+
+    font-feature-settings: 'liga' off, 'clig' off;
     font-family: 'Pretendard-SemiBold';
     font-size: 14px;
+    font-style: normal;
     line-height: 22px;
-    color: #222222;
+    color: #fff;
 `;
 
 // 상세 필터 목록 컨테이너 (필터 버튼 클릭하면 보이고 다시 클릭하면 사라짐)
@@ -112,12 +115,30 @@ const FilterOptionWrapper = styled.label`
     gap: 8px;
 `;
 
+// 필터 이름 + clear 버튼 묶음
+const NameAndClearBtn = styled.div`
+    display: flex;
+    justify-content: space-between;
+`;
+
 // 상세 필터 이름
 const FilterOptionName = styled.span`
     font-family: 'Pretendard-SemiBold';
     font-size: 14px;
     line-height: 22px;
     color: #222222;
+`;
+
+// 상세 필터 clear 초기화 버튼
+const FilterOptionClear = styled.button`
+    cursor: pointer;
+    border: none;
+    background: none;
+
+    font-family: 'Pretendard-Regular';
+    font-size: 12px;
+    line-height: 20px;
+    color: #909090;
 `;
 
 // 상세 필터 검색바 (태그, 기업, 날짜 등)
@@ -129,9 +150,9 @@ const FilterOptionInputBar = styled.input`
     align-items: center;
     box-sizing: border-box;
     border-radius: 8px;
-    border: 1px solid ${({ $isClicked }) => ($isClicked ? '#6C6C6C' : 'transparent')}; /* 상태에 따라 표시 or 숨김 */
+    border: 1px solid #d5d5d5; /* 상태에 따라 표시 or 숨김 */
     outline: none;
-    background-color: #ECECEC;
+    background-color: #fff;
 
     font-family: 'Pretendard-Regular';
     font-size: 18px;
@@ -157,17 +178,17 @@ const FilterOptionIcon = styled.div`
 `;
 
 // 상세 필터 검색바 토글 아이콘
-const FilterOptionToggleIcon = styled.div`
-    width: 24px;
-    height: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 50%;
-    right: 16px;
-    transform: translateY(-50%);
-`;
+// const FilterOptionToggleIcon = styled.div`
+//     width: 24px;
+//     height: 24px;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     position: absolute;
+//     top: 50%;
+//     right: 16px;
+//     transform: translateY(-50%);
+// `;
 
 /* ------------직무선택 드롭다운 style------------ */
 // 직무선택 드롭다운 전체
@@ -294,23 +315,16 @@ const SortSelector = styled.button`
 `;
 
 export default function Filter() {
-    // 직군선택 드롭다운 표시 -> true일 때 보임, false일 때 안보임
-    const [isJopVisible, setJopVisible] = useState(false);
-
-    // 선택된 직군들 저장
-    const [selectedJobs, setSelectedJobs] = useState([]);
-
-    // 부모 input(개발자, 디자이너) 상태 저장 - checked, indeterminate, unchecked
-    const [parentState, setParentState] = useState([]);
-
-    // 정렬 드롭다운 표시 -> true일 때 보임, false일 때 안보임
-    const [isSortVisible, setSortVisible] = useState(false);
-
-    // 선택된 정렬 방식 저장
-    const [selectedSort, setSelectedSort] = useState(sortHierarchy[0]);
-
-    // 상세 필터 목록 표시 -> true일 때 보임, false일 때 안보임
-    const [isFilterVisible, setFilterVisible] = useState(false);
+    const [isJopVisible, setJopVisible] = useState(false); // 직군선택 드롭다운 표시 -> true일 때 보임, false일 때 안보임
+    const [selectedJobs, setSelectedJobs] = useState([]); // 선택된 직군들 저장
+    const [parentState, setParentState] = useState([]); // 부모 input(개발자, 디자이너) 상태 저장 - checked, indeterminate, unchecked
+    const [isSortVisible, setSortVisible] = useState(false); // 정렬 드롭다운 표시 -> true일 때 보임, false일 때 안보임
+    const [selectedSort, setSelectedSort] = useState(sortHierarchy[0]); // 선택된 정렬 방식 저장
+    const [isFilterVisible, setFilterVisible] = useState(false); // 상세 필터 목록 표시 -> true일 때 보임, false일 때 안보임
+    const [companyOptions, setCompanyOptions] = useState([]); // 필터링된 기업 리스트
+    const [isCompanyVisible, setCompanyVisible] = useState(false); // 기업 드롭다운 표시 여부
+    const [companyQuery, setCompanyQuery] = useState(""); // 기업 검색어 저장
+    const [isCompanySelected, setCompanySelected] = useState(false); // 기업 선택 여부
 
     // 각 상세 필터 값 저장
     const [filters, setFilters] = useState({
@@ -320,7 +334,7 @@ export default function Filter() {
     });
 
     // 기업 드롭다운 표시 -> true일 때 보임, false일 때 안보임
-    const [isCompanyVisible, setCompanyVisible] = useState(false);
+    // const [isCompanyVisible, setCompanyVisible] = useState(false);
 
     // 필터 버튼 클릭하면 상세 필터 목록 나타나거나 사라지도록 하는 함수
     const clickFilterButton = () => {
@@ -401,6 +415,43 @@ export default function Filter() {
     // 적용된 필터 개수 계산 (빈 값은 카운트X)
     const filterCount = Object.values(filters).filter((value) => value !== "").length;
 
+    // 기업 필터에서 검색어를 이용해 기업 검색
+    // **********api 연결할 때는 백엔드 방식에 맞춰서 코드 변경 (현재는 프론트에서 필터링 하도록 되어있음)************
+    const searchCompanies = async (query) => {
+        if (!query) {
+            setCompanyOptions([]); // 검색어 없으면 리스트 초기화
+            setCompanyVisible(false); // 드롭다운 숨기기
+            return;
+        }
+
+        try {
+            const response = await fetch("/mockdata/Companies.json"); // JSON 파일에서 기업 리스트 불러오기
+            const data = await response.json();
+
+            // 검색어를 포함하는 기업 필터링
+            const filteredCompanies = data.companies
+                .map((company) => company.companyName) // 기업명만 추출
+                .filter((name) => name.includes(query)); // 검색어 포함 여부 확인
+
+            setCompanyOptions(filteredCompanies);
+            setCompanyVisible(true); // 입력 시 드롭다운 열기
+        } catch (error) {
+            console.error("기업 데이터 로드 실패:", error);
+            setCompanyOptions([]);
+        }
+    };
+
+    // 검색어 입력 시 동작 (드롭다운 표시 + 기업 검색)
+    const handleCompanyInputChange = (value) => {
+        setCompanyQuery(value);
+        // setCompanySelected(false); // 기업 선택 해제 (새로운 검색 가능하도록)
+        searchCompanies(value);
+
+        if (isCompanySelected === true) {
+            setFilters(prev => ({ ...prev, company: value }))
+        }
+    };
+
     return (
         <>
             <FilterContainer>
@@ -440,7 +491,7 @@ export default function Filter() {
                     </JobDropdown>
                 </ToggleDropdownWrapper>
                 <RightButtonContainer>
-                    {/* 필터 버튼 */}
+                    {/* 필터 */}
                     <FilterButton onClick={clickFilterButton}>
                         {filterCount > 0 ? (
                             <FilterCount>{filterCount}</FilterCount>
@@ -451,6 +502,7 @@ export default function Filter() {
                         )}
                         필터
                     </FilterButton>
+                    {/* 정렬 */}
                     <ToggleDropdownWrapper>
                         {/* 정렬 드롭다운의 토글 버튼 */}
                         <ToggleButton $isClicked={isSortVisible} onClick={clickSortButton}>{selectedSort}
@@ -477,6 +529,7 @@ export default function Filter() {
 
             {/* 필터 버튼 클릭하면 보이는 상세 필터 */}
             <DetailFilterContainer $visible={isFilterVisible}>
+
                 {/* 태그 필터 */}
                 <FilterOptionWrapper>
                     <FilterOptionName>태그</FilterOptionName>
@@ -486,48 +539,63 @@ export default function Filter() {
                         onChange={(e) => handleFilterChange("tag", e.target.value)}
                         />
                         <FilterOptionIcon>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M16.893 16.92L19.973 20M19 11.5C19 13.4891 18.2098 15.3968 16.8033 16.8033C15.3968 18.2098 13.4891 19 11.5 19C9.51088 19 7.60322 18.2098 6.1967 16.8033C4.79018 15.3968 4 13.4891 4 11.5C4 9.51088 4.79018 7.60322 6.1967 6.1967C7.60322 4.79018 9.51088 4 11.5 4C13.4891 4 15.3968 4.79018 16.8033 6.1967C18.2098 7.60322 19 9.51088 19 11.5Z" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M16.893 16.92L19.973 20M19 11.5C19 13.4891 18.2098 15.3968 16.8033 16.8033C15.3968 18.2098 13.4891 19 11.5 19C9.51088 19 7.60322 18.2098 6.1967 16.8033C4.79018 15.3968 4 13.4891 4 11.5C4 9.51088 4.79018 7.60322 6.1967 6.1967C7.60322 4.79018 9.51088 4 11.5 4C13.4891 4 15.3968 4.79018 16.8033 6.1967C18.2098 7.60322 19 9.51088 19 11.5Z" stroke="#909090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
                         </FilterOptionIcon>
                     </div>
                 </FilterOptionWrapper>
 
                 {/* 기업 필터 */}
-                <FilterOptionWrapper>
+                {/* <FilterOptionWrapper>
                     <FilterOptionName>기업</FilterOptionName>
-                    <div style={{ position: 'relative' }}>
-                        <FilterOptionInputBar 
+                    <InputAndDropdown 
+                        readOnly={false}
                         placeholder="선택"
                         value={filters.company}
-                        // onClick={clickCompanyInput}
-                        onChange={(e) => handleFilterChange("company", e.target.value)}
-                        />
-                        <FilterOptionIcon>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M3 21H21M9 8H10M9 12H10M9 16H10M14 8H15M14 12H15M14 16H15M5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        setValue={(newValue) => setFilters(prev => ({ ...prev, company: newValue }))}
+                        // data={dateHierarchy}
+                        width="389px"
+                        iconSvg={<svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+                            <path d="M3.33337 21H21.3334M9.33337 8H10.3334M9.33337 12H10.3334M9.33337 16H10.3334M14.3334 8H15.3334M14.3334 12H15.3334M14.3334 16H15.3334M5.33337 21V5C5.33337 4.46957 5.54409 3.96086 5.91916 3.58579C6.29423 3.21071 6.80294 3 7.33337 3H17.3334C17.8638 3 18.3725 3.21071 18.7476 3.58579C19.1227 3.96086 19.3334 4.46957 19.3334 5V21" stroke="#909090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>}
+                    />
+                </FilterOptionWrapper> */}
+                <FilterOptionWrapper>
+                    <FilterOptionName>기업</FilterOptionName>
+                    <InputAndDropdown 
+                        readOnly={false} // 기업 선택 후 입력 불가능
+                        placeholder="선택"
+                        value={companyQuery} // 검색어 상태 반영
+                        setValue={handleCompanyInputChange} // 검색어 변경 시 필터링
+                        data={isCompanyVisible ? companyOptions : []} // 드롭다운 데이터 설정
+                        width="389px"
+                        iconSvg={
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+                                <path d="M3.33337 21H21.3334M9.33337 8H10.3334M9.33337 12H10.3334M9.33337 16H10.3334M14.3334 8H15.3334M14.3334 12H15.3334M14.3334 16H15.3334M5.33337 21V5C5.33337 4.46957 5.54409 3.96086 5.91916 3.58579C6.29423 3.21071 6.80294 3 7.33337 3H17.3334C17.8638 3 18.3725 3.21071 18.7476 3.58579C19.1227 3.96086 19.3334 4.46957 19.3334 5V21" stroke="#909090" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
-                        </FilterOptionIcon>
-                        <FilterOptionToggleIcon>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="8" viewBox="0 0 15 8" fill="none">
-                                <path d="M13.6666 1L7.66663 7L1.66663 1" stroke="#222222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </FilterOptionToggleIcon>
-                    </div>
+                        }
+                    />
                 </FilterOptionWrapper>
 
                 {/* 날짜 필터 */}
                 <FilterOptionWrapper>
-                    <FilterOptionName>날짜</FilterOptionName>
+                    <NameAndClearBtn>
+                        <FilterOptionName>날짜</FilterOptionName>
+                        <FilterOptionClear onClick={() => setFilters(prev => ({ ...prev, date: "" }))}>clear</FilterOptionClear>
+                    </NameAndClearBtn>
                     <InputAndDropdown 
-                        readOnly={false}
+                        readOnly={true}
                         placeholder="선택"
                         value={filters.date}
                         setValue={(newValue) => setFilters(prev => ({ ...prev, date: newValue }))}
                         data={dateHierarchy}
                         width="389px"
-                        iconSvg={<svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 18 20" fill="none">
-                            <path d="M16 18H2V7H16M13 0V2H5V0H3V2H2C0.89 2 0 2.89 0 4V18C0 18.5304 0.210714 19.0391 0.585786 19.4142C0.960859 19.7893 1.46957 20 2 20H16C16.5304 20 17.0391 19.7893 17.4142 19.4142C17.7893 19.0391 18 18.5304 18 18V4C18 3.46957 17.7893 2.96086 17.4142 2.58579C17.0391 2.21071 16.5304 2 16 2H15V0M14 11H9V16H14V11Z" fill="#222222"/>
+                        iconSvg={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M4 4H20V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V4Z" stroke="#909090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4 8H20" stroke="#909090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 3V5" stroke="#909090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 3V5" stroke="#909090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>}
                     />
                 </FilterOptionWrapper>
