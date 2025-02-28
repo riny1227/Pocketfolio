@@ -30,6 +30,17 @@ const LoginTitle = styled.div`
     line-height: 40px;
 `;
 
+// 비밀번호 찾기 설명 부분
+const Description = styled.div`
+    color: #909090;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: 'Pretendard-Regular';
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;=
+`;
+
 // 아이디 칸, 비밀번호 칸, 로그인 버튼 감싸는 컨테이너
 const InputButtonWrapper = styled.div`
     display: flex;
@@ -108,7 +119,7 @@ const StyledLink = styled(Link)`
     line-height: 24px;
 `;
 
-export default function Login() {
+export default function FindPassword() {
     const [id, setId] = useState("");
     const [password, setPassword] = useState("");
     const { login } = useAuth();
@@ -126,32 +137,24 @@ export default function Login() {
     return (
         <LoginContainer>
             <CenterWrapper>
-                <LoginTitle>로그인</LoginTitle>
+                <LoginTitle>비밀번호를 잊으셨나요?</LoginTitle>
+                <Description>비밀번호를 재설정하려면 아래에 계정 ID를 입력해주세요.</Description>
                 <InputButtonWrapper>
                     {/* 아이디 입력 칸 */}
                     <StyledInput 
                         type="text"
-                        placeholder="아이디를 입력해주세요"
+                        placeholder="이메일을 입력해주세요"
                         value={id} 
                         onChange={(e) => setId(e.target.value)} 
                     />
 
-                    {/* 비밀번호 입력 칸 */}
-                    <StyledInput 
-                        type="password" 
-                        placeholder="비밀번호를 입력해주세요" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} 
-                    />
 
                     {/* 로그인 버튼 */}
-                    <StyledButton disabled={isDisabled} onClick={handleLogin}>로그인</StyledButton>
+                    <StyledButton disabled={isDisabled} onClick={handleLogin}>인증번호 요청</StyledButton>
                 </InputButtonWrapper>
                 <LinkWrapper>
                     {/* 비밀번호 찾기 링크 - 페이지 생성 이후 연결 링크 수정!!!!!!!!!!!!!!! */}
-                    <StyledLink to="/findpassword">비밀번호 찾기</StyledLink> 
-                    {/* 회원가입 링크 - 페이지 생성 이후 연결 링크 수정!!!!!!!!!!!!!!! */}
-                    <StyledLink to="/signup">회원가입</StyledLink>
+                    <StyledLink to="/login">로그인</StyledLink>
                 </LinkWrapper>
             </CenterWrapper>
         </LoginContainer>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import styled from 'styled-components';
 import logo from '../../imgs/logo.png';
 import Chat from '../Chat';
@@ -212,8 +213,8 @@ const ProfileIcon = styled.button`
 
 export default function Header() {
     const navigate = useNavigate();
+    const { isLoggedIn } = useAuth(); 
     const [searchText, setSearchText] = useState('');
-    const [isLoggedIn, setIsLoggedIn] = useState(false);  // 로그인 상태 관리
     const [isChatOpen, setChatOpen] = useState(false);
 
     return (
@@ -251,7 +252,7 @@ export default function Header() {
                 <ArticleText onClick={() => navigate('/article')}>아티클</ArticleText>
             </LeftContainer>
 
-            {/* 로그인 여부에 따른 컨텐츠 */}
+            {/* 로그인 여부에 따른 헤더 */}
             {isLoggedIn ? (
                 <RightContainer>
                     {/* 포트폴리오 작성 버튼 */}
@@ -294,8 +295,7 @@ export default function Header() {
                     {/* 회원가입 */}
                     <SignUpText onClick={() => navigate('/signup')}>회원가입</SignUpText>
                     {/* 로그인 */}
-                    {/* <LogInButton onClick={() => navigate('/login')}>로그인</LogInButton> */}
-                    <LogInButton onClick={() => setIsLoggedIn(true)}>로그인</LogInButton>
+                    <LogInButton onClick={() => navigate('/login')}>로그인</LogInButton>
                 </SignContainer>
             )}
         </HeaderContainer>        
