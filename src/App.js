@@ -12,7 +12,7 @@ import MyPageDetail from './pages/MypageDetail';
 import UserProfile from './pages/UserProfile';
 import WritePortfolio from './pages/WritePortfolio';
 import Login from './pages/Login';
-import FindPassword from './pages/FindPassword';
+import PortfolioDetailModal from './components/share/PortfolioDetailModal';
 
 function App() {
   return (

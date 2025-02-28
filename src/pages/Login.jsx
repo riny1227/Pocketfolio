@@ -130,7 +130,7 @@ export default function Login() {
                 <InputButtonWrapper>
                     {/* 아이디 입력 칸 */}
                     <StyledInput 
-                        type="text"
+                        type="email"
                         placeholder="아이디를 입력해주세요"
                         value={id} 
                         onChange={(e) => setId(e.target.value)} 
@@ -148,9 +148,10 @@ export default function Login() {
                     <StyledButton disabled={isDisabled} onClick={handleLogin}>로그인</StyledButton>
                 </InputButtonWrapper>
                 <LinkWrapper>
-                    {/* 비밀번호 찾기 링크 - 페이지 생성 이후 연결 링크 수정!!!!!!!!!!!!!!! */}
+                    {/* 비밀번호 찾기 링크 */}
                     <StyledLink to="/findpassword">비밀번호 찾기</StyledLink> 
-                    {/* 회원가입 링크 - 페이지 생성 이후 연결 링크 수정!!!!!!!!!!!!!!! */}
+
+                    {/* 회원가입 링크 */}
                     <StyledLink to="/signup">회원가입</StyledLink>
                 </LinkWrapper>
             </CenterWrapper>
