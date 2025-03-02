@@ -210,12 +210,22 @@ const NextButton = styled.button`
 
     &:hover {
         background: ${({ disabled }) => 
-            disabled ? '#E6E6E6' : '#B9D6F9'}; /* 호버시 색상 변경 */
+            disabled ? '#E6E6E6' : '#B6D3FA'};
+        
+        span {
+            color: ${({ disabled }) => 
+                disabled ? '#909090' : '#115ABF'};  /* 호버 시 텍스트 색상 변경 */
+        }
     }
 
     &:active {
         background: ${({ disabled }) => 
-            disabled ? '#E6E6E6' : '#A3C7F6'}; /* 클릭시 색상 변경 */
+            disabled ? '#E6E6E6' : '#1570EF'};
+
+        span {
+            color: ${({ disabled }) => 
+                disabled ? '#909090' : '#FFFFFF'};  /* 클릭 시 텍스트 색상 변경 */
+        }
     }
 `;
 
