@@ -1,0 +1,44 @@
+{
+    "chatId": 1,
+    "profileImage": "https://example.com/profile.jpg",
+    "userName": "김슈니",
+    "alarmOn": true,
+    "messages": [
+        {
+            "messageId": 1,
+            "sender": "me", 
+            "content": "안녕하세요!",
+            "timestamp": "2025-02-20 10:00"
+        },
+        {
+            "messageId": 2,
+            "sender": "me", 
+            "content": "혹시 제작 시간까지 총 얼마정도 걸리셨을까요? 기간을 얼마 잡고 제작하셨는지 궁금해요!",
+            "timestamp": "2025-02-20 10:02"
+        },
+        {
+            "messageId": 3,
+            "sender": "me",
+            "content": "포트폴리오 너무 인상깊게 잘 봤습니다!",
+            "timestamp": "2025-02-20 10:05"
+        },
+        {
+            "messageId": 4,
+            "sender": "me",
+            "content": "편하실 때 답변주세요 감사합니다!",
+            "timestamp": "2025-02-21 8:56"
+        },
+        {
+            "messageId": 5,
+            "sender": "other",
+            "content": "안녕하세요:)",
+            "timestamp": "2025-02-22 09:35"
+        },
+        {
+            "messageId": 6,
+            "sender": "other",
+            "content": "프로젝트 완성까지는 3달 정도, 포트폴리오는 정리만 한 거라 4-5일 정도에 끝낸 것 같습니다.",
+            "timestamp": "2025-02-22 09:39"
+        }
+    ]
+}
