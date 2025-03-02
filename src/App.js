@@ -12,7 +12,7 @@ import MyPageDetail from './pages/MypageDetail';
 import UserProfile from './pages/UserProfile';
 import WritePortfolio from './pages/WritePortfolio';
 import Login from './pages/Login';
-import PortfolioDetailModal from './components/share/PortfolioDetailModal';
+import FindPassword from './pages/FindPassword';
 
 function App() {
   return (
@@ -41,8 +41,7 @@ function App() {
             <Route path="/user/:id" element={<UserProfile />} />
             <Route path="/userprofile" element={<UserProfile />} />
             {/* 포트폴리오 작성 페이지 */}
-            <Route path="/write-portfolio" element={<WritePortfolio />} />
-            
+            <Route path="/write-portfolio" element={<WritePortfolio />} />   
           </Routes>
           <Footer />
         </div>

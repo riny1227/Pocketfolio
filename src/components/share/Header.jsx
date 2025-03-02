@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import styled from 'styled-components';
 import logo from '../../imgs/logo.png';
 import Chat from '../Chat';
+import profileImage from '../../imgs/Profile.png';
 
 // 헤더 컨테이너
 const HeaderContainer = styled.div`
@@ -17,7 +18,6 @@ const HeaderContainer = styled.div`
     padding: 0px 24px;
     z-index: 1000;
     box-sizing: border-box;
-    overflow: hidden; // 넘치는 내용 잘리게 처리
 `;
 
 // 로고 + 검색창 + 아티클 컨테이너
@@ -28,6 +28,7 @@ const LeftContainer = styled.div`
     flex-direction: row;
     align-items: center;
     gap: 32px;
+    margin-left: 104px;
 `;
 
 // 검색창 컨테이너
@@ -104,7 +105,7 @@ const SignContainer = styled.div`
     display: flex;
     align-items: center;
     gap: 32px;
-    margin-left: auto; // 오른쪽 끝에 위치하도록
+    margin-right: 104px;
 `;
 
 // 회원가입 텍스트
@@ -145,6 +146,7 @@ const RightContainer = styled.div`
     display: flex;
     align-items: center;
     gap: 32px;
+    margin-right: 104px;
 `;
 
 // 포트폴리오 작성 버튼
@@ -197,6 +199,14 @@ const BellIcon = styled.button`
     padding: 0; /* 여백 제거 */
 `;
 
+// 프로필 wrapper
+const ProfileWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+`;
+
 // 프로필 아이콘
 const ProfileIcon = styled.button`
     display: flex;
@@ -209,13 +219,77 @@ const ProfileIcon = styled.button`
     background: #E8F1FD;
     border: none;
     cursor: pointer;
+    position: relative;
+`;
+
+// 드롭다운 메뉴 스타일
+const DropdownMenu = styled.div`
+    position: absolute;
+    top: 52px;
+    right: -60px;
+    width: 264px;
+    height: 216px;
+    flex-shrink: 0;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 16px;
+    border: 1px solid #E6E6E6;
+    background: #FFF;
+    box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.08);
+    display: ${props => (props.isVisible ? 'flex' : 'none')};
+    z-index: 2000;
+`;
+
+// 프로필 이미지
+const ProfileImg = styled.div`
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    background-image: url(${profileImage});
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+`;
+
+// 드롭다운 메뉴 아이템 스타일
+const DropdownItem = styled.span`
+    padding: 8px 20px;
+    color: #000;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: Pretendard;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    text-align: left;
+    line-height: 24px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #F8F8F8;
+    }
 `;
 
 export default function Header() {
     const navigate = useNavigate();
-    const { isLoggedIn } = useAuth(); 
+    const { isLoggedIn, logout } = useAuth(); 
     const [searchText, setSearchText] = useState('');
     const [isChatOpen, setChatOpen] = useState(false);
+    // 사용자 ID 변수 선언(임시)
+    const userId = 1;
+    // 드롭다운 상태 관리
+    const [isVisible, setIsVisible] = useState(false);  
+    // 드롭다운 메뉴 마우스 올렸을 때 보이게
+    const handleMouseEnter = () => setIsVisible(true);
+    const handleMouseLeave = () => setIsVisible(false);
+    const handleDropdownMouseEnter = () => setIsVisible(true);
+    const handleDropdownMouseLeave = () => setIsVisible(false);
+
+    // 로그아웃 함수
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
 
     return (
         <HeaderContainer>
@@ -284,11 +358,27 @@ export default function Header() {
                     </BellIcon>
 
                     {/* 프로필 아이콘 */}
-                    <ProfileIcon onClick={() => navigate('/mypage')}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.33333 8.16664C9.33333 5.58931 11.4227 3.49997 14 3.49997C16.5773 3.49997 18.6667 5.58931 18.6667 8.16664C18.6667 10.744 16.5773 12.8333 14 12.8333C11.4227 12.8333 9.33333 10.744 9.33333 8.16664ZM9.33333 15.1666C6.11167 15.1666 3.5 17.7783 3.5 21C3.5 22.933 5.067 24.5 7 24.5H21C22.933 24.5 24.5 22.933 24.5 21C24.5 17.7783 21.8883 15.1666 18.6667 15.1666H9.33333Z" fill="#1570EF"/>
-                        </svg>
-                    </ProfileIcon>
+                    <ProfileWrapper
+                        onMouseEnter={handleMouseEnter} 
+                        onMouseLeave={handleMouseLeave} 
+                    >
+                        <ProfileIcon onClick={() => navigate('/mypage')} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M9.33333 8.16664C9.33333 5.58931 11.4227 3.49997 14 3.49997C16.5773 3.49997 18.6667 5.58931 18.6667 8.16664C18.6667 10.744 16.5773 12.8333 14 12.8333C11.4227 12.8333 9.33333 10.744 9.33333 8.16664ZM9.33333 15.1666C6.11167 15.1666 3.5 17.7783 3.5 21C3.5 22.933 5.067 24.5 7 24.5H21C22.933 24.5 24.5 22.933 24.5 21C24.5 17.7783 21.8883 15.1666 18.6667 15.1666H9.33333Z" fill="#1570EF"/>
+                            </svg>
+                        </ProfileIcon>
+
+                        {/* 드롭다운 메뉴 */}
+                        <DropdownMenu 
+                            isVisible={isVisible}
+                            onMouseEnter={handleDropdownMouseEnter}
+                            onMouseLeave={handleDropdownMouseLeave}
+                        >
+                            <ProfileImg onClick={() => navigate('/mypage')}/>
+                            <DropdownItem onClick={() => navigate(`/mypage/${userId}`)}>프로필 편집</DropdownItem>
+                            <DropdownItem onClick={handleLogout}>로그아웃</DropdownItem>
+                        </DropdownMenu>
+                    </ProfileWrapper>
                 </RightContainer>
             ) : (
                 <SignContainer>

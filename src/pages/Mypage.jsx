@@ -5,7 +5,8 @@ import Card from '../components/share/Card';
 import FollowersModal from '../components/share/FollowersModal';
 
 // 대체 이미지 사진 사용
-import exampleImg from '../imgs/example.png'
+import exampleImg from '../imgs/example.png';
+import profileImage from '../imgs/Profile.png';
 
 // PortfolioDetailModal 불러오기
 import PortfolioDetailModal from '../components/share/PortfolioDetailModal';
@@ -75,11 +76,12 @@ const Profile = styled.div`
 
 // 프로필 이미지
 const ProfileImg = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 17px;
-    align-self: stretch;
+    width: 159px;
+    height: 159px;
+    border-radius: 50%;
+    background-image: url(${profileImage});
+    background-size: cover;
+    background-position: center;
 `;
 
 // 프로필 이름
@@ -437,11 +439,7 @@ export default function Mypage() {
                         {/* 프로필 이미지+이름 */}
                         <Profile>
                             {/* 프로필 이미지 */}
-                            <ProfileImg>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="159" height="159" viewBox="0 0 159 159" fill="none">
-                                    <circle cx="79.5" cy="79.5" r="79.5" fill="white"/>
-                                </svg>
-                            </ProfileImg>
+                            <ProfileImg/>
                             {/* 프로필 이름 */}
                             <ProfileName>{name}</ProfileName>
                         </Profile>
