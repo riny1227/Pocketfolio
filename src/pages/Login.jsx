@@ -1,6 +1,7 @@
 import styled from "styled-components";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const LoginContainer = styled.div`
     width: 100%;
@@ -110,8 +111,17 @@ const StyledLink = styled(Link)`
 export default function Login() {
     const [id, setId] = useState("");
     const [password, setPassword] = useState("");
+    const { login } = useAuth();
+    const navigate = useNavigate();
 
     const isDisabled = id.trim() === "" || password.trim() === ""; // 공백 제외하고 입력된 문자 체크
+
+    const handleLogin = () => {
+        if (!isDisabled) {
+            login(id);
+            navigate("/"); // 로그인 후 메인 페이지로 이동
+        }
+    };
 
     return (
         <LoginContainer>
@@ -135,7 +145,7 @@ export default function Login() {
                     />
 
                     {/* 로그인 버튼 */}
-                    <StyledButton disabled={isDisabled}>로그인</StyledButton>
+                    <StyledButton disabled={isDisabled} onClick={handleLogin}>로그인</StyledButton>
                 </InputButtonWrapper>
                 <LinkWrapper>
                     {/* 비밀번호 찾기 링크 */}
