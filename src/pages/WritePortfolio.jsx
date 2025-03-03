@@ -108,11 +108,13 @@ const ContentContainer = styled.div`
     display: flex;
     width: 1280px;
     padding: 24px;
+    margin-bottom: 40px;
     flex-direction: column;
     align-items: flex-start;
     gap: 32px;
     border-radius: 12px;
-    border: 1px solid #E6E6E6;
+    border: none;
+    background: #FDFDFD;
     background: #FFF;
 `;
 
