@@ -473,14 +473,21 @@ export default function SignUp() {
     };
 
     // 인증번호 확인
-    const handleVerifyCode = () => {
-        if (inputCode === serverCode) {
-            setIsVerified(true);
-            alert("이메일 인증이 완료되었습니다.");
-        } else {
-            alert("인증번호가 올바르지 않습니다.");
+    const handleVerifyCode = async () => {
+        try {
+            const response = await verifyCode(userInfo.email, inputCode); // API 호출
+            if (response.success) {
+                setIsVerified(true);
+                alert("이메일 인증이 완료되었습니다.");
+            } else {
+                alert("인증번호가 올바르지 않습니다.");
+            }
+        } catch (error) {
+            console.error("인증 코드 검증 에러:", error);
+            alert("인증번호 검증 중 오류가 발생했습니다. 다시 시도해 주세요.");
         }
     };
+
 
     // 회원가입 처리
     const handleSignUp = async () => {
