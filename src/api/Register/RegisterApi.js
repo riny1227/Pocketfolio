@@ -68,7 +68,6 @@ export const verifyCode = async (code) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            withCredentials: true
         });
 
         console.log("이메일 인증번호 검증 응답:", response.data);
