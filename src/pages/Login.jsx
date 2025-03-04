@@ -112,6 +112,7 @@ const StyledLink = styled(Link)`
 export default function Login() {
     const [id, setId] = useState("");
     const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -120,12 +121,19 @@ export default function Login() {
     const handleLogin = async () => {
         if (!isDisabled) {
             try {
-                const { message, token } = await login(id, password); // 로그인 API 호출
-                login(token); // 토큰을 context에 저장
-                console.log(message);
-                navigate("/"); // 로그인 후 메인 페이지로 이동
+                // 로그인 API 호출
+                const response = await login(id, password);
+
+                if (response && response.message && response.token) {
+                    // 로그인 성공 시 context에 토큰 저장
+                    login(response.token);
+                    console.log(response.message); // 로그인 성공 메시지 출력
+                    navigate("/"); // 로그인 후 메인 페이지로 이동
+                }
             } catch (error) {
+                // API 에러 발생 시
                 console.error("로그인 에러:", error.message);
+                setErrorMessage(error.message); // 에러 메시지를 상태에 저장
             }
         }
     };
@@ -153,6 +161,9 @@ export default function Login() {
 
                     {/* 로그인 버튼 */}
                     <StyledButton disabled={isDisabled} onClick={handleLogin}>로그인</StyledButton>
+                    
+                    {/* 에러 메시지 출력 */}
+                    {errorMessage && <div style={{ color: 'red', marginTop: '10px' }}>{errorMessage}</div>}
                 </InputButtonWrapper>
                 <LinkWrapper>
                     {/* 비밀번호 찾기 링크 */}
