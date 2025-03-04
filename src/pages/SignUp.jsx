@@ -439,28 +439,19 @@ export default function SignUp() {
         setStep(step - 1);
     };
 
-    const [verificationCode, setVerificationCode] = useState(""); // 생성된 인증번호
+    // 이메일 인증 관련 상태
+    const [serverCode, setServerCode] = useState(""); // 서버에서 받은 인증번호
     const [inputCode, setInputCode] = useState(""); // 사용자가 입력한 인증번호
-    const [isVerified, setIsVerified] = useState(false); // 인증 여부
-    const [isCodeSent, setIsCodeSent] = useState(false); // 인증번호 전송 여부
-    // 이메일 유효성 검사
-    const isValidEmail = (email) => {
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regex.test(email);
-    };
-      
-    const isEmailValid = userInfo.email && isValidEmail(userInfo.email);
+    const [isVerified, setIsVerified] = useState(false); // 최종 인증 여부
 
-    // 인증번호가 6자리일 때
+    // 이메일 유효성 검사 함수
+    const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const isEmailValid = userInfo.email && isValidEmail(userInfo.email);
     const isCodeValid = inputCode.length === 6;
 
-    // 입력값 변경 핸들러
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setUserInfo((prev) => ({
-        ...prev,
-        [name]: value,
-        }));
+        setUserInfo((prev) => ({ ...prev, [name]: value }));
     };
 
     // 이메일 인증번호 요청
@@ -471,9 +462,10 @@ export default function SignUp() {
         }
 
         try {
+            console.log("인증번호 요청 이메일:", userInfo.email);
             const response = await sendVerificationCode(userInfo.email);
-            setVerificationCode(response.code);  // 서버에서 받은 인증번호 설정
-            setIsCodeSent(true);
+            console.log("인증번호 응답:", response);
+            setServerCode(response.code);
             alert("인증번호가 이메일로 발송되었습니다.");
         } catch (error) {
             alert(error.message);
@@ -482,7 +474,7 @@ export default function SignUp() {
 
     // 인증번호 확인
     const handleVerifyCode = () => {
-        if (inputCode === verificationCode) {
+        if (inputCode === serverCode) {
             setIsVerified(true);
             alert("이메일 인증이 완료되었습니다.");
         } else {
@@ -492,21 +484,24 @@ export default function SignUp() {
 
     // 회원가입 처리
     const handleSignUp = async () => {
-        if (!inputCode) {
-            alert("인증번호를 입력하세요.");
+        if (!isVerified) {
+            alert("먼저 이메일 인증을 완료하세요.");
             return;
         }
 
         try {
-            const response = await verifyCode(userInfo.email, inputCode);
-            if (response.status === 200) {
-                setIsVerified(true);
-                alert("이메일 인증이 완료되었습니다.");
-            } else {
-                alert("인증번호가 올바르지 않습니다.");
-            }
+            const response = await register(
+                userInfo.name,
+                userInfo.email,
+                userInfo.password,
+                userInfo.passwordchk,
+                inputCode
+            );
+            console.log("회원가입 응답:", response);
+            // 회원가입 성공 시 step3으로 이동
+            setStep(3);
         } catch (error) {
-            alert(error.message);  // 인증번호 검증 실패 시 에러 메시지 표시
+            alert(error.message);
         }
     };
 
