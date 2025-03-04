@@ -2,7 +2,6 @@ import styled from "styled-components";
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { login as loginApi } from "../api/LoginApi";
 
 const LoginContainer = styled.div`
     width: 100%;
@@ -122,7 +121,7 @@ export default function Login() {
         if (!isDisabled) {
             try {
                 // 로그인 API 호출
-                const response = await loginApi(id, password);
+                const response = await login(id, password);
 
                 if (response && response.message && response.token) {
                     // 로그인 성공 시 context에 토큰 저장

@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { findPassword, verifyCode, resetPassword } from "../api/PasswordApi";
 
 // 비밀번호 찾기 페이지 전체 컴포넌트
 const FindPasswordContainer = styled.div`
@@ -206,6 +207,51 @@ export default function FindPassword() {
     // 공백 제외하고 입력된 문자가 존재하는지 체크
     const isBothDisabled = newPassword.trim() === "" || checkPassword.trim() === "";
 
+    const handleFindPassword = async () => {
+        if (!isValidEmail(id.trim())) {
+            alert("유효한 이메일을 입력해주세요.");
+            return;
+        }
+
+        try {
+            const data = await findPassword(id);
+            alert(data.message); // 서버에서 보내주는 성공 메시지
+            setStep(1); // 인증번호 요청 후, 인증번호 입력 화면으로 이동
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
+    const handleVerifyCode = async () => {
+        if (!isValidCode(code.trim())) {
+            alert("유효한 인증번호를 입력해주세요.");
+            return;
+        }
+
+        try {
+            const data = await verifyCode(code);
+            alert(data.message); // 인증 성공 메시지
+            setStep(2); // 비밀번호 입력 화면으로 이동
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
+    const handleResetPassword = async () => {
+        if (!isValidPassword(newPassword.trim()) || newPassword !== checkPassword) {
+            alert("새 비밀번호가 유효하지 않거나 비밀번호가 일치하지 않습니다.");
+            return;
+        }
+
+        try {
+            const data = await resetPassword(newPassword, checkPassword);
+            alert(data.message); // 비밀번호 재설정 성공 메시지
+            setStep(3); // 비밀번호 재설정 완료 화면으로 이동
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+    
     const renderStep = () => {
         switch (step) {
             case 0: // 아이디 입력
@@ -222,7 +268,7 @@ export default function FindPassword() {
                                 onChange={(e) => setId(e.target.value)} 
                             />
                             {/* 인증번호 찾기 버튼 */}
-                            <StyledButton disabled={!isValidEmail(id.trim())} onClick={() => setStep(1)}>인증번호 찾기</StyledButton>
+                            <StyledButton disabled={!isValidEmail(id.trim())} onClick={handleFindPassword}>인증번호 요청</StyledButton>
                         </InputButtonWrapper>
                         <LinkWrapper>
                             {/* 로그인 링크 */}
@@ -244,7 +290,7 @@ export default function FindPassword() {
                                 onChange={(e) => setCode(e.target.value)} 
                             />
                             {/* 인증번호 확인 버튼 */}
-                            <StyledButton disabled={!isValidCode(code.trim())} onClick={() => setStep(2)}>인증번호 확인</StyledButton>
+                            <StyledButton disabled={!isValidCode(code.trim())} onClick={handleVerifyCode}>인증번호 확인</StyledButton>
                         </InputButtonWrapper>
                     </CenterWrapper>
                 );
@@ -268,7 +314,7 @@ export default function FindPassword() {
                                 onChange={(e) => setCheckPassword(e.target.value)} 
                             />
                             {/* 인증번호 찾기 버튼 */}
-                            <StyledButton disabled={!isValidPassword(newPassword.trim()) || isBothDisabled} onClick={() => setStep(3)}>비밀번호 재설정</StyledButton>
+                            <StyledButton disabled={!isValidPassword(newPassword.trim()) || isBothDisabled} onClick={handleResetPassword}>비밀번호 재설정</StyledButton>
                         </InputButtonWrapper>
                     </CenterWrapper>
                 );
