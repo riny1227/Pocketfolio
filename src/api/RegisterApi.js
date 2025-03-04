@@ -31,8 +31,7 @@ export const sendVerificationCode = async (email) => {
             {
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                withCredentials: true
+                }
             }
         );
 
