@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { login } from "../api/LoginApi";
+import { login as loginApi } from "../api/LoginApi";
 
 const LoginContainer = styled.div`
     width: 100%;
@@ -122,7 +122,7 @@ export default function Login() {
         if (!isDisabled) {
             try {
                 // 로그인 API 호출
-                const response = await login(id, password);
+                const response = await loginApi(id, password);
 
                 if (response && response.message && response.token) {
                     // 로그인 성공 시 context에 토큰 저장
@@ -161,9 +161,6 @@ export default function Login() {
 
                     {/* 로그인 버튼 */}
                     <StyledButton disabled={isDisabled} onClick={handleLogin}>로그인</StyledButton>
-                    
-                    {/* 에러 메시지 출력 */}
-                    {errorMessage && <div style={{ color: 'red', marginTop: '10px' }}>{errorMessage}</div>}
                 </InputButtonWrapper>
                 <LinkWrapper>
                     {/* 비밀번호 찾기 링크 */}
