@@ -63,10 +63,17 @@ export const verifyCode = async (code) => {
     const url = "https://pocketfolio.co.kr/api/user/reg-verify-code";
     const bodyData = { verificationCode: code };
 
+    const token = localStorage.getItem("jwtToken");
+
+    if (!token) {
+        throw new Error("로그인 정보가 없습니다. 다시 로그인해 주세요.");
+    }
+
     try {
         const response = await axios.post(url, bodyData, {
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,  // JWT 토큰을 헤더에 포함
             },
         });
 
