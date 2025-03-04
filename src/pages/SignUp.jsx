@@ -454,9 +454,6 @@ export default function SignUp() {
         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(password);
     };
 
-    // 공백 제외하고 입력된 문자가 존재하는지 체크
-    const isBothDisabled = newPassword.trim() === "" || checkPassword.trim() === "";
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setUserInfo((prev) => ({ ...prev, [name]: value }));
@@ -724,7 +721,7 @@ export default function SignUp() {
                             <PreviousButton onClick={handlePreviousStep}>
                                 <span>이전</span>
                             </PreviousButton>
-                            <NextButton disabled={!isVerified && !isValidPassword(newPassword.trim()) || isBothDisabled} onClick={handleSignUp}>
+                            <NextButton disabled={!isVerified && !isValidPassword} onClick={handleSignUp}>
                                 <span>다음</span>
                             </NextButton>
                         </ButtonWrapper>

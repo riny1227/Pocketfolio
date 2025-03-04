@@ -14,7 +14,7 @@ export const findPassword = async (email) => {
 };
 
 // 인증 코드 검증
-export const verifyCode = async (verificationCode) => {
+export const verifyCode = async (verificationCode, token) => {
     const url = "https://pocketfolio.co.kr/api/user/verify-code";
 
     try {
@@ -31,7 +31,7 @@ export const verifyCode = async (verificationCode) => {
 };
 
 // 비밀번호 재설정
-export const resetPassword = async (newPassword, passwordCheck) => {
+export const resetPassword = async (newPassword, passwordCheck, token) => {
     const url = "https://pocketfolio.co.kr/api/user/reset-password";
 
     try {
