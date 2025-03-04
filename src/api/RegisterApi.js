@@ -75,8 +75,17 @@ export const verifyCode = async (email, verificationCode) => {
         return response.data;
     } catch (error) {
         console.error("이메일 인증번호 검증 에러:", error);
-
+    
+        if (error.response) {
+            console.error("응답 데이터:", error.response.data);
+            console.error("응답 상태코드:", error.response.status);
+        } else if (error.request) {
+            console.error("요청은 갔지만 응답이 없음:", error.request);
+        } else {
+            console.error("요청 설정 중 에러 발생:", error.message);
+        }
+    
         const errorMessage = error.response?.data?.error || "네트워크 오류가 발생했습니다. 인증번호를 다시 시도해 주세요.";
         throw new Error(errorMessage);
     }
-};
+};    
