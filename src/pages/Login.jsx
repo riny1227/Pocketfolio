@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { login } from "../api/LoginApi";
 
 const LoginContainer = styled.div`
     width: 100%;
@@ -116,10 +117,16 @@ export default function Login() {
 
     const isDisabled = id.trim() === "" || password.trim() === ""; // 공백 제외하고 입력된 문자 체크
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (!isDisabled) {
-            login(id);
-            navigate("/"); // 로그인 후 메인 페이지로 이동
+            try {
+                const { message, token } = await login(id, password); // 로그인 API 호출
+                login(token); // 토큰을 context에 저장
+                console.log(message);
+                navigate("/"); // 로그인 후 메인 페이지로 이동
+            } catch (error) {
+                console.error("로그인 에러:", error.message);
+            }
         }
     };
 
