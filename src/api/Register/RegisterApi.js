@@ -63,32 +63,20 @@ export const verifyCode = async (code) => {
     const url = "https://pocketfolio.co.kr/api/user/reg-verify-code";
     const bodyData = { verificationCode: code };
 
-    const token = localStorage.getItem("jwtToken");
-
-    if (!token) {
-        throw new Error("로그인 정보가 없습니다. 다시 로그인해 주세요.");
-    }
-
     try {
         const response = await axios.post(url, bodyData, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,  // JWT 토큰을 헤더에 포함
             },
         });
 
         console.log("이메일 인증번호 검증 응답:", response.data);
 
-        if (response.status !== 200) {
-            throw new Error(response.data?.error || "인증번호 확인에 실패했습니다.");
-        }
-
         return response.data;
     } catch (error) {
         console.error("이메일 인증번호 검증 에러:", error);
 
-        // error.response가 없을 경우 대비하여 처리
-        const errorMessage = error.response?.data?.error || error.message || "네트워크 오류가 발생했습니다. 인증번호를 다시 시도해 주세요.";
+        const errorMessage = error.response?.data?.error || "네트워크 오류가 발생했습니다. 인증번호를 다시 시도해 주세요.";
         throw new Error(errorMessage);
     }
 };
