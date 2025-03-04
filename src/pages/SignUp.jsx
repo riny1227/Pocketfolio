@@ -475,7 +475,7 @@ export default function SignUp() {
     // 인증번호 확인
     const handleVerifyCode = async () => {
         try {
-            const response = await verifyCode(userInfo.email, inputCode); // API 호출
+            const response = await verifyCode(inputCode);
             if (response.success) {
                 setIsVerified(true);
                 alert("이메일 인증이 완료되었습니다.");
@@ -486,8 +486,7 @@ export default function SignUp() {
             console.error("인증 코드 검증 에러:", error);
             alert("인증번호 검증 중 오류가 발생했습니다. 다시 시도해 주세요.");
         }
-    };
-
+    };    
 
     // 회원가입 처리
     const handleSignUp = async () => {
