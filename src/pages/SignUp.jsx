@@ -476,12 +476,12 @@ export default function SignUp() {
     const handleVerifyCode = async () => {
         try {
             const response = await verifyCode(userInfo.email, inputCode);
-            if (response.success) {
+            if (response.message === "인증 코드가 확인되었습니다.") {
                 setIsVerified(true);
                 alert("이메일 인증이 완료되었습니다.");
             } else {
                 alert("인증번호가 올바르지 않습니다.");
-            }
+            }            
         } catch (error) {
             console.error("인증 코드 검증 에러:", error);
             alert("인증번호 검증 중 오류가 발생했습니다. 다시 시도해 주세요.");
@@ -501,7 +501,6 @@ export default function SignUp() {
                 userInfo.email,
                 userInfo.password,
                 userInfo.passwordchk,
-                inputCode
             );
             console.log("회원가입 응답:", response);
             // 회원가입 성공 시 step3으로 이동
