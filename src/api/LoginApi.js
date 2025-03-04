@@ -3,7 +3,7 @@ import axios from 'axios';
 // 로그인 API
 export const login = async (email, password) => {
     const url = "https://pocketfolio.co.kr/api/user/login";
-    const bodyData = { email, password};
+    const bodyData = { email, password };
 
     try {
         const response = await axios.post(url, bodyData);
@@ -13,7 +13,8 @@ export const login = async (email, password) => {
         console.log("로그인 성공:", message);
         console.log("발급된 토큰:", token);
 
-        return { message, token };  // 필요한 데이터만 반환
+        // 로그인 성공 시 message와 token 반환
+        return { message, token };
     } catch (error) {
         console.error("로그인 에러:", error);
 
