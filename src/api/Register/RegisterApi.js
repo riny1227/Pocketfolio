@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 // 회원가입 API
-export const register = async (name, email, password, passwordCheck, verificationCode) => {
+export const register = async (name, email, password, passwordCheck) => {
     const url = "https://pocketfolio.co.kr/api/user/register";
-    const bodyData = { name, email, password, passwordCheck, verificationCode };
+    const bodyData = { name, email, password, passwordCheck};
 
     try {
         const response = await axios.post(url, bodyData);
@@ -20,7 +20,7 @@ export const register = async (name, email, password, passwordCheck, verificatio
 
 // 이메일 인증번호 요청 API
 export const sendVerificationCode = async (email) => {
-    const url = "https://pocketfolio.co.kr/api/user/send-verification-code";
+    const url = "https://pocketfolio.co.kr/api/user/reg-send-verification-code";
 
     try {
         console.log("이메일 인증 요청 보냄", { email });
@@ -59,12 +59,16 @@ export const sendVerificationCode = async (email) => {
 };
 
 // 이메일 인증번호 검증 API
-export const verifyCode = async (email, verificationCode) => {
-    const url = "https://pocketfolio.co.kr/api/user/verify-code";
-    const bodyData = { email, verificationCode };
+export const verifyCode = async (email, code) => {
+    const url = "https://pocketfolio.co.kr/api/user/reg-verify-code";
+    const bodyData = { email, code };
 
     try {
-        const response = await axios.post(url, bodyData);
+        const response = await axios.post(url, { email, code }, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
 
         console.log("이메일 인증번호 검증 응답:", response.data);
 
