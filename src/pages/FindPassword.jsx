@@ -214,14 +214,11 @@ export default function FindPassword() {
         }
 
         try {
-            setLoading(true);
             const data = await findPassword(id);
             alert(data.message); // 서버에서 보내주는 성공 메시지
             setStep(1); // 인증번호 요청 후, 인증번호 입력 화면으로 이동
         } catch (error) {
             alert(error.message);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -232,14 +229,11 @@ export default function FindPassword() {
         }
 
         try {
-            setLoading(true);
             const data = await verifyCode(code);
             alert(data.message); // 인증 성공 메시지
             setStep(2); // 비밀번호 입력 화면으로 이동
         } catch (error) {
             alert(error.message);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -250,14 +244,11 @@ export default function FindPassword() {
         }
 
         try {
-            setLoading(true);
             const data = await resetPassword(newPassword, checkPassword);
             alert(data.message); // 비밀번호 재설정 성공 메시지
             setStep(3); // 비밀번호 재설정 완료 화면으로 이동
         } catch (error) {
             alert(error.message);
-        } finally {
-            setLoading(false);
         }
     };
     
