@@ -279,11 +279,10 @@ export default function Header() {
     const userId = 1;
     // 드롭다운 상태 관리
     const [isVisible, setIsVisible] = useState(false);  
+    
     // 드롭다운 메뉴 마우스 올렸을 때 보이게
     const handleMouseEnter = () => setIsVisible(true);
     const handleMouseLeave = () => setIsVisible(false);
-    const handleDropdownMouseEnter = () => setIsVisible(true);
-    const handleDropdownMouseLeave = () => setIsVisible(false);
 
     // 로그아웃 함수
     const handleLogout = () => {
@@ -371,8 +370,8 @@ export default function Header() {
                         {/* 드롭다운 메뉴 */}
                         <DropdownMenu 
                             isVisible={isVisible}
-                            onMouseEnter={handleDropdownMouseEnter}
-                            onMouseLeave={handleDropdownMouseLeave}
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
                         >
                             <ProfileImg onClick={() => navigate('/mypage')}/>
                             <DropdownItem onClick={() => navigate(`/mypage/${userId}`)}>프로필 편집</DropdownItem>
