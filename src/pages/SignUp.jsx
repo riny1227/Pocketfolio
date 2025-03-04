@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { register, sendVerificationCode, verifyCode } from '../api/Register/RegisterApi';
+import { register, sendVerificationCode, verifyCode } from '../api/RegisterApi';
 
 // 전체 컴포넌트 감싸는 컨테이너
 const SignUpContainer = styled.div`
@@ -475,7 +475,7 @@ export default function SignUp() {
     // 인증번호 확인
     const handleVerifyCode = async () => {
         try {
-            const response = await verifyCode(inputCode);
+            const response = await verifyCode(userInfo.email, inputCode);
             if (response.success) {
                 setIsVerified(true);
                 alert("이메일 인증이 완료되었습니다.");

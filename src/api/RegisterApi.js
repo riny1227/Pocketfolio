@@ -31,7 +31,8 @@ export const sendVerificationCode = async (email) => {
             {
                 headers: {
                     'Content-Type': 'application/json',
-                }
+                },
+                withCredentials: true
             }
         );
 
@@ -39,7 +40,7 @@ export const sendVerificationCode = async (email) => {
 
         return response.data;
     } catch (error) {
-        // 응답 로그 상세 출력력
+        // 응답 로그 상세 출력
         console.error("이메일 인증번호 전송 에러:", error);
 
         if (error.response) {
@@ -59,9 +60,12 @@ export const sendVerificationCode = async (email) => {
 };
 
 // 이메일 인증번호 검증 API
-export const verifyCode = async (code) => {
+export const verifyCode = async (email, code) => {
     const url = "https://pocketfolio.co.kr/api/user/reg-verify-code";
-    const bodyData = { verificationCode: code };
+    const bodyData = { 
+        email,
+        verificationCode: code 
+    };
 
     try {
         const response = await axios.post(url, bodyData, {
