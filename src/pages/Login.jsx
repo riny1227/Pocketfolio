@@ -112,7 +112,7 @@ const StyledLink = styled(Link)`
 export default function Login() {
     const [id, setId] = useState("");
     const [password, setPassword] = useState("");
-    const { setToken } = useAuth();
+    const { login } = useAuth();
     const navigate = useNavigate();
 
     const isDisabled = id.trim() === "" || password.trim() === ""; // 공백 제외하고 입력된 문자 체크
@@ -120,12 +120,12 @@ export default function Login() {
     const handleLogin = async () => {
         if (!isDisabled) {
             try {
-                const { message, token } = await login(id, password);  // 로그인 API 호출
-                setToken(token);  // 토큰을 context에 저장
+                const { message, token } = await login(id, password); // 로그인 API 호출
+                login(token); // 토큰을 context에 저장
                 console.log(message);
                 navigate("/"); // 로그인 후 메인 페이지로 이동
             } catch (error) {
-                setErrorMessage(error.message); // 에러 메시지 처리
+                console.error("로그인 에러:", error.message);
             }
         }
     };
