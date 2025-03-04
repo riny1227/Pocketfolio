@@ -3,26 +3,18 @@ import axios from 'axios';
 // 회원가입 API
 export const register = async (name, email, password, passwordCheck, verificationCode) => {
     const url = "https://pocketfolio.co.kr/api/user/register";
-    const bodyData = {
-        name,
-        email,
-        password,
-        passwordCheck,
-        verificationCode  // 이메일 인증번호
-    };
+    const bodyData = { name, email, password, passwordCheck, verificationCode };
 
     try {
         const response = await axios.post(url, bodyData);
-        return response.data;  // 응답 데이터 반환
+        
+        console.log("회원가입 응답:", response.data); // 서버 응답 확인용 로그
+
+        return response.data; // 응답 구조가 맞는지 확인 필요
     } catch (error) {
         console.error("회원가입 에러:", error);
-        if (error.response) {
-            // 서버에서 반환한 에러 메시지
-            throw new Error(error.response.data.message || "회원가입에 실패했습니다. 다시 시도해 주세요.");
-        } else {
-            // 네트워크 에러나 다른 종류의 오류
-            throw new Error("네트워크 오류가 발생했습니다. 다시 시도해 주세요.");
-        }
+        
+        throw new Error(error.response?.data?.message || error.response?.data?.error || "회원가입에 실패했습니다. 다시 시도해 주세요.");
     }
 };
 
@@ -32,46 +24,39 @@ export const sendVerificationCode = async (email) => {
 
     try {
         const response = await axios.post(url, { email });
-        if (response.data.status !== 200) {
-            // 실패 응답일 경우 에러를 발생시킵니다.
-            throw new Error(response.data.error || "이메일 인증번호 전송에 실패했습니다.");
+
+        console.log("이메일 인증번호 전송 응답:", response.data);
+
+        if (response.status !== 200) {
+            throw new Error("이메일 인증번호 전송에 실패했습니다.");
         }
-        return response.data;  // 성공 시 응답 데이터 반환
+
+        return response.data;
     } catch (error) {
         console.error("이메일 인증번호 전송 에러:", error);
-        if (error.response && error.response.data) {
-            // 서버에서 반환한 에러 메시지가 있는 경우
-            throw new Error(error.response.data.error || "이메일 인증번호 전송에 실패했습니다.");
-        } else {
-            // 네트워크 에러나 다른 종류의 오류
-            throw new Error("네트워크 오류가 발생했습니다. 이메일 인증번호를 다시 시도해 주세요.");
-        }
+
+        throw new Error(error.response?.data?.error || "네트워크 오류가 발생했습니다. 이메일 인증번호를 다시 시도해 주세요.");
     }
 };
 
 // 이메일 인증번호 검증 API
 export const verifyCode = async (email, verificationCode) => {
     const url = "https://pocketfolio.co.kr/api/user/verify-code";
-    const bodyData = {
-        email,
-        verificationCode
-    };
+    const bodyData = { email, verificationCode };
 
     try {
         const response = await axios.post(url, bodyData);
-        if (response.data.status !== 200) {
-            // 실패 응답일 경우 에러를 발생시킵니다.
-            throw new Error(response.data.error || "인증번호 확인에 실패했습니다.");
+
+        console.log("이메일 인증번호 검증 응답:", response.data);
+
+        if (response.status !== 200) {
+            throw new Error(response.data?.error || "인증번호 확인에 실패했습니다.");
         }
-        return response.data;  // 성공 시 응답 데이터 반환
+
+        return response.data;
     } catch (error) {
         console.error("이메일 인증번호 검증 에러:", error);
-        if (error.response && error.response.data) {
-            // 서버에서 반환한 에러 메시지가 있는 경우
-            throw new Error(error.response.data.error || "인증번호 확인에 실패했습니다.");
-        } else {
-            // 네트워크 에러나 다른 종류의 오류
-            throw new Error("네트워크 오류가 발생했습니다. 이메일 인증번호를 다시 시도해 주세요.");
-        }
+
+        throw new Error(error.response?.data?.error || "네트워크 오류가 발생했습니다. 인증번호를 다시 시도해 주세요.");
     }
 };
