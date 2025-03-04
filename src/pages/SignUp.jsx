@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import InputAndDropdown from '../components/share/InputAndDropdown';
+import { register, sendVerificationCode, verifyCode } from '../api/Register/RegisterApi';
 
 // 전체 컴포넌트 감싸는 컨테이너
 const SignUpContainer = styled.div`
@@ -336,11 +336,11 @@ const SendCodeButton = styled.button`
     align-items: center;    
     border: none;
     border-radius: 12px;
-    background: #E6E6E6;
-    cursor: pointer;
+    background: ${({ disabled }) => (disabled ? '#E6E6E6' : '#DCEAFD')};
+    cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
 
     span {
-        color: #909090;
+        color: ${({ disabled }) => (disabled ? '#909090' : '#1570EF')};
         text-align: center;
         font-feature-settings: 'liga' off, 'clig' off;
         font-family: 'Pretendard-SemiBold';
@@ -443,6 +443,16 @@ export default function SignUp() {
     const [inputCode, setInputCode] = useState(""); // 사용자가 입력한 인증번호
     const [isVerified, setIsVerified] = useState(false); // 인증 여부
     const [isCodeSent, setIsCodeSent] = useState(false); // 인증번호 전송 여부
+    // 이메일 유효성 검사
+    const isValidEmail = (email) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    };
+      
+    const isEmailValid = userInfo.email && isValidEmail(userInfo.email);
+
+    // 인증번호가 6자리일 때
+    const isCodeValid = inputCode.length === 6;
 
     // 입력값 변경 핸들러
     const handleInputChange = (e) => {
@@ -454,42 +464,50 @@ export default function SignUp() {
     };
 
     // 이메일 인증번호 요청
-    const handleEmailCheck = () => {
+    const handleEmailCheck = async () => {
         if (!userInfo.email) {
-        alert("이메일을 입력하세요.");
-        return;
+            alert("이메일을 입력하세요.");
+            return;
         }
 
-        // 6자리 랜덤 인증번호 생성
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
-        setVerificationCode(code);
-        setIsCodeSent(true);
-        alert(`인증번호가 이메일로 발송되었습니다: ${code}`); // 실제로는 서버를 통해 전송해야 합니다.
+        try {
+            const response = await sendVerificationCode(userInfo.email);
+            setVerificationCode(response.code);  // 서버에서 받은 인증번호 설정
+            setIsCodeSent(true);
+            alert("인증번호가 이메일로 발송되었습니다.");
+        } catch (error) {
+            alert(error.message);
+        }
     };
 
     // 인증번호 확인
     const handleVerifyCode = () => {
         if (inputCode === verificationCode) {
-        setIsVerified(true);
-        alert("이메일 인증이 완료되었습니다.");
+            setIsVerified(true);
+            alert("이메일 인증이 완료되었습니다.");
         } else {
-        alert("인증번호가 올바르지 않습니다.");
+            alert("인증번호가 올바르지 않습니다.");
         }
     };
 
     // 회원가입 처리
-    const handleSignUp = () => {
-        if (!isVerified) {
-        alert("이메일 인증을 완료하세요.");
-        return;
+    const handleSignUp = async () => {
+        if (!inputCode) {
+            alert("인증번호를 입력하세요.");
+            return;
         }
 
-        if (userInfo.password !== userInfo.passwordchk) {
-        alert("비밀번호가 일치하지 않습니다.");
-        return;
+        try {
+            const response = await verifyCode(userInfo.email, inputCode);
+            if (response.status === 200) {
+                setIsVerified(true);
+                alert("이메일 인증이 완료되었습니다.");
+            } else {
+                alert("인증번호가 올바르지 않습니다.");
+            }
+        } catch (error) {
+            alert(error.message);  // 인증번호 검증 실패 시 에러 메시지 표시
         }
-
-        alert("회원가입 성공!");
     };
 
     return (
@@ -644,7 +662,7 @@ export default function SignUp() {
                                         value={userInfo.email}
                                         onChange={handleInputChange}
                                     />
-                                    <SendCodeButton onClick={handleEmailCheck}>
+                                    <SendCodeButton onClick={handleEmailCheck} disabled={!isEmailValid}>
                                         <span>인증번호 요청</span>
                                     </SendCodeButton>
                                 </SendCodeWrapper>
@@ -654,12 +672,17 @@ export default function SignUp() {
                                 <Title>인증번호</Title>
                                 <SendCodeWrapper>
                                     <InputField
-                                        type="number"
+                                        type="text"
                                         placeholder="인증번호 6자리를 입력해 주세요"
+                                        maxLength={6}
                                         value={inputCode}
-                                        onChange={(e) => setInputCode(e.target.value)} // 입력값 업데이트 추가
+                                        onChange={(e) => {
+                                            // 숫자만 입력되도록 처리
+                                            const value = e.target.value.replace(/[^0-9]/g, '');
+                                            setInputCode(value);
+                                        }}
                                     />
-                                    <SendCodeButton onClick={handleVerifyCode}>
+                                    <SendCodeButton onClick={handleVerifyCode} disabled={!isCodeValid}>
                                         <span>인증번호 확인</span>
                                     </SendCodeButton>
                                 </SendCodeWrapper>
@@ -693,7 +716,7 @@ export default function SignUp() {
                             <PreviousButton onClick={handlePreviousStep}>
                                 <span>이전</span>
                             </PreviousButton>
-                            <NextButton disabled={!isVerified} onClick={handleNextStep}>
+                            <NextButton disabled={!isVerified} onClick={handleSignUp}>
                                 <span>다음</span>
                             </NextButton>
                         </ButtonWrapper>
