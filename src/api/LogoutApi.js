@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// 로그아웃 API 호출 함수
+// 로그아웃 API
 export const logout = async () => {
     const url = "https://pocketfolio.co.kr/api/user/logout";
 

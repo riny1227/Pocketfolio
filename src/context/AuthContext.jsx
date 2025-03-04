@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
-import { login as loginApi } from "../api/LoginApi";  // login API 호출 함수
-import { logout as logoutApi } from "../api/LogoutApi";  // logout API 호출 함수
+import { login as loginApi } from "../api/LoginApi";
+import { logout as logoutApi } from "../api/LogoutApi";
 
 // AuthContext 생성
 const AuthContext = createContext();
@@ -37,7 +37,7 @@ export function AuthProvider({ children }) {
             setIsLoggedIn(false);
             setToken(null);
             console.log("로그아웃 성공");
-            
+
             // 로그인 페이지로 리다이렉트
             window.location.href = "/login";
         } catch (error) {
