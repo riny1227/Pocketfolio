@@ -79,6 +79,9 @@ export const verifyCode = async (code) => {
         return response.data;
     } catch (error) {
         console.error("이메일 인증번호 검증 에러:", error);
-        throw new Error(error.response?.data?.error || "네트워크 오류가 발생했습니다. 인증번호를 다시 시도해 주세요.");
+
+        // error.response가 없을 경우 대비하여 처리
+        const errorMessage = error.response?.data?.error || error.message || "네트워크 오류가 발생했습니다. 인증번호를 다시 시도해 주세요.";
+        throw new Error(errorMessage);
     }
 };
