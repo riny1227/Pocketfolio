@@ -496,6 +496,19 @@ export default function SignUp() {
             return;
         }
 
+        const { password, passwordchk } = userInfo;
+
+        // 비밀번호 조건 체크
+        if (!isValidPassword(password)) {
+            alert("비밀번호는 8자 이상, 영어 대/소문자, 숫자, 특수기호를 각각 1개 이상 포함해야 합니다.");
+            return;
+        }
+
+        if (password !== passwordchk) {
+            alert("비밀번호가 서로 일치하지 않습니다.");
+            return;
+        }
+
         try {
             const response = await register(
                 userInfo.name,

@@ -73,13 +73,13 @@ export const verifyCode = async (email, verificationCode) => {
 };    
 
 // 비밀번호 재설정
-export const resetPassword = async (newPassword, passwordCheck) => {
+export const resetPassword = async (email, newPassword, passwordCheck) => {
     const url = "https://pocketfolio.co.kr/api/user/reset-password";
 
     try {
         const response = await axios.post(
             url, 
-            { newPassword, passwordCheck },
+            { email, newPassword, passwordCheck },
         );
         return response.data; // 성공 시 메시지 반환
     } catch (error) {
