@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Card from '../components/share/Card';
 import Carousel from '../components/share/Carousel';
 import Filter from '../components/Filter';
+import { fetchRecommendPortfolios, fetchRecentPortfolios, fetchJobList, fetchPopularTags, fetchFilteredPortfolios } from '../api/HomeApi';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../imgs/example.png'
@@ -71,6 +72,20 @@ export default function Home() {
             )
         );
     };
+
+    // 추천 포트폴리오 조회 api 연결 - 테스트
+    useEffect(() => {
+        const getRecommendPortfolios = async () => {
+            try {
+                const data = await fetchRecommendPortfolios();
+                console.log('추천 포트폴리오 조회 data : ', data);
+            } catch (error) {
+                console.error('getRecommendPortfolios 에러 발생 : ', error)
+            }
+        };
+
+        getRecommendPortfolios();
+    }, []);
 
     return (
         <HomeContainer>
