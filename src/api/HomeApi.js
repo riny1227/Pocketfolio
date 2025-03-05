@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://pocketfolio.co.kr';
+const BASE_URL = 'https://pocketfolio.co.kr/api';
 
 // 추천 포트폴리오 조회
 export const fetchRecommendPortfolios = async () => {
