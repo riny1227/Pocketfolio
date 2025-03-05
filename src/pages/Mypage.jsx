@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 import Card from '../components/share/Card';
 import FollowersModal from '../components/share/FollowersModal';
+import { useAuth } from '../context/AuthContext';
+import { getUserInfo, getPortfolioList, getBookmarks, getLikes } from '../api/MypageApi';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../imgs/example.png';
@@ -337,6 +339,10 @@ const AddPortfolioCard = styled.div`
 
 export default function Mypage() {
     const navigate = useNavigate();
+    const { token } = useAuth();
+
+    
+
     // 사용자 ID 변수 선언
     const userId = 1;
     // name 변수 선언

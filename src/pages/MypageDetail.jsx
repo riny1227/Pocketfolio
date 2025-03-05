@@ -5,6 +5,8 @@ import InputAndDropdown from '../components/share/InputAndDropdown';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import profileImage from '../imgs/Profile.png';
+import { useAuth } from '../context/AuthContext';
+import { getUserInfo, saveProfile } from '../api/MypageApi';
 
 // 전체 컴포넌트 감싸는 컨테이너
 const MypageDetailContainer = styled.div`
