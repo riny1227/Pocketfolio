@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styled from 'styled-components';
@@ -277,12 +277,27 @@ export default function Header() {
     const [isChatOpen, setChatOpen] = useState(false);
     // 사용자 ID 변수 선언(임시)
     const userId = 1;
+
     // 드롭다운 상태 관리
     const [isVisible, setIsVisible] = useState(false);  
-    
-    // 드롭다운 메뉴 마우스 올렸을 때 보이게
-    const handleMouseEnter = () => setIsVisible(true);
-    const handleMouseLeave = () => setIsVisible(false);
+    // 타이머 관리
+    const closerTimer = useRef(null);
+
+    const handleMouseEnter = () => {
+        // 타이머가 있다면 취소
+        if (closeTimer.current) {
+            clearTimeout(closeTimer.current);
+            closeTimer.current = null;
+        }
+        setIsVisible(true);
+    };
+
+    const handleMouseLeave = () => {
+        // 마우스가 벗어나면 잠시 후 메뉴 닫기
+        closeTimer.current = setTimeout(() => {
+            setIsVisible(false);
+        }, 300); // 300ms 딜레이
+    };
 
     // 로그아웃 함수
     const handleLogout = () => {
