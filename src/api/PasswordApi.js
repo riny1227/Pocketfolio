@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 이메일 인증번호 요청 API
 export const findPassword = async (email) => {
-    const url = "https://pocketfolio.co.kr/api/user/reg-send-verification-code";
+    const url = "https://pocketfolio.co.kr/api/user/send-verification-code";
 
     try {
         console.log("이메일 인증 요청 보냄", { email });
@@ -42,7 +42,7 @@ export const findPassword = async (email) => {
 
 // 이메일 인증번호 검증 API
 export const verifyCode = async (email, verificationCode) => {
-    const url = "https://pocketfolio.co.kr/api/user/reg-verify-code";
+    const url = "https://pocketfolio.co.kr/api/user/verify-code";
     const bodyData = { email, verificationCode };
 
     try {
