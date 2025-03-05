@@ -281,7 +281,7 @@ export default function Header() {
     // 드롭다운 상태 관리
     const [isVisible, setIsVisible] = useState(false);  
     // 타이머 관리
-    const closerTimer = useRef(null);
+    const closeTimer = useRef(null);
 
     const handleMouseEnter = () => {
         // 타이머가 있다면 취소
