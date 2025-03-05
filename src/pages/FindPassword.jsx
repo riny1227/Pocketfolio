@@ -215,7 +215,7 @@ export default function FindPassword() {
             const data = await findPassword(id);
             setStep(1); // 인증번호 입력 단계로 이동
         } catch (error) {
-            alert(error.message || "이메일 인증 요청 중 오류가 발생했습니다.");
+            console.log(error.message || "이메일 인증 요청 중 오류가 발생했습니다.");
         }
     };
 
@@ -230,7 +230,7 @@ export default function FindPassword() {
             const data = await verifyCode(id, code);
             setStep(2); // 비밀번호 입력 화면으로 이동
         } catch (error) {
-            alert(error.message);
+            console.log(error.message);
         }
     };
 
