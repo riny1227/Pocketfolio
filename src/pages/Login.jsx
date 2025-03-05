@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const LoginContainer = styled.div`
@@ -111,28 +111,17 @@ const StyledLink = styled(Link)`
 export default function Login() {
     const [id, setId] = useState("");
     const [password, setPassword] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
     const { login } = useAuth();
-    const navigate = useNavigate();
 
     const isDisabled = id.trim() === "" || password.trim() === ""; // 공백 제외하고 입력된 문자 체크
 
     const handleLogin = async () => {
         if (!isDisabled) {
             try {
-                // 로그인 API 호출
-                const response = await login(id, password);
-
-                if (response && response.message && response.token) {
-                    // 로그인 성공 시 context에 토큰 저장
-                    login(response.token);
-                    console.log(response.message); // 로그인 성공 메시지 출력
-                    navigate("/"); // 로그인 후 메인 페이지로 이동
-                }
+                // AuthContext의 login 함수 호출
+                await login(id, password);
             } catch (error) {
-                // API 에러 발생 시
                 console.error("로그인 에러:", error.message);
-                setErrorMessage(error.message); // 에러 메시지를 상태에 저장
             }
         }
     };

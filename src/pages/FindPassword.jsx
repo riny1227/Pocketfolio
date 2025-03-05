@@ -207,6 +207,7 @@ export default function FindPassword() {
     // 공백 제외하고 입력된 문자가 존재하는지 체크
     const isBothDisabled = newPassword.trim() === "" || checkPassword.trim() === "";
 
+    // 이메일 인증번호 요청
     const handleFindPassword = async () => {
         if (!isValidEmail(id.trim())) {
             alert("유효한 이메일을 입력해주세요.");
@@ -222,6 +223,7 @@ export default function FindPassword() {
         }
     };
 
+    // 인증번호 확인
     const handleVerifyCode = async () => {
         if (!isValidCode(code.trim())) {
             alert("유효한 인증번호를 입력해주세요.");
@@ -229,7 +231,7 @@ export default function FindPassword() {
         }
 
         try {
-            const data = await verifyCode(code);
+            const data = await verifyCode(id, code);
             alert(data.message); // 인증 성공 메시지
             setStep(2); // 비밀번호 입력 화면으로 이동
         } catch (error) {
@@ -237,6 +239,7 @@ export default function FindPassword() {
         }
     };
 
+    // 비밀번호 재설정
     const handleResetPassword = async () => {
         if (!isValidPassword(newPassword.trim()) || newPassword !== checkPassword) {
             alert("새 비밀번호가 유효하지 않거나 비밀번호가 일치하지 않습니다.");
