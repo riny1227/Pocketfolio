@@ -216,11 +216,7 @@ export default function FindPassword() {
             alert(data.message); // 서버에서 보내주는 성공 메시지
             setStep(1); // 인증번호 입력 단계로 이동
         } catch (error) {
-            if (error.response && error.response.status === 400) {
-                alert("등록되지 않은 이메일입니다.");
-            } else {
-                alert(error.message || "이메일 인증 요청 중 오류가 발생했습니다."); // 기타 에러 처리
-            }
+            alert(error.message || "이메일 인증 요청 중 오류가 발생했습니다.");
         }
     };
 
