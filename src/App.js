@@ -16,37 +16,37 @@ import FindPassword from './pages/FindPassword';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="App">
-          <Header />
-          <Routes>
-            {/* 메인 페이지 */}
-            <Route path="/" element={<Home />} />
-            {/* 회원가입 */}
-            <Route path="/signup" element={<SignUp />} />
-            {/* 로그인 페이지 */}
-            <Route path="/login" element={<Login />} />
-            {/* 비밀번호 찾기 */}
-            <Route path="/findpassword" element={<FindPassword />} />
-            {/* 아티클 */}
-            <Route path="/article" element={<Article />} />
-            {/* 아티클 상세 페이지 */}
-            <Route path="/article/:id" element={<ArticleDetail />} />
-            {/* 마이페이지 */}
-            <Route path="/mypage" element={<Mypage />} />
-            {/* 마이페이지 프로필편집 페이지 */}
-            <Route path="/mypage/:id" element={<MyPageDetail />} />
-            {/* 사용자 프로필 페이지 */}
-            <Route path="/user/:id" element={<UserProfile />} />
-            <Route path="/userprofile" element={<UserProfile />} />
-            {/* 포트폴리오 작성 페이지 */}
-            <Route path="/write-portfolio" element={<WritePortfolio />} />   
-          </Routes>
-          <Footer />
-        </div>
-      </Router>   
-    </AuthProvider>
+      <Router>    
+        <AuthProvider>
+          <div className="App">
+            <Header />
+            <Routes>
+              {/* 메인 페이지 */}
+              <Route path="/" element={<Home />} />
+              {/* 회원가입 */}
+              <Route path="/signup" element={<SignUp />} />
+              {/* 로그인 페이지 */}
+              <Route path="/login" element={<Login />} />
+              {/* 비밀번호 찾기 */}
+              <Route path="/findpassword" element={<FindPassword />} />
+              {/* 아티클 */}
+              <Route path="/article" element={<Article />} />
+              {/* 아티클 상세 페이지 */}
+              <Route path="/article/:id" element={<ArticleDetail />} />
+              {/* 마이페이지 */}
+              <Route path="/mypage" element={<Mypage />} />
+              {/* 마이페이지 프로필편집 페이지 */}
+              <Route path="/mypage/:id" element={<MyPageDetail />} />
+              {/* 사용자 프로필 페이지 */}
+              <Route path="/user/:id" element={<UserProfile />} />
+              <Route path="/userprofile" element={<UserProfile />} />
+              {/* 포트폴리오 작성 페이지 */}
+              <Route path="/write-portfolio" element={<WritePortfolio />} />   
+            </Routes>
+            <Footer />
+          </div>
+        </AuthProvider>
+      </Router>
   );
 }
 
