@@ -204,9 +204,6 @@ export default function FindPassword() {
         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(password);
     };
 
-    // 공백 제외하고 입력된 문자가 존재하는지 체크
-    const isBothDisabled = newPassword.trim() === "" || checkPassword.trim() === "";
-
     // 이메일 인증번호 요청
     const handleFindPassword = async () => {
         if (!isValidEmail(id.trim())) {
@@ -216,10 +213,9 @@ export default function FindPassword() {
 
         try {
             const data = await findPassword(id);
-            alert(data.message); // 서버에서 보내주는 성공 메시지
-            setStep(1); // 인증번호 요청 후, 인증번호 입력 화면으로 이동
+            setStep(1); // 인증번호 입력 단계로 이동
         } catch (error) {
-            alert(error.message);
+            console.log(error.message || "이메일 인증 요청 중 오류가 발생했습니다.");
         }
     };
 
@@ -232,26 +228,30 @@ export default function FindPassword() {
 
         try {
             const data = await verifyCode(id, code);
-            alert(data.message); // 인증 성공 메시지
             setStep(2); // 비밀번호 입력 화면으로 이동
         } catch (error) {
-            alert(error.message);
+            console.log(error.message);
         }
     };
 
     // 비밀번호 재설정
     const handleResetPassword = async () => {
-        if (!isValidPassword(newPassword.trim()) || newPassword !== checkPassword) {
-            alert("새 비밀번호가 유효하지 않거나 비밀번호가 일치하지 않습니다.");
+        if (!isValidPassword(newPassword.trim())) {
+            alert("비밀번호는 최소 8자 이상, 영문 대소문자, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.");
             return;
         }
-
+    
+        if (newPassword !== checkPassword) {
+            alert("비밀번호가 서로 일치하지 않습니다.");
+            return;
+        }
+    
         try {
-            const data = await resetPassword(newPassword, checkPassword);
+            const data = await resetPassword(id, newPassword, checkPassword);
             alert(data.message); // 비밀번호 재설정 성공 메시지
-            setStep(3); // 비밀번호 재설정 완료 화면으로 이동
+            setStep(3); // 완료 단계로 이동
         } catch (error) {
-            alert(error.message);
+            alert(error.message || "비밀번호 재설정 중 오류가 발생했습니다.");
         }
     };
     
@@ -317,7 +317,7 @@ export default function FindPassword() {
                                 onChange={(e) => setCheckPassword(e.target.value)} 
                             />
                             {/* 인증번호 찾기 버튼 */}
-                            <StyledButton disabled={!isValidPassword(newPassword.trim()) || isBothDisabled} onClick={handleResetPassword}>비밀번호 재설정</StyledButton>
+                            <StyledButton onClick={handleResetPassword}>비밀번호 재설정</StyledButton>
                         </InputButtonWrapper>
                     </CenterWrapper>
                 );
