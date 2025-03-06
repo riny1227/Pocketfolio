@@ -92,10 +92,11 @@ export default function Home() {
 
     // 검색 api 실행 결과 가져오기
     useEffect(() => {
-        if (location.state?.searchResults) {
+        if (Array.isArray(location.state?.searchResults)) {
             setCards(location.state.searchResults);
         }
     }, [location.state]);
+    
 
     return (
         <HomeContainer>
