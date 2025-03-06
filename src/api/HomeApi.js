@@ -50,7 +50,7 @@ export const fetchPopularTags = async () => {
     }
 }
 
-// 포트폴리오 필터 및 정렬
+// 포트폴리오 필터 및 정렬 - 수정 필요함
 export const fetchFilteredPortfolios = async () => {
     try {
         const response = await axios.get(`${BASE_URL}/home/portfolios`);
