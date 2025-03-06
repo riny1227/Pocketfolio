@@ -6,7 +6,7 @@ export const getUserInfo = async (token) => {
         throw new Error('Token not found');
     }
 
-    const url = "https://pocketfolio.co.kr/api/mypage/profile";
+    const url = "https://pocketfolio.co.kr/api/mypage/fetchInfo";
 
     const headers = {
         'Authorization': `Bearer ${token}`,
