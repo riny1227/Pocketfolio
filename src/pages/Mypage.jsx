@@ -470,11 +470,11 @@ export default function Mypage() {
                             <FollowContainer>
                                 <FollowItem onClick={() => handleOpenModal('followers')}>
                                     <Label>팔로워</Label>
-                                    <Number>{follower.length}</Number>
+                                    <Number>{follower}</Number>
                                 </FollowItem>
                                 <FollowItem onClick={() => handleOpenModal('following')}>
                                     <Label>팔로잉</Label>
-                                    <Number>{following.length}</Number>
+                                    <Number>{following}</Number>
                                 </FollowItem>
                             </FollowContainer>
                             {/* 프로필정보 편집하기 버튼*/}
