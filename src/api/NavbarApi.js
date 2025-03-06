@@ -23,8 +23,8 @@ export const fetchSearch = async (query, type, limit = 10) => {
     try {
         const response = await axios.get(`${BASE_URL}/nav/search`, {
             params: {
-                query: query, // 검색 키워드
-                type: type,   // 검색 대상 ("portfolio", "user", "tag" 등)
+                query: encodeURIComponent(query), // 검색 키워드 - 한글 인코딩 추가
+                type: `"${type}"`,   // 검색 대상 ("portfolio", "user", "tag" 등) - 큰따옴표 포함해서 전달
                 limit: limit  // 최대 검색 개수 (기본값 10)
             }
         });
