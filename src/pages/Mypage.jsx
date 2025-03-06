@@ -492,7 +492,7 @@ export default function Mypage() {
                             <ProfileBottomContainer>
                                 <ProfileTopText>소개</ProfileTopText>
                                 <ProfileBottomText>{introduce}</ProfileBottomText>
-                                {education.length > 0 && (
+                                {Array.isArray(education) && education.length > 0 && (
                                     <>
                                         <ProfileTopText>학력</ProfileTopText>
                                         {education.map((edu, index) => (
@@ -504,7 +504,7 @@ export default function Mypage() {
                                     </>
                                 )}
 
-                                {activities.length > 0 && (
+                                {Array.isArray(activities) && activities.length > 0 && (
                                     <>
                                         <ProfileTopText>활동</ProfileTopText>
                                         {activities.map((act, index) => (
