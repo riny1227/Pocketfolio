@@ -1,10 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from "styled-components";
 import InputAndDropdown from '../components/share/InputAndDropdown';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import profileImage from '../imgs/Profile.png';
+import { useAuth } from '../context/AuthContext';
+import { getUserInfo, saveProfile } from '../api/MypageApi';
 
 // 전체 컴포넌트 감싸는 컨테이너
 const MypageDetailContainer = styled.div`
@@ -330,7 +332,7 @@ const SubmitButton = styled.button`
 `;
 
 export default function MypageDetail() {
-    const { id } = useParams();
+    const { token } = useAuth();
     // 이름과 소개 필드에 대한 상태
     const [name, setName] = useState('');
     const [intro, setIntro] = useState('');
@@ -338,6 +340,12 @@ export default function MypageDetail() {
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 70 }, (_, i) => (currentYear - i).toString());
     const endyears = ["현재", ...Array.from({ length: 70 }, (_, i) => (currentYear - i).toString())];
+    // 학력사항 관리
+    const [education, setEducation] = useState([]);
+    const [school, setSchool] = useState('');
+    const [eduStatus, setEduStatus] = useState('');
+    const [eduStartYear, setEduStartYear] = useState('');
+    const [eduEndYear, setEduEndYear] = useState('');
     const [selectedEducation, setSelectedEducation] = useState(""); // 학력 선택 상태
     const [selectedStatus, setSelectedStatus] = useState(""); // 상태 선택 상태
     // 활동사항 항목 관리
@@ -361,6 +369,57 @@ export default function MypageDetail() {
         setStartDate(null);
         setEndDate(null);
         setActivityName('');
+    };
+
+    // 저장 후 로딩/성공/에러 상태 관리
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+            if (token) {
+                const fetchData = async () => {
+                    try {
+                        const userData = await getUserInfo(token);
+                        setName(userData.name);
+                        setIntro(userData.intro);
+                        setEducation(userData.education);
+                        setActivityList(userData.activities);
+                    } catch (error) {
+                        console.error("데이터 가져오기 실패", error);
+                    }
+                };
+    
+                fetchData();
+            }
+        }, [token]);
+
+    const handleSubmit = async () => {
+        // 필수 값 체크
+        if (!name || !intro) {
+            setError("이름과 소개는 필수 입력값입니다.");
+            return;
+        }
+
+        const profileData = {
+            name,
+            intro,
+            education: {
+                status: selectedStatus,
+            },
+            activities: activityList,
+        };
+
+        setLoading(true);
+        setError('');
+        try {
+            await saveProfile(profileData, token);
+            alert("프로필 정보가 저장되었습니다!");
+        } catch (err) {
+            setError("프로필 저장에 실패했습니다. 다시 시도해주세요.");
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -409,8 +468,8 @@ export default function MypageDetail() {
                             />
                             <InputAndDropdown 
                                 placeholder="상태" 
-                                value={selectedStatus} 
-                                setValue={setSelectedStatus} 
+                                value={eduStatus} 
+                                setValue={setEduStatus} 
                                 data={["졸업", "재학", "중퇴"]} 
                                 width="235px"
                             />
@@ -421,16 +480,16 @@ export default function MypageDetail() {
                             <EducationPeriodWrapper>
                                 <InputAndDropdown 
                                     placeholder="년도" 
-                                    value={selectedEducation} 
-                                    setValue={setSelectedEducation} 
+                                    value={eduStartYear} 
+                                    setValue={setEduStartYear} 
                                     data={years}
                                     width="235px"
                                 />
                                 <TildeText>~</TildeText>
                                 <InputAndDropdown 
                                     placeholder="년도" 
-                                    value={selectedStatus} 
-                                    setValue={setSelectedStatus} 
+                                    value={eduEndYear} 
+                                    setValue={setEduEndYear} 
                                     data={endyears}
                                     width="235px"
                                 />
@@ -440,6 +499,8 @@ export default function MypageDetail() {
                             <InputWrapper>
                                 <InputAndDropdown
                                     placeholder="학교 찾아보기"
+                                    value={school}
+                                    setValue={setSchool}
                                     iconSvg={SearchIcon}
                                     hasToggle={false}
                                     width="504px"
@@ -459,7 +520,7 @@ export default function MypageDetail() {
                     <ContentContainer>
                     {/* 추가된 활동사항 항목들을 렌더링 */}
                     {activityList.map((activity, index) => (
-                        <div key={index} style={{ marginBottom: '20px' }}>
+                        <div key={index}>
                             <div style={{ marginBottom: '20px' }}>
                                 <ContentOneWrapper>
                                     <ContentTitleText>활동기간</ContentTitleText>
@@ -552,6 +613,16 @@ export default function MypageDetail() {
                                     dateFormat="yyyy.MM.dd"
                                     placeholderText="시작일"
                                 />
+                                <IconStyle
+                                    onClick={() => startDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
+                                        stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </IconStyle>
                             </StyledDatePickerWrapper>
                             <TildeText>~</TildeText>
                             <StyledDatePickerWrapper>
@@ -562,6 +633,16 @@ export default function MypageDetail() {
                                     placeholderText="완료일"
                                     minDate={startDate} // 시작일 이후 날짜만 선택 가능
                                 />
+                                <IconStyle
+                                    onClick={() => endDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
+                                        stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </IconStyle>
                             </StyledDatePickerWrapper>
                         </DatePickerContainer>
                     </ContentOneWrapper>
@@ -585,7 +666,7 @@ export default function MypageDetail() {
             </DetailContainer>
 
             {/* 프로필 정보 저장하기 버튼 */}
-            <SubmitButton disabled={isButtonDisabled}>
+            <SubmitButton disabled={isButtonDisabled} onClick={handleSubmit}>
                 <span>프로필 정보 저장</span>
             </SubmitButton>
         </MypageDetailContainer>
