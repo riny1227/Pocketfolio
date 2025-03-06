@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import { login as loginApi } from "../api/LoginApi";
 import { logout as logoutApi } from "../api/LogoutApi";
@@ -8,17 +8,7 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [token, setToken] = useState(null);
-
-    // localStorage에서 토큰 체크
-    useEffect(() => {
-        const savedToken = localStorage.getItem("accessToken");
-
-        if (savedToken) {
-            setIsLoggedIn(true);
-            setToken(savedToken);
-        }
-    }, []);
+    const [token, setToken] = useState(localStorage.getItem('accessToken') || null);
 
     // 로그인 함수
     const login = async (email, password) => {

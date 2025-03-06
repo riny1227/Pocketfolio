@@ -370,6 +370,7 @@ export default function Mypage() {
 
     useEffect(() => {
         if (token) {
+            console.log("Fetched token:", token); // token 확인
             const fetchData = async () => {
                 try {
                     const userData = await getUserInfo(token);
