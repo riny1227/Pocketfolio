@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import logo from '../../imgs/logo.png';
 import Chat from '../Chat';
 import profileImage from '../../imgs/Profile.png';
-import { fetchSearch } from "../../api/SearchApi"; // 검색 API 불러오기
+import { fetchSearch } from "../../api/NavbarApi"; // 검색 API 불러오기
 
 // 헤더 컨테이너
 const HeaderContainer = styled.div`

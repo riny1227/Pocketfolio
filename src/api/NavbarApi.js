@@ -37,7 +37,7 @@ export const fetchSearch = async (query, type, limit = 10) => {
 };
 
 // 알람 리스트 조회
-export const fetchNotifications = async () => {
+export const fetchNotifications = async (token) => {
     try {
         const response = await axios.get(`${BASE_URL}/nav/notifications`, {
             headers: {
