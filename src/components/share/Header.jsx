@@ -276,8 +276,6 @@ export default function Header() {
     const { isLoggedIn, logout } = useAuth(); 
     const [searchText, setSearchText] = useState('');
     const [isChatOpen, setChatOpen] = useState(false);
-    // 사용자 ID 변수 선언(임시)
-    const userId = 1;
 
     // 드롭다운 상태 관리
     const [isVisible, setIsVisible] = useState(false);  
@@ -420,7 +418,7 @@ export default function Header() {
                             onMouseLeave={handleDropdownMouseLeave}
                         >
                             <ProfileImg onClick={() => navigate('/mypage')}/>
-                            <DropdownItem onClick={() => navigate(`/mypage/${userId}`)}>프로필 편집</DropdownItem>
+                            <DropdownItem onClick={() => navigate(`/mypage/edit`)}>프로필 편집</DropdownItem>
                             <DropdownItem onClick={handleLogout}>로그아웃</DropdownItem>
                         </DropdownMenu>
                     </ProfileWrapper>

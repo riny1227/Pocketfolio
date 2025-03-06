@@ -1,9 +1,7 @@
 import axios from 'axios';
 
 // 사용자 정보 가져오기
-export const getUserInfo = async () => {
-    const token = localStorage.getItem('accessToken');
-    
+export const getUserInfo = async (token) => {
     if (!token) {
         throw new Error('Token not found');
     }
@@ -74,7 +72,7 @@ export const getLikes = async (token) => {
         throw new Error('Token not found');
     }
 
-    const url = "https://pocketfolio.co.kr/api/mypage/like";
+    const url = "https://pocketfolio.co.kr/api/mypage/likes";
 
     const headers = {
         'Authorization': `Bearer ${token}`,
