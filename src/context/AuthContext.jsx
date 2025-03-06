@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 import { login as loginApi } from "../api/LoginApi";
 import { logout as logoutApi } from "../api/LogoutApi";
@@ -9,6 +9,16 @@ export function AuthProvider({ children }) {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [token, setToken] = useState(null);
+
+    // localStorage에서 토큰 체크
+    useEffect(() => {
+        const savedToken = localStorage.getItem("accessToken");
+
+        if (savedToken) {
+            setIsLoggedIn(true);
+            setToken(savedToken);
+        }
+    }, []);
 
     // 로그인 함수
     const login = async (email, password) => {
@@ -43,6 +53,7 @@ export function AuthProvider({ children }) {
 
             setIsLoggedIn(false);
             setToken(null);
+            localStorage.removeItem("accessToken");
             console.log("로그아웃 성공");
 
             navigate("/login"); // 로그인 화면으로 이동
