@@ -6,7 +6,7 @@ export const getUserInfo = async (token) => {
         throw new Error('Token not found');
     }
 
-    const url = "https://pocketfolio.co.kr/api/mypage/profile/{userId}";
+    const url = "https://pocketfolio.co.kr/api/mypage/profile";
 
     const headers = {
         'Authorization': `Bearer ${token}`,
@@ -28,7 +28,7 @@ export const getPortfolioList = async (token) => {
         throw new Error('Token not found');
     }
 
-    const url = "https://pocketfolio.co.kr/api/mypage/portfolio/{userId}";
+    const url = "https://pocketfolio.co.kr/api/mypage/portfolio";
 
     const headers = {
         'Authorization': `Bearer ${token}`,
@@ -50,7 +50,7 @@ export const getBookmarks = async (token) => {
         throw new Error('Token not found');
     }
 
-    const url = "https://pocketfolio.co.kr/api/mypage/bookmark/{userId}";
+    const url = "https://pocketfolio.co.kr/api/mypage/bookmark";
 
     const headers = {
         'Authorization': `Bearer ${token}`,
@@ -72,7 +72,7 @@ export const getLikes = async (token) => {
         throw new Error('Token not found');
     }
 
-    const url = "https://pocketfolio.co.kr/api/mypage/like/{userId}";
+    const url = "https://pocketfolio.co.kr/api/mypage/like";
 
     const headers = {
         'Authorization': `Bearer ${token}`,

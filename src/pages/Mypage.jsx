@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 import Card from '../components/share/Card';
@@ -217,6 +217,16 @@ const ProfileBottomText = styled.text`
     line-height: 24px;
 `;
 
+const ProfileBottomDateText = styled.text`
+    color: #909090;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: 'Pretendard-Regular';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+`;
+
 // 내용(오른쪽) 컨테이너
 const MypageRightContainer = styled.div`
     display: flex;
@@ -341,35 +351,51 @@ export default function Mypage() {
     const navigate = useNavigate();
     const { token } = useAuth();
 
-    
+    const [name, setName] = useState("");
+    const [follower, setFollowers] = useState("");
+    const [following, setFollowing] = useState("");
+    const [introduce, setIntroduce] = useState("");
+    const [education, setEducation] = useState([]);
+    const [activities, setActivities] = useState([]);
+    const [portfolioCards, setPortfolioCards] = useState([]);   // 포트폴리오 리스트
+    const [bookmarkedCards, setBookmarkedCards] = useState([]); // 북마크 리스트
+    const [likedCards, setLikedCards] = useState([]); // 좋아요 리스트
 
-    // 사용자 ID 변수 선언
-    const userId = 1;
-    // name 변수 선언
-    const [name, setName] = useState("RIM YOURI"); // 임시 이름 설정
     // 활성화된 탭 상태
     const [activeTab, setActiveTab] = useState("portfolio");
     // 호버 모드
     const [hoverMode, setHoverMode] = useState("mypage");
-
     // 카드 선택 
     const [selectedCard, setSelectedCard] = useState(null);
 
-    // 샘플 데이터
-    const portfolioCards = [
-        { title: "포트폴리오 1", name: "1", views: 1234, likes: 567 },
-        { title: "포트폴리오 2", name: "2", views: 5678, likes: 890 },
-    ];
+    useEffect(() => {
+        if (token) {
+            const fetchData = async () => {
+                try {
+                    const userData = await getUserInfo(token);
+                    setName(userData.name);
+                    setFollowers(userData.follower);
+                    setFollowing(userData.following);
+                    setIntroduce(userData.introduce);
+                    setEducation(userData.education);
+                    setActivities(userData.activities);
 
-    const [bookmarkedCards, setBookmarkedCards] = useState([
-        { id: 1, title: "북마크 1", name: "1", views: 3456, likes: 123, isBookmarked: false },
-        { id: 2, title: "북마크 2", name: "2", views: 7890, likes: 456, isBookmarked: false},
-    ]);
+                    const portfolioList = await getPortfolioList(token);
+                    setPortfolioCards(portfolioList);
 
-    const [likedCards, setLikedCards] = useState([
-        { id: 1, title: "좋아요 1", name: "1", views: 2345, likes: 678, isBookmarked: false },
-        { id: 2, title: "좋아요 2", name: "2", views: 5678, likes: 890, isBookmarked: false },
-    ]);
+                    const bookmarkList = await getBookmarks(token);
+                    setBookmarkedCards(bookmarkList);
+
+                    const likedList = await getLikes(token);
+                    setLikedCards(likedList);
+                } catch (error) {
+                    console.error("데이터 가져오기 실패", error);
+                }
+            };
+
+            fetchData();
+        }
+    }, [token]);
 
     const handleCardClick = (card) => {
         setSelectedCard(card);
@@ -405,21 +431,9 @@ export default function Mypage() {
         );
     };       
     
-    // 샘플 데이터 팔로워&팔로잉
-    const [followers] = useState([
-        { id: 1, name: '이름이름이름이름이름이름이름이름' },
-        { id: 11, name: '이름2' },
-        { id: 12, name: '이름3' },
-      ]);
-
-    const [following] = useState([
-    { id: 1, name: '이름이름이름이름이름이름이름이름' },
-    { id: 2, name: '이름2' },
-    { id: 3, name: '이름55' },
-    ]);
-
-    const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열림 여부 상태
-    const [modalType, setModalType] = useState('followers'); // 'followers' or 'following'
+    // 팔로워 & 팔로잉 모달 관련
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalType, setModalType] = useState('followers');
 
     const handleOpenModal = (type) => {
         setModalType(type); // 모달 타입 설정 (팔로워 또는 팔로잉)
@@ -455,7 +469,7 @@ export default function Mypage() {
                             <FollowContainer>
                                 <FollowItem onClick={() => handleOpenModal('followers')}>
                                     <Label>팔로워</Label>
-                                    <Number>{followers.length}</Number>
+                                    <Number>{follower.length}</Number>
                                 </FollowItem>
                                 <FollowItem onClick={() => handleOpenModal('following')}>
                                     <Label>팔로잉</Label>
@@ -471,12 +485,35 @@ export default function Mypage() {
                                         <path d="M15 6L18 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                         <path d="M13 20H21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
-                                    <span onClick={() => navigate(`/mypage/${userId}`)}>프로필정보 편집하기</span> 
+                                    <span onClick={() => navigate(`/mypage/edit`)}>프로필정보 편집하기</span> 
                                 </div>
                             </EditButton>
                             <ProfileBottomContainer>
                                 <ProfileTopText>소개</ProfileTopText>
-                                <ProfileBottomText>어제의 나보다 오늘의 내가 1%로라도 더 나은 사람이기를..</ProfileBottomText>
+                                <ProfileBottomText>{introduce}</ProfileBottomText>
+                                {education.length > 0 && (
+                                    <>
+                                        <ProfileTopText>학력</ProfileTopText>
+                                        {education.map((edu, index) => (
+                                            <div key={index}>
+                                                <ProfileBottomDateText>{edu.startDate} ~ {edu.endDate}</ProfileBottomDateText>
+                                                <ProfileBottomText>{edu.school} ({edu.status})</ProfileBottomText>
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
+
+                                {activities.length > 0 && (
+                                    <>
+                                        <ProfileTopText>활동</ProfileTopText>
+                                        {activities.map((act, index) => (
+                                            <div key={index}>
+                                                <ProfileBottomDateText>{act.startDate} ~ {act.endDate}</ProfileBottomDateText>
+                                                <ProfileBottomText>{act.activityName}</ProfileBottomText>
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
                             </ProfileBottomContainer>
                         </ProfileEditContainer>
                     </ProfileContainer>
@@ -551,7 +588,7 @@ export default function Mypage() {
             {isModalOpen && (
                 <FollowersModal
                     type={modalType}
-                    users={modalType === 'followers' ? followers : following}
+                    users={modalType === 'followers' ? follower : following}
                     onClose={handleCloseModal}
                     followedUsers={[1, 2, 3]}
                 />

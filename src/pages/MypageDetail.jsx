@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from "styled-components";
 import InputAndDropdown from '../components/share/InputAndDropdown';
@@ -332,7 +332,7 @@ const SubmitButton = styled.button`
 `;
 
 export default function MypageDetail() {
-    const { id } = useParams();
+    const { token } = useAuth();
     // 이름과 소개 필드에 대한 상태
     const [name, setName] = useState('');
     const [intro, setIntro] = useState('');
@@ -340,6 +340,12 @@ export default function MypageDetail() {
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 70 }, (_, i) => (currentYear - i).toString());
     const endyears = ["현재", ...Array.from({ length: 70 }, (_, i) => (currentYear - i).toString())];
+    // 학력사항 관리
+    const [education, setEducation] = useState([]);
+    const [school, setSchool] = useState('');
+    const [eduStatus, setEduStatus] = useState('');
+    const [eduStartYear, setEduStartYear] = useState('');
+    const [eduEndYear, setEduEndYear] = useState('');
     const [selectedEducation, setSelectedEducation] = useState(""); // 학력 선택 상태
     const [selectedStatus, setSelectedStatus] = useState(""); // 상태 선택 상태
     // 활동사항 항목 관리
@@ -363,6 +369,58 @@ export default function MypageDetail() {
         setStartDate(null);
         setEndDate(null);
         setActivityName('');
+    };
+
+    // 저장 후 로딩/성공/에러 상태 관리
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+            if (token) {
+                const fetchData = async () => {
+                    try {
+                        const userData = await getUserInfo(token);
+                        setName(userData.name);
+                        setIntro(userData.intro);
+                        setEducation(userData.education);
+                        setActivityList(userData.activities);
+                    } catch (error) {
+                        console.error("데이터 가져오기 실패", error);
+                    }
+                };
+    
+                fetchData();
+            }
+        }, [token]);
+
+    const handleSubmit = async () => {
+        // 필수 값 체크
+        if (!name || !intro) {
+            setError("이름과 소개는 필수 입력값입니다.");
+            return;
+        }
+
+        // 저장할 데이터 구성 (필요에 따라 구조 변경)
+        const profileData = {
+            name,
+            intro,
+            education: {
+                status: selectedStatus,
+            },
+            activities: activityList,
+        };
+
+        setLoading(true);
+        setError('');
+        try {
+            await saveProfile(profileData, token);
+            alert("프로필 정보가 저장되었습니다!");
+        } catch (err) {
+            setError("프로필 저장에 실패했습니다. 다시 시도해주세요.");
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -404,15 +462,15 @@ export default function MypageDetail() {
                             <ContentTitleText>최종학력</ContentTitleText>
                             <InputAndDropdown 
                                 placeholder="학교" 
-                                value={selectedEducation} 
-                                setValue={setSelectedEducation} 
+                                value={school} 
+                                setValue={setSchool} 
                                 data={["중학교", "고등학교", "대학 (2,3년제)", "대학 (4년제)", "대학원"]} 
                                 width="235px"
                             />
                             <InputAndDropdown 
                                 placeholder="상태" 
-                                value={selectedStatus} 
-                                setValue={setSelectedStatus} 
+                                value={eduStatus} 
+                                setValue={setEduStatus} 
                                 data={["졸업", "재학", "중퇴"]} 
                                 width="235px"
                             />
@@ -423,16 +481,16 @@ export default function MypageDetail() {
                             <EducationPeriodWrapper>
                                 <InputAndDropdown 
                                     placeholder="년도" 
-                                    value={selectedEducation} 
-                                    setValue={setSelectedEducation} 
+                                    value={eduStartYear} 
+                                    setValue={setEduStartYear} 
                                     data={years}
                                     width="235px"
                                 />
                                 <TildeText>~</TildeText>
                                 <InputAndDropdown 
                                     placeholder="년도" 
-                                    value={selectedStatus} 
-                                    setValue={setSelectedStatus} 
+                                    value={eduEndYear} 
+                                    setValue={setEduEndYear} 
                                     data={endyears}
                                     width="235px"
                                 />
@@ -587,7 +645,7 @@ export default function MypageDetail() {
             </DetailContainer>
 
             {/* 프로필 정보 저장하기 버튼 */}
-            <SubmitButton disabled={isButtonDisabled}>
+            <SubmitButton disabled={isButtonDisabled} onClick={handleSubmit}>
                 <span>프로필 정보 저장</span>
             </SubmitButton>
         </MypageDetailContainer>
