@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import Card from '../components/share/Card';
 import Carousel from '../components/share/Carousel';
@@ -38,6 +39,8 @@ const CardItem = styled.div`
 `;
 
 export default function Home() {
+    const location = useLocation();
+
     // 호버 모드
     const [hoverMode, setHoverMode] = useState("home");
 
@@ -73,19 +76,26 @@ export default function Home() {
         );
     };
 
-    // 추천 포트폴리오 조회 api 연결 - 테스트
-    useEffect(() => {
-        const getRecommendPortfolios = async () => {
-            try {
-                const data = await fetchRecommendPortfolios();
-                console.log('추천 포트폴리오 조회 data : ', data);
-            } catch (error) {
-                console.error('getRecommendPortfolios 에러 발생 : ', error)
-            }
-        };
+    // 추천 포트폴리오 조회 api 연결 - 테스트 (404)
+    // useEffect(() => {
+    //     const getRecommendPortfolios = async () => {
+    //         try {
+    //             const data = await fetchRecommendPortfolios();
+    //             console.log('추천 포트폴리오 조회 data : ', data);
+    //         } catch (error) {
+    //             console.error('getRecommendPortfolios 에러 발생 : ', error)
+    //         }
+    //     };
 
-        getRecommendPortfolios();
-    }, []);
+    //     getRecommendPortfolios();
+    // }, []);
+
+    // 검색 api 실행 결과 가져오기
+    useEffect(() => {
+        if (location.state?.searchResults) {
+            setCards(location.state.searchResults);
+        }
+    }, [location.state]);
 
     return (
         <HomeContainer>
@@ -101,7 +111,7 @@ export default function Home() {
                     <CardItem key={index} onClick={() => handleCardClick(card)}>
                         <Card
                             title={card.title}
-                            image={exampleImg} // 예시 이미지 사용
+                            image={card.thumnail || exampleImg} // 썸네일 없다면 예시 이미지 사용
                             name={card.name}
                             views={card.views}
                             likes={card.likes}
