@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 // 사용자 정보 가져오기
-export const getUserInfo = async (token) => {
+export const getUserInfo = async () => {
+    const token = localStorage.getItem('accessToken');
+    
     if (!token) {
         throw new Error('Token not found');
     }
