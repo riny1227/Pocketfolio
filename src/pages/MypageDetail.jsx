@@ -400,7 +400,6 @@ export default function MypageDetail() {
             return;
         }
 
-        // 저장할 데이터 구성 (필요에 따라 구조 변경)
         const profileData = {
             name,
             intro,
@@ -462,8 +461,8 @@ export default function MypageDetail() {
                             <ContentTitleText>최종학력</ContentTitleText>
                             <InputAndDropdown 
                                 placeholder="학교" 
-                                value={school} 
-                                setValue={setSchool} 
+                                value={selectedEducation} 
+                                setValue={setSelectedEducation} 
                                 data={["중학교", "고등학교", "대학 (2,3년제)", "대학 (4년제)", "대학원"]} 
                                 width="235px"
                             />
@@ -500,6 +499,8 @@ export default function MypageDetail() {
                             <InputWrapper>
                                 <InputAndDropdown
                                     placeholder="학교 찾아보기"
+                                    value={school}
+                                    setValue={setSchool}
                                     iconSvg={SearchIcon}
                                     hasToggle={false}
                                     width="504px"
@@ -519,7 +520,7 @@ export default function MypageDetail() {
                     <ContentContainer>
                     {/* 추가된 활동사항 항목들을 렌더링 */}
                     {activityList.map((activity, index) => (
-                        <div key={index} style={{ marginBottom: '20px' }}>
+                        <div key={index}>
                             <div style={{ marginBottom: '20px' }}>
                                 <ContentOneWrapper>
                                     <ContentTitleText>활동기간</ContentTitleText>
@@ -612,6 +613,16 @@ export default function MypageDetail() {
                                     dateFormat="yyyy.MM.dd"
                                     placeholderText="시작일"
                                 />
+                                <IconStyle
+                                    onClick={() => startDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
+                                        stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </IconStyle>
                             </StyledDatePickerWrapper>
                             <TildeText>~</TildeText>
                             <StyledDatePickerWrapper>
@@ -622,6 +633,16 @@ export default function MypageDetail() {
                                     placeholderText="완료일"
                                     minDate={startDate} // 시작일 이후 날짜만 선택 가능
                                 />
+                                <IconStyle
+                                    onClick={() => endDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
+                                        stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </IconStyle>
                             </StyledDatePickerWrapper>
                         </DatePickerContainer>
                     </ContentOneWrapper>
