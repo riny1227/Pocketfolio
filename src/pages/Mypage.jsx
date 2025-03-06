@@ -563,7 +563,7 @@ export default function Mypage() {
                             </CardItem>
                         )}
                         
-                        {cards.map((card, index) => (
+                        {Array.isArray(cards) && cards.map((card, index) => (
                             <CardItem key={index} onClick={() => handleCardClick(card)}>
                                 <Card
                                     title={card.title}
@@ -572,8 +572,8 @@ export default function Mypage() {
                                     views={card.views}
                                     likes={card.likes}
                                     hoverMode={activeTab === "portfolio" ? "mypage" : "home"}
-                                    isBookmarked={card.isBookmarked} // 북마크 상태 전달
-                                    onBookmarkChange={() => handleBookmarkToggle(card.id)} // 북마크 상태 변경 함수 전달
+                                    isBookmarked={card.isBookmarked}
+                                    onBookmarkChange={() => handleBookmarkToggle(card.id)}
                                 />
                             </CardItem>
                         ))}
