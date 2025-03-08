@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from "styled-components";
+import { fetchPortfolioDetails } from '../../api/Portfolio/PortfolioDetailApi';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../../imgs/example.png';
@@ -297,6 +298,7 @@ const UserPortfoliosContainer = styled.div`
     gap: 16px;
     margin-top: 68px;
     margin-left: 520px;
+    justify-content: ${({ portfolioCount }) => (portfolioCount < 3 ? 'flex-end' : 'flex-start')};
 `;
 
 // 포트폴리오 이미지 스타일
@@ -332,7 +334,10 @@ const SimilarPortfolioContainer = styled.div`
     };
 `;
 
-const PortfolioDetailModal = ({ card, onClose }) => {
+const PortfolioDetailModal = ({ portfolioId, onClose }) => {
+    const [portfolio, setPortfolio] = useState(null); // 포트폴리오 데이터 상태
+    const [isLoading, setIsLoading] = useState(true); // 로딩 상태
+    const [error, setError] = useState(null); // 오류 상태
 
     // 모달 아닌 부분 눌렀을 때, 닫히도록
     const handleOverlayClick = (e) => {
@@ -340,6 +345,43 @@ const PortfolioDetailModal = ({ card, onClose }) => {
           onClose();
         }
     };
+
+    // 포트폴리오 데이터를 API에서 불러오는 useEffect
+    useEffect(() => {
+        const loadPortfolioDetails = async () => {
+
+            setIsLoading(true);  // 🔹 새로운 요청이 시작될 때 로딩 상태 초기화
+            setError(null);  // 🔹 에러 메시지도 초기화
+
+            try {
+                const data = await fetchPortfolioDetails(portfolioId);
+                setPortfolio(data); // 데이터를 상태에 저장
+            } catch (error) {
+                setError('포트폴리오 상세 정보를 불러오는 데 실패했습니다.');
+            } finally {
+                setIsLoading(false); // 로딩 완료
+            }
+        };
+
+        if (portfolioId) { // 유효한 ID일 때만 API 호출 
+            loadPortfolioDetails();
+        }
+    }, [portfolioId]); // portfolioId가 바뀔 때마다 실행
+
+    // 로딩 중, 오류 처리 및 데이터 표시
+    if (isLoading) {
+        return (
+            <ModalOverlay onClick={handleOverlayClick}>
+                <ModalContainer onClick={(e) => e.stopPropagation()}>
+                    <div style={{ padding: '20px', textAlign: 'center' }}>⏳ 로딩 중...</div>
+                </ModalContainer>
+            </ModalOverlay>
+        );
+    }
+
+    if (error) {
+        return <div>{error}</div>;
+    }
 
     return (
         <ModalOverlay onClick={handleOverlayClick}>
