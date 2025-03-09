@@ -204,6 +204,15 @@ const ProfileWrapper = styled.div`
     align-self: stretch;
 `;
 
+// 활동사항 각 하나씩
+const ActivityWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    align-self: stretch;
+`;
+
 // 프로필정보 상단 부분
 const ProfileTopText = styled.text`
     color: #222;
@@ -517,10 +526,10 @@ export default function Mypage() {
                                     <ProfileWrapper>
                                         <ProfileTopText>활동</ProfileTopText>
                                         {activities.map((act, index) => (
-                                            <ProfileWrapper key={index}>
+                                            <ActivityWrapper key={index}>
                                                 <ProfileBottomDateText>{act.startDate} ~ {act.endDate}</ProfileBottomDateText><br/>
                                                 <ProfileBottomText>{act.activityName}</ProfileBottomText>
-                                            </ProfileWrapper>
+                                            </ActivityWrapper>
                                         ))}
                                     </ProfileWrapper>
                                 )}
