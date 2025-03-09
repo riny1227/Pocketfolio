@@ -429,6 +429,15 @@ export default function MypageDetail() {
                     setIntroduce(userData.introduce);
                     setEducation(userData.education);
                     setActivities(userData.activities);
+
+                    // 수정하는 경우
+                    if(userData.education){
+                        const { school, status, startDate, endDate } = userData.education;
+                        setSchool(school);
+                        setEduStatus(status);
+                        setEduStartYear(startDate);
+                        setEduEndYear(endDate);
+                    }
                 } catch (error) {
                     console.error("데이터 가져오기 실패", error);
                 }
