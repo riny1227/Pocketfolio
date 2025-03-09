@@ -506,17 +506,15 @@ export default function Mypage() {
                                     <ProfileBottomText>{introduce}</ProfileBottomText>
                                 </ProfileWrapper>
                                 {education && (
-                                    <>
+                                    <ProfileWrapper>
                                         <ProfileTopText>학력</ProfileTopText>
-                                        <ProfileWrapper>
-                                            <ProfileBottomDateText>{education.startDate} ~ {education.endDate}</ProfileBottomDateText>
-                                            <ProfileBottomText>{education.school} ({education.status})</ProfileBottomText>
-                                        </ProfileWrapper>
-                                    </>
+                                        <ProfileBottomDateText>{education.startDate} ~ {education.endDate}</ProfileBottomDateText>
+                                        <ProfileBottomText>{education.school} ({education.status})</ProfileBottomText>
+                                    </ProfileWrapper>
                                 )}
 
                                 {Array.isArray(activities) && activities.length > 0 && (
-                                    <>
+                                    <ProfileWrapper>
                                         <ProfileTopText>활동</ProfileTopText>
                                         {activities.map((act, index) => (
                                             <ProfileWrapper key={index}>
@@ -524,7 +522,7 @@ export default function Mypage() {
                                                 <ProfileBottomText>{act.activityName}</ProfileBottomText>
                                             </ProfileWrapper>
                                         ))}
-                                    </>
+                                    </ProfileWrapper>
                                 )}
                             </ProfileBottomContainer>
                         </ProfileEditContainer>
