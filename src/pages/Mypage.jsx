@@ -527,7 +527,7 @@ export default function Mypage() {
                                         <ProfileTopText>활동</ProfileTopText>
                                         {activities.map((act, index) => (
                                             <ActivityWrapper key={index}>
-                                                <ProfileBottomDateText>{act.startDate} ~ {act.endDate}</ProfileBottomDateText><br/>
+                                                <ProfileBottomDateText>{act.startDate} ~ {act.endDate}</ProfileBottomDateText>
                                                 <ProfileBottomText>{act.activityName}</ProfileBottomText>
                                             </ActivityWrapper>
                                         ))}
@@ -548,7 +548,7 @@ export default function Mypage() {
                         >
                             <span>포트폴리오</span>
                             <div className="count">
-                                <span className="countText">{portfolioCards ? portfolioCards.length : 0}</span>
+                                <span className="countText">{portfolioCards?.length ?? 0}</span>    
                             </div>
                         </Tap>
                         <Tap
@@ -557,7 +557,7 @@ export default function Mypage() {
                         >
                             <span>북마크</span>
                             <div className="count">
-                                <span className="countText">{bookmarkedCards ? bookmarkedCards.length : 0}</span>
+                                <span className="countText">{bookmarkedCards?.length ?? 0}</span>
                             </div>
                         </Tap>
                         <Tap
