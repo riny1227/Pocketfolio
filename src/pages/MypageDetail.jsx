@@ -378,7 +378,7 @@ export default function MypageDetail() {
             const fetchData = async () => {
                 try {
                     const userData = await getUserInfo(token);
-                    setUserId(userData.userId);
+                    setUserId(userData.user_id);
                     setName(userData.name);
                     setIntroduce(userData.introduce);
                     setEducation(userData.education);
