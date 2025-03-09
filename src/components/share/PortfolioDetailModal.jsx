@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 import { fetchPortfolioDetails } from '../../api/Portfolio/PortfolioDetailApi';
 import { deletePortfolio } from '../../api/Portfolio/PortfolioDeleteApi';
@@ -375,6 +376,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose, token }) => {
     const [isLoading, setIsLoading] = useState(true); // 로딩 상태
     const [error, setError] = useState(null); // 오류 상태
     const [isDeleting, setIsDeleting] = useState(false); // 삭제 상태
+    const navigate = useNavigate();
 
     // 모달 아닌 부분 눌렀을 때, 닫히도록
     const handleOverlayClick = (e) => {
@@ -382,6 +384,12 @@ const PortfolioDetailModal = ({ portfolioId, onClose, token }) => {
           onClose();
         }
     };
+
+    // 수정 버튼 클릭시
+    const handleEditClick = () => {
+        // 수정 페이지로 포트폴리오 정보를 전달하여 이동
+        navigate('/src/pages/WritePortfolio.jsx', { state: { portfolioId } });
+      };
 
     // 삭제 버튼 클릭시 
     const handleDeleteClick = async () => {
@@ -438,6 +446,20 @@ const PortfolioDetailModal = ({ portfolioId, onClose, token }) => {
     //     return <div>{error}</div>;
     // }
 
+    // 공유 버튼 클릭시
+    const handleShareClick = async () => {
+        const shareUrl = `https://pocketfolio.co.kr/api/portfolio/${portfolioId}`;
+
+        navigator.clipboard.writeText(shareUrl) // 클립보드에 URL 복사
+            .then(() => {
+            alert('링크가 클립보드에 복사되었습니다!');
+            })
+            .catch(err => {
+            alert('링크 복사에 실패했습니다.');
+            console.error(err);
+            });
+    };
+
     return (
         <ModalOverlay onClick={handleOverlayClick}>
             {/* 모달을 닫는 버튼 */}
@@ -476,7 +498,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose, token }) => {
                     {/* 헤더 아이콘 컨테이너 */}
                     <HeaderIconContainer>
                         {/* 공유 아이콘 */}
-                        <SBGIconStyle>
+                        <SBGIconStyle onClick={handleShareClick}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                                 <path d="M3.33325 10.0003V16.667C3.33325 17.109 3.50885 17.5329 3.82141 17.8455C4.13397 18.1581 4.55789 18.3337 4.99992 18.3337H14.9999C15.4419 18.3337 15.8659 18.1581 16.1784 17.8455C16.491 17.5329 16.6666 17.109 16.6666 16.667V10.0003M13.3333 5.00033L9.99992 1.66699M9.99992 1.66699L6.66659 5.00033M9.99992 1.66699V12.5003" stroke="#909090" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
@@ -494,7 +516,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose, token }) => {
                             </svg>
                         </SBGIconStyle>
                         {/* 수정, 삭제 버튼 */}
-                        <ModifyButton>수정</ModifyButton>
+                        <ModifyButton onClick={handleEditClick}>수정</ModifyButton>
                         <DeleteButton
                         onClick={handleDeleteClick} 
                         disabled={isDeleting}>삭제</DeleteButton>

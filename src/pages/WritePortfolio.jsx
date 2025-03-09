@@ -7,7 +7,7 @@ import { registerLocale, setDefaultLocale } from "react-datepicker";
 import ko from "date-fns/locale/ko"; // 한국어 로케일 import
 import InputAndDropdown from "../components/share/InputAndDropdown";
 import { create, uploadAttachments, uploadCover } from "../api/Portfolio/PortfolioUploadApi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // 한국어 로케일 등록
 registerLocale("ko", ko);
@@ -534,7 +534,25 @@ export default function WritePortfolio() {
     const [coverImage, setCoverImage] = useState(null);
     const [attachments, setAttachments] = useState([]);
     const navigate = useNavigate();
+    const location = useLocation();
 
+    const { portfolioData } = location.state || {}; // PortfolioDetailModal에서 전달받은 데이터
+
+    useEffect(() => {
+        if (portfolioData) {
+            setTitle(portfolioData.title);
+            setRole(portfolioData.role);
+            setJob(portfolioData.job);
+            setCompany(portfolioData.company);
+            setUrl(portfolioData.url);
+            setMemo(portfolioData.description);
+            setStartDate(new Date(portfolioData.durationStart));
+            setEndDate(new Date(portfolioData.durationEnd));
+            setImagePreview(portfolioData.coverImage || exampleImage);
+            setFileName(portfolioData.attachments?.[0]?.name || '');
+        }
+    }, [portfolioData]);
+    
     useEffect(() => {
         // 모든 필드가 채워졌는지 확인(URL, 간단설명 제외)
         if (title && startDate && endDate && role && job && company && fileName) {
