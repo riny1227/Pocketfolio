@@ -468,11 +468,13 @@ export default function Mypage() {
                         <ProfileEditContainer>
                             {/* 팔로워+팔로잉 영역 */}
                             <FollowContainer>
-                                <FollowItem onClick={() => handleOpenModal('followers')}>
+                                <FollowItem>
+                                    {/* onClick={() => handleOpenModal('followers')} */}
                                     <Label>팔로워</Label>
                                     <Number>{follower}</Number>
                                 </FollowItem>
-                                <FollowItem onClick={() => handleOpenModal('following')}>
+                                <FollowItem>
+                                    {/* onClick={() => handleOpenModal('following')} */}
                                     <Label>팔로잉</Label>
                                     <Number>{following}</Number>
                                 </FollowItem>

@@ -466,6 +466,8 @@ export default function MypageDetail() {
         // 날짜를 "YYYY-MM-DD" 형식으로 변환
         const formatDate = (date) => {
             if (!date) return null;
+            // date가 Date 객체가 아니면 Date 객체로 변환
+            const validDate = date instanceof Date ? date : new Date(date);
             return date.toISOString().split('T')[0];
         };
 
