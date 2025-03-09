@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import logo from '../../imgs/logo.png';
 import Chat from '../Chat';
 import profileImage from '../../imgs/Profile.png';
+import { fetchSearch } from "../../api/NavbarApi"; // 검색 API 불러오기
 
 // 헤더 컨테이너
 const HeaderContainer = styled.div`
@@ -275,11 +276,10 @@ export default function Header() {
     const { isLoggedIn, logout } = useAuth(); 
     const [searchText, setSearchText] = useState('');
     const [isChatOpen, setChatOpen] = useState(false);
-    // 사용자 ID 변수 선언(임시)
-    const userId = 1;
 
     // 드롭다운 상태 관리
     const [isVisible, setIsVisible] = useState(false);  
+
     // 타이머 관리
     const closeTimer = useRef(null);
 
@@ -293,16 +293,44 @@ export default function Header() {
     };
 
     const handleMouseLeave = () => {
-        // 마우스가 벗어나면 잠시 후 메뉴 닫기
+        // 드롭다운 메뉴에 마우스가 벗어났을 때만 닫기
+        if (!isVisible) return;
         closeTimer.current = setTimeout(() => {
             setIsVisible(false);
-        }, 300); // 300ms 딜레이
+        }, 300);
+    };
+
+    // 드롭다운 메뉴에 마우스를 올려도 메뉴가 사라지지 않게 하기
+    const handleDropdownMouseEnter = () => {
+        // 메뉴 내부로 마우스를 이동했을 때 메뉴 닫히지 않도록 함
+        if (closeTimer.current) {
+            clearTimeout(closeTimer.current);
+            closeTimer.current = null;
+        }
+    };
+
+    const handleDropdownMouseLeave = () => {
+        closeTimer.current = setTimeout(() => {
+            setIsVisible(false);
+        }, 300);
     };
 
     // 로그아웃 함수
     const handleLogout = () => {
         logout();
         navigate('/');
+    };
+
+    // 검색 실행 함수
+    const handleSearch = async (event) => {
+        if (event.key === "Enter" && searchText.trim() !== "") {
+            try {
+                const result = await fetchSearch(searchText, "portfolio", 10); // 포트폴리오 검색 (type = "portfolio", limit = 10으로 고정)
+                navigate("/", { state: { searchResults: result, searchText } }); // 검색 결과를 Home으로 전달
+            } catch (error) {
+                console.error("handleSearch 에러 발생 : ", error);
+            }
+        }
     };
 
     return (
@@ -327,6 +355,7 @@ export default function Header() {
                         type="text"
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
+                        onKeyDown={handleSearch} // 엔터 입력 시 검색 api 실행
                         placeholder="검색어를 입력하세요."
                     />
                     <SearchIcon>
@@ -385,11 +414,11 @@ export default function Header() {
                         {/* 드롭다운 메뉴 */}
                         <DropdownMenu 
                             isVisible={isVisible}
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={handleMouseLeave}
+                            onMouseEnter={handleDropdownMouseEnter}
+                            onMouseLeave={handleDropdownMouseLeave}
                         >
                             <ProfileImg onClick={() => navigate('/mypage')}/>
-                            <DropdownItem onClick={() => navigate(`/mypage/${userId}`)}>프로필 편집</DropdownItem>
+                            <DropdownItem onClick={() => navigate(`/mypage/edit`)}>프로필 편집</DropdownItem>
                             <DropdownItem onClick={handleLogout}>로그아웃</DropdownItem>
                         </DropdownMenu>
                     </ProfileWrapper>

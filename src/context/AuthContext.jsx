@@ -8,7 +8,7 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [token, setToken] = useState(null);
+    const [token, setToken] = useState(localStorage.getItem('jwtToken') || null);
 
     // 로그인 함수
     const login = async (email, password) => {
@@ -43,6 +43,7 @@ export function AuthProvider({ children }) {
 
             setIsLoggedIn(false);
             setToken(null);
+            localStorage.removeItem("jwtToken");
             console.log("로그아웃 성공");
 
             navigate("/login"); // 로그인 화면으로 이동

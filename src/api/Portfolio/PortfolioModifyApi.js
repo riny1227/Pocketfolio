@@ -1,25 +1,32 @@
+import axios from 'axios';
+
 // 포트폴리오 수정 API
-export const modifyPortfolio = async (portfolioId, updateData) => {
+export const modifyPortfolio = async (portfolioId, updateData, token) => {
     try {
-        const response = await fetch(`"https://pocketfolio.co.kr/api/portfolio/${portfolioId}"`, {
-            method: 'PUT',  // 수정 요청이므로 PUT 메서드 사용
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updateData),  // 요청 본문에 수정된 데이터 포함
-        });
-    
-        // 응답이 성공적이면 JSON을 반환
-        if (response.ok) {
-            const data = await response.json();
-            return {
-                message: data.message,
-            };
-        } else {
-            // 오류 처리
-            throw new Error('Failed to modify portfolio');
+        const response = await axios.patch(`https://pocketfolio.co.kr/api/portfolio/${portfolioId}`,
+        updateData,
+            {
+                headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                },
+            }
+        );
+        
+        // 성공 응답 처리 
+        if (response.status === 200) {
+            return { message: '포트폴리오가 수정되었습니다.' };
         }
-    } catch (error) {
-        console.error('Error modifying portfolio:', error);
-    }
+
+
+        } catch (error) {
+            if (error.response) {
+            if (error.response.status === 403) {
+                throw new Error('수정 권한이 없습니다.');
+            } else if (error.response.status === 500) {
+                throw new Error('포트폴리오 수정 중 오류가 발생했습니다.');
+            }
+            throw new Error('네트워크 오류가 발생했습니다.');
+            }
+        }
 };
