@@ -462,14 +462,6 @@ export default function MypageDetail() {
             alert("이름과 소개는 필수로 입력해주세요.");
             return;
         }
-                
-        // 날짜를 "YYYY-MM-DD" 형식으로 변환
-        const formatDate = (date) => {
-            if (!date) return null;
-            // date가 Date 객체가 아니면 Date 객체로 변환
-            const validDate = date instanceof Date ? date : new Date(date);
-            return date.toISOString().split('T')[0];
-        };
 
         const profileData = {
             userId,
@@ -488,8 +480,8 @@ export default function MypageDetail() {
             ...(activities.length > 0 ? {
                 activities: activities.map((act) => ({
                     activityName: act.activityName,
-                    startDate: formatDate(act.startDate),
-                    endDate: formatDate(act.endDate)
+                    startDate: act.startDate,
+                    endDate: act.endDate
                 }))
             } : {})
         };        
@@ -619,7 +611,7 @@ export default function MypageDetail() {
                                                         newActivityList[index].startDate = date;
                                                         setActivities(newActivityList);
                                                     }}
-                                                    dateFormat="yyyy.MM.dd"
+                                                    dateFormat="yyyy-MM-dd"
                                                     placeholderText="시작일"
                                                 />
                                                 <IconStyle
@@ -644,7 +636,7 @@ export default function MypageDetail() {
                                                         newActivityList[index].endDate = date;
                                                         setActivities(newActivityList);
                                                     }}
-                                                    dateFormat="yyyy.MM.dd"
+                                                    dateFormat="yyyy-MM-dd"
                                                     placeholderText="완료일"
                                                     minDate={activity.startDate} // 시작일 이후 날짜만 선택 가능
                                                 />
