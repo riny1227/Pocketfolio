@@ -406,6 +406,7 @@ export default function MypageDetail() {
 
     // 활동사항 항목 관리
     const [activities, setActivities] = useState([defaultActivity]); // 활동사항 목록
+    const [activityId, setActivityId] = useState("");
     const [startDate, setStartDate] = useState(null); // 시작일
     const [endDate, setEndDate] = useState(null); // 완료일
     const [activityName, setActivityName] = useState(""); // 활동명
@@ -439,7 +440,7 @@ export default function MypageDetail() {
                     setEducation(userData.education);
                     setActivities(userData.activities);
 
-                    // 수정하는 경우
+                    // 학력사항 수정하는 경우
                     if(userData.education){
                         const { school, status, startDate, endDate } = userData.education;
                         setSchool(school);
@@ -477,8 +478,10 @@ export default function MypageDetail() {
                     endDate: eduEndYear
                 }
             } : {}),
+
             ...(activities.length > 0 ? {
                 activities: activities.map((act) => ({
+                    activityId: act.activityId,
                     activityName: act.activityName,
                     startDate: act.startDate,
                     endDate: act.endDate
