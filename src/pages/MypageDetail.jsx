@@ -332,6 +332,13 @@ const SubmitButton = styled.button`
     }
 `;
 
+// 기본값으로 하나의 활동사항 설정
+const defaultActivity = {
+    startDate: null,
+    endDate: null,
+    activityName: ""
+  };
+
 export default function MypageDetail() {
     const navigate = useNavigate();
     const { token } = useAuth();
@@ -398,7 +405,7 @@ export default function MypageDetail() {
     };
 
     // 활동사항 항목 관리
-    const [activities, setActivities] = useState([]); // 활동사항 목록
+    const [activities, setActivities] = useState([defaultActivity]); // 활동사항 목록
     const [startDate, setStartDate] = useState(null); // 시작일
     const [endDate, setEndDate] = useState(null); // 완료일
     const [activityName, setActivityName] = useState(""); // 활동명
@@ -593,149 +600,89 @@ export default function MypageDetail() {
                     </TitleWrapper>
                     <Line/>
                     <ContentContainer>
-                    {/* 추가된 활동사항 항목들을 렌더링 */}
-                    {activities.map((activity, index) => (
-                        <div key={index}>
-                            <div style={{ marginBottom: '20px' }}>
-                                <ContentOneWrapper>
-                                    <ContentTitleText>활동기간</ContentTitleText>
-                                    <DatePickerContainer>
-                                        {/* 시작일 */}
-                                        <StyledDatePickerWrapper>
-                                            <StyledDatePicker
-                                                ref={startDateRef}
-                                                selected={activity.startDate}
-                                                onChange={(date) => {
-                                                    const newActivityList = [...activities];
-                                                    newActivityList[index].startDate = date;
-                                                    setActivities(newActivityList);
-                                                }}
-                                                dateFormat="yyyy.MM.dd"
-                                                placeholderText="시작일"
-                                            />
-                                            <IconStyle
-                                                onClick={() => startDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width="24"
-                                                height="24"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
-                                                    stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                            </IconStyle>
-                                        </StyledDatePickerWrapper>
-                                        <TildeText>~</TildeText>
-                                        {/* 완료일 */}
-                                        <StyledDatePickerWrapper>
-                                            <StyledDatePicker
-                                                ref={endDateRef}
-                                                selected={activity.endDate}
-                                                onChange={(date) => {
-                                                    const newActivityList = [...activities];
-                                                    newActivityList[index].endDate = date;
-                                                    setActivities(newActivityList);
-                                                }}
-                                                dateFormat="yyyy.MM.dd"
-                                                placeholderText="완료일"
-                                                minDate={activity.startDate} // 시작일 이후 날짜만 선택 가능
-                                            />
-                                            <IconStyle
-                                                onClick={() => endDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width="24"
-                                                height="24"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
-                                                    stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                            </IconStyle>
-                                        </StyledDatePickerWrapper>
-                                    </DatePickerContainer>
-                                </ContentOneWrapper>
+                        {/* 추가된 활동사항 항목들을 렌더링 */}
+                        {activities.map((activity, index) => (
+                            <div key={index}>
+                                <div style={{ marginBottom: '20px' }}>
+                                    <ContentOneWrapper>
+                                        <ContentTitleText>활동기간</ContentTitleText>
+                                        <DatePickerContainer>
+                                            {/* 시작일 */}
+                                            <StyledDatePickerWrapper>
+                                                <StyledDatePicker
+                                                    ref={startDateRef}
+                                                    selected={activity.startDate}
+                                                    onChange={(date) => {
+                                                        const newActivityList = [...activities];
+                                                        newActivityList[index].startDate = date;
+                                                        setActivities(newActivityList);
+                                                    }}
+                                                    dateFormat="yyyy.MM.dd"
+                                                    placeholderText="시작일"
+                                                />
+                                                <IconStyle
+                                                    onClick={() => startDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="24"
+                                                    height="24"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
+                                                        stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                </IconStyle>
+                                            </StyledDatePickerWrapper>
+                                            <TildeText>~</TildeText>
+                                            {/* 완료일 */}
+                                            <StyledDatePickerWrapper>
+                                                <StyledDatePicker
+                                                    ref={endDateRef}
+                                                    selected={activity.endDate}
+                                                    onChange={(date) => {
+                                                        const newActivityList = [...activities];
+                                                        newActivityList[index].endDate = date;
+                                                        setActivities(newActivityList);
+                                                    }}
+                                                    dateFormat="yyyy.MM.dd"
+                                                    placeholderText="완료일"
+                                                    minDate={activity.startDate} // 시작일 이후 날짜만 선택 가능
+                                                />
+                                                <IconStyle
+                                                    onClick={() => endDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="24"
+                                                    height="24"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
+                                                        stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                </IconStyle>
+                                            </StyledDatePickerWrapper>
+                                        </DatePickerContainer>
+                                    </ContentOneWrapper>
+                                </div>
+                                <InfoLine />
+                                <div style={{ marginTop: '20px', marginBottom: '20px' }}>
+                                    <ContentOneWrapper>
+                                        <ContentTitleText>활동명</ContentTitleText>
+                                        <StyledActivityInput
+                                            type="text"
+                                            value={activity.activityName}
+                                            onChange={(e) => {
+                                                const newActivityList = [...activities];
+                                                newActivityList[index].activityName = e.target.value;
+                                                setActivities(newActivityList);
+                                            }}
+                                            maxLength={25} // 최대 글자 수 지정
+                                            placeholder="활동명"
+                                        />
+                                        <CharCount>
+                                            <NumCount>{activity.activityName.length}</NumCount> / 25
+                                        </CharCount>
+                                    </ContentOneWrapper>
+                                </div>
+                                <div style={{marginTop: '20px'}}><InfoLine /></div>
                             </div>
-                            <InfoLine />
-                            <div style={{ marginTop: '20px', marginBottom: '20px' }}>
-                                <ContentOneWrapper>
-                                    <ContentTitleText>활동명</ContentTitleText>
-                                    <StyledActivityInput
-                                        type="text"
-                                        value={activity.activityName}
-                                        onChange={(e) => {
-                                            const newActivityList = [...activities];
-                                            newActivityList[index].activityName = e.target.value;
-                                            setActivities(newActivityList);
-                                        }}
-                                        maxLength={25} // 최대 글자 수 지정
-                                        placeholder="활동명"
-                                    />
-                                    <CharCount>
-                                        <NumCount>{activity.activityName.length}</NumCount> / 25
-                                    </CharCount>
-                                </ContentOneWrapper>
-                            </div>
-                            <div style={{marginTop: '20px'}}><InfoLine /></div>
-                        </div>
-                    ))}
-                    
-                    {/* 입력 필드 */}
-                    <ContentOneWrapper>
-                        <ContentTitleText>활동기간</ContentTitleText>
-                        <DatePickerContainer>
-                            <StyledDatePickerWrapper>
-                                <StyledDatePicker
-                                    selected={startDate}
-                                    onChange={(date) => setStartDate(date)}
-                                    dateFormat="yyyy.MM.dd"
-                                    placeholderText="시작일"
-                                />
-                                <IconStyle
-                                    onClick={() => startDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
-                                        stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </IconStyle>
-                            </StyledDatePickerWrapper>
-                            <TildeText>~</TildeText>
-                            <StyledDatePickerWrapper>
-                                <StyledDatePicker
-                                    selected={endDate}
-                                    onChange={(date) => setEndDate(date)}
-                                    dateFormat="yyyy.MM.dd"
-                                    placeholderText="완료일"
-                                    minDate={startDate} // 시작일 이후 날짜만 선택 가능
-                                />
-                                <IconStyle
-                                    onClick={() => endDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
-                                        stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </IconStyle>
-                            </StyledDatePickerWrapper>
-                        </DatePickerContainer>
-                    </ContentOneWrapper>
-                    <InfoLine />
-                    <ContentOneWrapper>
-                        <ContentTitleText>활동명</ContentTitleText>
-                        <StyledActivityInput
-                            type="text"
-                            value={activityName}
-                            onChange={(e) => setActivityName(e.target.value)}
-                            maxLength={25} // 최대 글자 수 지정
-                            placeholder="활동명"
-                        />
-                        <CharCount>
-                            <NumCount>{activityName.length}</NumCount> / 25
-                        </CharCount>
-                    </ContentOneWrapper>
-                    <InfoLine />
+                        ))}
                 </ContentContainer>
                 </DetailWrapper>
             </DetailContainer>
