@@ -333,6 +333,7 @@ const SubmitButton = styled.button`
 
 export default function MypageDetail() {
     const { token } = useAuth();
+    const [userId, setUserId] = useState("");
     // 이름과 소개 필드에 대한 상태
     const [name, setName] = useState("");
     const [introduce, setIntroduce] = useState("");
@@ -372,23 +373,24 @@ export default function MypageDetail() {
     };
 
     useEffect(() => {
-            if (token) {
-                console.log("Fetched token:", token); // token 확인
-                const fetchData = async () => {
-                    try {
-                        const userData = await getUserInfo(token);
-                        setName(userData.name);
-                        setIntroduce(userData.introduce);
-                        setEducation(userData.education);
-                        setActivities(userData.activities);
-                    } catch (error) {
-                        console.error("데이터 가져오기 실패", error);
-                    }
-                };
-    
-                fetchData();
-            }
-        }, [token]);
+        if (token) {
+            console.log("Fetched token:", token); // token 확인
+            const fetchData = async () => {
+                try {
+                    const userData = await getUserInfo(token);
+                    setUserId(userData.userId);
+                    setName(userData.name);
+                    setIntroduce(userData.introduce);
+                    setEducation(userData.education);
+                    setActivities(userData.activities);
+                } catch (error) {
+                    console.error("데이터 가져오기 실패", error);
+                }
+            };
+
+            fetchData();
+        }
+    }, [token]);
 
     const handleSubmit = async () => {
         // 필수 값 체크
@@ -403,8 +405,6 @@ export default function MypageDetail() {
             return date.toISOString().split('T')[0];
         };
 
-        const userId = token && token.userId;
-        
         const profileData = {
             userId,
             name, 
