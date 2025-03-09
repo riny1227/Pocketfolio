@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, act } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from "styled-components";
 import InputAndDropdown from '../components/share/InputAndDropdown';
@@ -334,35 +334,35 @@ const SubmitButton = styled.button`
 export default function MypageDetail() {
     const { token } = useAuth();
     // 이름과 소개 필드에 대한 상태
-    const [name, setName] = useState('');
-    const [intro, setIntro] = useState('');
+    const [name, setName] = useState("");
+    const [introduce, setIntroduce] = useState("");
     // 날짜에 대한 부분
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 70 }, (_, i) => (currentYear - i).toString());
     const endyears = ["현재", ...Array.from({ length: 70 }, (_, i) => (currentYear - i).toString())];
     // 학력사항 관리
     const [education, setEducation] = useState([]);
-    const [school, setSchool] = useState('');
-    const [eduStatus, setEduStatus] = useState('');
-    const [eduStartYear, setEduStartYear] = useState('');
-    const [eduEndYear, setEduEndYear] = useState('');
+    const [school, setSchool] = useState("");
+    const [eduStatus, setEduStatus] = useState("");
+    const [eduStartYear, setEduStartYear] = useState("");
+    const [eduEndYear, setEduEndYear] = useState("");
     const [selectedEducation, setSelectedEducation] = useState(""); // 학력 선택 상태
     const [selectedStatus, setSelectedStatus] = useState(""); // 상태 선택 상태
     // 활동사항 항목 관리
-    const [activityList, setActivityList] = useState([]); // 활동사항 목록
+    const [activities, setActivities] = useState([]); // 활동사항 목록
     const [startDate, setStartDate] = useState(null); // 시작일
     const [endDate, setEndDate] = useState(null); // 완료일
-    const [activityName, setActivityName] = useState(''); // 활동명
+    const [activityName, setActivityName] = useState(""); // 활동명
 
     const startDateRef = useRef(null);
     const endDateRef = useRef(null);
     
     // 저장하기 버튼 상태 관리
-    const isButtonDisabled = !name || !intro;
+    const isButtonDisabled = !name || !introduce;
 
     const handleAddActivity = () => {
-        setActivityList([
-            ...activityList,
+        setActivities([
+            ...activities,
             { startDate, endDate, activityName } // 새로운 활동사항 항목 추가
         ]);
         // 입력 필드 초기화
@@ -371,19 +371,16 @@ export default function MypageDetail() {
         setActivityName('');
     };
 
-    // 저장 후 로딩/성공/에러 상태 관리
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-
     useEffect(() => {
             if (token) {
+                console.log("Fetched token:", token); // token 확인
                 const fetchData = async () => {
                     try {
                         const userData = await getUserInfo(token);
                         setName(userData.name);
-                        setIntro(userData.intro);
+                        setIntroduce(userData.introduce);
                         setEducation(userData.education);
-                        setActivityList(userData.activities);
+                        setActivities(userData.activities);
                     } catch (error) {
                         console.error("데이터 가져오기 실패", error);
                     }
@@ -395,8 +392,8 @@ export default function MypageDetail() {
 
     const handleSubmit = async () => {
         // 필수 값 체크
-        if (!name || !intro) {
-            setError("이름과 소개는 필수 입력값입니다.");
+        if (!name || !introduce) {
+            alert("이름과 소개는 필수로 입력해주세요.");
             return;
         }
                 
@@ -405,35 +402,34 @@ export default function MypageDetail() {
             if (!date) return null;
             return date.toISOString().split('T')[0];
         };
+
+        const userId = token && token.userId;
         
         const profileData = {
+            userId,
             name, 
-            introduce: intro,
+            introduce,
             education: {
             school,            // 학교명
             status: eduStatus, // 학력 상태
             startDate: eduStartYear, // 학력 시작
             endDate: eduEndYear   // 학력 종료
             },
-            activities: activityList.map((act) => ({
+            activities: activities.map((act) => ({
             activityName: act.activityName,
             startDate: formatDate(act.startDate), // 활동 시작
             endDate: formatDate(act.endDate)        // 활동 종료
             }))
         };
         
-        setLoading(true);
-        setError('');
         try {
             await saveProfile(profileData, token);
             alert("프로필 정보가 저장되었습니다!");
         } catch (err) {
-            setError("프로필 저장에 실패했습니다. 다시 시도해주세요.");
+            alert("프로필 저장에 실패했습니다. 다시 시도해주세요.");
             console.error(err);
-        } finally {
-            setLoading(false);
         }
-        };          
+    };          
 
     return (
         <MypageDetailContainer>
@@ -448,6 +444,7 @@ export default function MypageDetail() {
                                 <RightInputField
                                     placeholder="이름"
                                     value={name}
+                                    setValue={setName}
                                     onChange={(e) => setName(e.target.value)}
                                 />
                             </RightWrapper>
@@ -455,8 +452,9 @@ export default function MypageDetail() {
                                 <RightTitle>소개</RightTitle>
                                 <RightInputField
                                     placeholder="짧게 나를 소개하기"
-                                    value={intro}
-                                    onChange={(e) => setIntro(e.target.value)}
+                                    value={introduce}
+                                    setValue={setIntroduce}
+                                    onChange={(e) => setIntroduce(e.target.value)}
                                 />
                             </RightWrapper>   
                         </RightContainer>
@@ -532,7 +530,7 @@ export default function MypageDetail() {
                     <Line/>
                     <ContentContainer>
                     {/* 추가된 활동사항 항목들을 렌더링 */}
-                    {activityList.map((activity, index) => (
+                    {activities.map((activity, index) => (
                         <div key={index}>
                             <div style={{ marginBottom: '20px' }}>
                                 <ContentOneWrapper>
@@ -544,9 +542,9 @@ export default function MypageDetail() {
                                                 ref={startDateRef}
                                                 selected={activity.startDate}
                                                 onChange={(date) => {
-                                                    const newActivityList = [...activityList];
+                                                    const newActivityList = [...activities];
                                                     newActivityList[index].startDate = date;
-                                                    setActivityList(newActivityList);
+                                                    setActivities(newActivityList);
                                                 }}
                                                 dateFormat="yyyy.MM.dd"
                                                 placeholderText="시작일"
@@ -569,9 +567,9 @@ export default function MypageDetail() {
                                                 ref={endDateRef}
                                                 selected={activity.endDate}
                                                 onChange={(date) => {
-                                                    const newActivityList = [...activityList];
+                                                    const newActivityList = [...activities];
                                                     newActivityList[index].endDate = date;
-                                                    setActivityList(newActivityList);
+                                                    setActivities(newActivityList);
                                                 }}
                                                 dateFormat="yyyy.MM.dd"
                                                 placeholderText="완료일"
@@ -599,9 +597,9 @@ export default function MypageDetail() {
                                         type="text"
                                         value={activity.activityName}
                                         onChange={(e) => {
-                                            const newActivityList = [...activityList];
+                                            const newActivityList = [...activities];
                                             newActivityList[index].activityName = e.target.value;
-                                            setActivityList(newActivityList);
+                                            setActivities(newActivityList);
                                         }}
                                         maxLength={25} // 최대 글자 수 지정
                                         placeholder="활동명"
