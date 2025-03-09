@@ -548,7 +548,7 @@ export default function Mypage() {
                         >
                             <span>포트폴리오</span>
                             <div className="count">
-                                <span className="countText">{portfolioCards.length}</span>
+                                <span className="countText">{portfolioCards ? portfolioCards.length : 0}</span>
                             </div>
                         </Tap>
                         <Tap
@@ -557,7 +557,7 @@ export default function Mypage() {
                         >
                             <span>북마크</span>
                             <div className="count">
-                                <span className="countText">{bookmarkedCards.length}</span>
+                                <span className="countText">{bookmarkedCards ? bookmarkedCards.length : 0}</span>
                             </div>
                         </Tap>
                         <Tap
