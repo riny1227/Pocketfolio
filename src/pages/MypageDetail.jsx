@@ -409,18 +409,24 @@ export default function MypageDetail() {
             userId,
             name, 
             introduce,
-            education: {
-            school,            // 학교명
-            status: eduStatus, // 학력 상태
-            startDate: eduStartYear, // 학력 시작
-            endDate: eduEndYear   // 학력 종료
-            },
-            activities: activities.map((act) => ({
-            activityName: act.activityName,
-            startDate: formatDate(act.startDate), // 활동 시작
-            endDate: formatDate(act.endDate)        // 활동 종료
-            }))
-        };
+            
+            // education과 activities가 비어 있으면 제외하기
+            ...(school || eduStatus || eduStartYear || eduEndYear ? {
+                education: {
+                    school,
+                    status: eduStatus,
+                    startDate: eduStartYear,
+                    endDate: eduEndYear
+                }
+            } : {}),
+            ...(activities.length > 0 ? {
+                activities: activities.map((act) => ({
+                    activityName: act.activityName,
+                    startDate: formatDate(act.startDate),
+                    endDate: formatDate(act.endDate)
+                }))
+            } : {})
+        };        
         
         try {
             await saveProfile(profileData, token);
