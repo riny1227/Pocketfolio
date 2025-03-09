@@ -195,6 +195,15 @@ const ProfileBottomContainer = styled.div`
     align-self: stretch;
 `;
 
+// 프로필정보 wrapper
+const ProfileWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    align-self: stretch;
+`;
+
 // 프로필정보 상단 부분
 const ProfileTopText = styled.text`
     color: #222;
@@ -492,15 +501,17 @@ export default function Mypage() {
                                 </div>
                             </EditButton>
                             <ProfileBottomContainer>
-                                <ProfileTopText>소개</ProfileTopText>
-                                <ProfileBottomText>{introduce}</ProfileBottomText>
+                                <ProfileWrapper>
+                                    <ProfileTopText>소개</ProfileTopText>
+                                    <ProfileBottomText>{introduce}</ProfileBottomText>
+                                </ProfileWrapper>
                                 {education && (
                                     <>
                                         <ProfileTopText>학력</ProfileTopText>
-                                        <div>
+                                        <ProfileWrapper>
                                             <ProfileBottomDateText>{education.startDate} ~ {education.endDate}</ProfileBottomDateText>
                                             <ProfileBottomText>{education.school} ({education.status})</ProfileBottomText>
-                                        </div>
+                                        </ProfileWrapper>
                                     </>
                                 )}
 
@@ -508,10 +519,10 @@ export default function Mypage() {
                                     <>
                                         <ProfileTopText>활동</ProfileTopText>
                                         {activities.map((act, index) => (
-                                            <div key={index}>
+                                            <ProfileWrapper key={index}>
                                                 <ProfileBottomDateText>{act.startDate} ~ {act.endDate}</ProfileBottomDateText><br/>
                                                 <ProfileBottomText>{act.activityName}</ProfileBottomText>
-                                            </div>
+                                            </ProfileWrapper>
                                         ))}
                                     </>
                                 )}
