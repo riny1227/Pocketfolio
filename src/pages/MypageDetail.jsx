@@ -399,16 +399,29 @@ export default function MypageDetail() {
             setError("이름과 소개는 필수 입력값입니다.");
             return;
         }
-
-        const profileData = {
-            name,
-            intro,
-            education: {
-                status: selectedStatus,
-            },
-            activities: activityList,
+                
+        // 날짜를 "YYYY-MM-DD" 형식으로 변환
+        const formatDate = (date) => {
+            if (!date) return null;
+            return date.toISOString().split('T')[0];
         };
-
+        
+        const profileData = {
+            name, 
+            introduce: intro,
+            education: {
+            school,            // 학교명
+            status: eduStatus, // 학력 상태
+            startDate: eduStartYear, // 학력 시작
+            endDate: eduEndYear   // 학력 종료
+            },
+            activities: activityList.map((act) => ({
+            activityName: act.activityName,
+            startDate: formatDate(act.startDate), // 활동 시작
+            endDate: formatDate(act.endDate)        // 활동 종료
+            }))
+        };
+        
         setLoading(true);
         setError('');
         try {
@@ -420,7 +433,7 @@ export default function MypageDetail() {
         } finally {
             setLoading(false);
         }
-    };
+        };          
 
     return (
         <MypageDetailContainer>
