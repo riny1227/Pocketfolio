@@ -492,15 +492,13 @@ export default function Mypage() {
                             <ProfileBottomContainer>
                                 <ProfileTopText>소개</ProfileTopText>
                                 <ProfileBottomText>{introduce}</ProfileBottomText>
-                                {Array.isArray(education) && education.length > 0 && (
+                                {education && (
                                     <>
                                         <ProfileTopText>학력</ProfileTopText>
-                                        {education.map((edu, index) => (
-                                            <div key={index}>
-                                                <ProfileBottomDateText>{edu.startDate} ~ {edu.endDate}</ProfileBottomDateText>
-                                                <ProfileBottomText>{edu.school} ({edu.status})</ProfileBottomText>
-                                            </div>
-                                        ))}
+                                        <div>
+                                            <ProfileBottomDateText>{education.startDate} ~ {education.endDate}</ProfileBottomDateText>
+                                            <ProfileBottomText>{education.school} ({education.status})</ProfileBottomText>
+                                        </div>
                                     </>
                                 )}
 
