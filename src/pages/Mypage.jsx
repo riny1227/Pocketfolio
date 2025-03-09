@@ -527,7 +527,7 @@ export default function Mypage() {
                                         <ProfileTopText>활동</ProfileTopText>
                                         {activities.map((act, index) => (
                                             <ActivityWrapper key={index}>
-                                                <ProfileBottomDateText>{act.startDate} ~ {act.endDate}</ProfileBottomDateText><br/>
+                                                <ProfileBottomDateText>{act.startDate} ~ {act.endDate}</ProfileBottomDateText>
                                                 <ProfileBottomText>{act.activityName}</ProfileBottomText>
                                             </ActivityWrapper>
                                         ))}
