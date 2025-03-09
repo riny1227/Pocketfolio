@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import profileImage from '../imgs/Profile.png';
 import { useAuth } from '../context/AuthContext';
-import { getUserInfo, saveProfile } from '../api/MypageApi';
+import { getUserInfo, schoolList, saveProfile } from '../api/MypageApi';
 
 // 전체 컴포넌트 감싸는 컨테이너
 const MypageDetailContainer = styled.div`
@@ -349,6 +349,52 @@ export default function MypageDetail() {
     const [eduEndYear, setEduEndYear] = useState("");
     const [selectedEducation, setSelectedEducation] = useState(""); // 학력 선택 상태
     const [selectedStatus, setSelectedStatus] = useState(""); // 상태 선택 상태
+    const [schoolListData, setSchoolListData] = useState([]);
+    const [gubun, setGubun] = useState("");
+
+    // 학교 목록 가져오는 함수
+    const fetchSchoolList = async (searchSchulNm) => {
+        try {
+            if (!gubun) return;
+
+            const schools = await schoolList(gubun, searchSchulNm);
+            const schoolNames = schools.map((school) => school.name); // 학교명만 추출
+
+            setSchoolListData(schoolNames);
+        } catch (error) {
+            console.error('학교 목록을 불러오는 중 오류 발생:', error);
+        }
+    };
+
+    // 학교 검색어가 변경될 때마다 학교 목록을 API로 불러오기
+    useEffect(() => {
+        if (school) {
+            fetchSchoolList(school); // 학교 이름에 맞는 목록을 가져옴
+        }
+    }, [school, gubun]);
+
+    // 학력 선택에 따른 gubun 설정
+    const handleEducationChange = (selectedValue) => {
+        setSelectedEducation(selectedValue);
+
+        let gubunValue = '';
+        switch (selectedValue) {
+            case '중학교':
+                gubunValue = 'mid_list';
+                break;
+            case '고등학교':
+                gubunValue = 'high_list';
+                break;
+            case '대학교':
+                gubunValue = 'univ_list';
+                break;
+            default:
+                gubunValue = '';
+        }
+
+        setGubun(gubunValue); // 선택된 값에 따라 gubun 값을 업데이트
+    };
+
     // 활동사항 항목 관리
     const [activities, setActivities] = useState([]); // 활동사항 목록
     const [startDate, setStartDate] = useState(null); // 시작일
@@ -383,6 +429,15 @@ export default function MypageDetail() {
                     setIntroduce(userData.introduce);
                     setEducation(userData.education);
                     setActivities(userData.activities);
+
+                    // 수정하는 경우
+                    if(userData.education){
+                        const { school, status, startDate, endDate } = userData.education;
+                        setSchool(school);
+                        setEduStatus(status);
+                        setEduStartYear(startDate);
+                        setEduEndYear(endDate);
+                    }
                 } catch (error) {
                     console.error("데이터 가져오기 실패", error);
                 }
@@ -409,7 +464,7 @@ export default function MypageDetail() {
             userId,
             name, 
             introduce,
-            
+
             // education과 activities가 비어 있으면 제외하기
             ...(school || eduStatus || eduStartYear || eduEndYear ? {
                 education: {
@@ -469,8 +524,7 @@ export default function MypageDetail() {
                 
                 <DetailWrapper>
                     <TitleWrapper>
-                        <TitleText>학력사항</TitleText>  
-                        <AddButton>추가</AddButton>                      
+                        <TitleText>학력사항</TitleText>           
                     </TitleWrapper>
                     <Line/>
                     <ContentContainer>
@@ -479,8 +533,8 @@ export default function MypageDetail() {
                             <InputAndDropdown 
                                 placeholder="학교" 
                                 value={selectedEducation} 
-                                setValue={setSelectedEducation} 
-                                data={["중학교", "고등학교", "대학 (2,3년제)", "대학 (4년제)", "대학원"]} 
+                                setValue={handleEducationChange} 
+                                data={["중학교", "고등학교", "대학교"]} 
                                 width="235px"
                             />
                             <InputAndDropdown 
@@ -518,6 +572,7 @@ export default function MypageDetail() {
                                     placeholder="학교 찾아보기"
                                     value={school}
                                     setValue={setSchool}
+                                    data={schoolListData} 
                                     iconSvg={SearchIcon}
                                     hasToggle={false}
                                     width="504px"

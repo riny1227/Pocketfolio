@@ -109,3 +109,26 @@ export const saveProfile = async (userData, token) => {
         throw error;
     }
 };
+
+// 학교찾기
+export const schoolList = async (gubun, searchSchulNm) => {
+    if (!gubun || !searchSchulNm) {
+      throw new Error('학교 종류와 검색어를 입력해주세요.');
+    }
+  
+    const url = "https://pocketfolio.co.kr/api/mypage/searchUniversity";
+    
+    try {
+      const response = await axios.get(url, {
+        params: {
+          gubun: gubun,  // 학교 종류
+          searchSchulNm: searchSchulNm, // 검색어
+        },
+      });
+  
+      return response.data.universities; // 반환된 학교 리스트 반환
+    } catch (error) {
+      console.error('Error fetching school list:', error);
+      throw error;
+    }
+};
