@@ -297,7 +297,7 @@ export default function Header() {
         if (!isVisible) return;
         closeTimer.current = setTimeout(() => {
             setIsVisible(false);
-        }, 300);
+        }, 400);
     };
 
     // 드롭다운 메뉴에 마우스를 올려도 메뉴가 사라지지 않게 하기
@@ -418,7 +418,7 @@ export default function Header() {
                             onMouseLeave={handleDropdownMouseLeave}
                         >
                             <ProfileImg onClick={() => navigate('/mypage')}/>
-                            <DropdownItem onClick={() => navigate(`/mypage/edit`)}>프로필 편집</DropdownItem>
+                            <DropdownItem onClick={() => navigate('/mypage/edit')}>프로필 편집</DropdownItem>
                             <DropdownItem onClick={handleLogout}>로그아웃</DropdownItem>
                         </DropdownMenu>
                     </ProfileWrapper>
