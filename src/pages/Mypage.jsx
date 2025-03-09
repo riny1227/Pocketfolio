@@ -204,6 +204,15 @@ const ProfileWrapper = styled.div`
     align-self: stretch;
 `;
 
+// 활동사항 각 하나씩
+const ActivityWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    align-self: stretch;
+`;
+
 // 프로필정보 상단 부분
 const ProfileTopText = styled.text`
     color: #222;
@@ -506,25 +515,23 @@ export default function Mypage() {
                                     <ProfileBottomText>{introduce}</ProfileBottomText>
                                 </ProfileWrapper>
                                 {education && (
-                                    <>
+                                    <ProfileWrapper>
                                         <ProfileTopText>학력</ProfileTopText>
-                                        <ProfileWrapper>
-                                            <ProfileBottomDateText>{education.startDate} ~ {education.endDate}</ProfileBottomDateText>
-                                            <ProfileBottomText>{education.school} ({education.status})</ProfileBottomText>
-                                        </ProfileWrapper>
-                                    </>
+                                        <ProfileBottomDateText>{education.startDate} ~ {education.endDate}</ProfileBottomDateText>
+                                        <ProfileBottomText>{education.school} ({education.status})</ProfileBottomText>
+                                    </ProfileWrapper>
                                 )}
 
                                 {Array.isArray(activities) && activities.length > 0 && (
-                                    <>
+                                    <ProfileWrapper>
                                         <ProfileTopText>활동</ProfileTopText>
                                         {activities.map((act, index) => (
-                                            <ProfileWrapper key={index}>
+                                            <ActivityWrapper key={index}>
                                                 <ProfileBottomDateText>{act.startDate} ~ {act.endDate}</ProfileBottomDateText><br/>
                                                 <ProfileBottomText>{act.activityName}</ProfileBottomText>
-                                            </ProfileWrapper>
+                                            </ActivityWrapper>
                                         ))}
-                                    </>
+                                    </ProfileWrapper>
                                 )}
                             </ProfileBottomContainer>
                         </ProfileEditContainer>
@@ -541,7 +548,7 @@ export default function Mypage() {
                         >
                             <span>포트폴리오</span>
                             <div className="count">
-                                <span className="countText">{portfolioCards.length}</span>
+                                <span className="countText">{portfolioCards ? portfolioCards.length : 0}</span>
                             </div>
                         </Tap>
                         <Tap
@@ -550,7 +557,7 @@ export default function Mypage() {
                         >
                             <span>북마크</span>
                             <div className="count">
-                                <span className="countText">{bookmarkedCards.length}</span>
+                                <span className="countText">{bookmarkedCards ? bookmarkedCards.length : 0}</span>
                             </div>
                         </Tap>
                         <Tap
