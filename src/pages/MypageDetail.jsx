@@ -332,6 +332,7 @@ const SubmitButton = styled.button`
 `;
 
 export default function MypageDetail() {
+    const navigate = useNavigate();
     const { token } = useAuth();
     const [userId, setUserId] = useState("");
     // 이름과 소개 필드에 대한 상태
@@ -486,6 +487,7 @@ export default function MypageDetail() {
         try {
             await saveProfile(profileData, token);
             alert("프로필 정보가 저장되었습니다!");
+            navigate("/mypage");
         } catch (err) {
             alert("프로필 저장에 실패했습니다. 다시 시도해주세요.");
             console.error(err);
