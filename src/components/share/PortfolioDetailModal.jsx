@@ -329,14 +329,14 @@ const SimpleIntroText = styled.div`
 
 // 사용자 포트폴리오 이미지 컨테이너 
 const UserPortfoliosContainer = styled.div`
-    width: 100%;
+    width: calc(3 * 288px + 2 * 16px);
     height: 200px;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 16px;
     margin-top: 68px;
     margin-left: 520px;
-    justify-content: ${({ portfolioCount }) => (portfolioCount < 3 ? 'flex-end' : 'flex-start')};
+    justify-content: flex-end;
 `;
 
 // 포트폴리오 이미지 스타일
@@ -373,12 +373,19 @@ const SimilarPortfolioContainer = styled.div`
 `;
 
 const PortfolioDetailModal = ({ portfolioId, onClose }) => {
-    const { token, user } = useAuth();
+    const { token } = useAuth();
     const [portfolio, setPortfolio] = useState(null); // 포트폴리오 데이터 상태
     const [isLoading, setIsLoading] = useState(true); // 로딩 상태
     const [error, setError] = useState(null); // 오류 상태
     const [isDeleting, setIsDeleting] = useState(false); // 삭제 상태
     const navigate = useNavigate();
+
+    // 사용자 포트폴리오 데이터
+    const userPortfolios = [
+        { id: 1, image: exampleImg },
+        { id: 2, image: exampleImg },
+        { id: 3, image: exampleImg },
+    ]
 
     // 모달 아닌 부분 눌렀을 때, 닫히도록
     const handleOverlayClick = (e) => {
@@ -412,41 +419,41 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
     };
 
     // 포트폴리오 데이터를 API에서 불러오는 useEffect
-    useEffect(() => {
-        const loadPortfolioDetails = async () => {
+    // useEffect(() => {
+    //     const loadPortfolioDetails = async () => {
 
-            setIsLoading(true);  // 새로운 요청이 시작될 때 로딩 상태 초기화
-            setError(null);  // 에러 메시지도 초기화
+    //         setIsLoading(true);  // 새로운 요청이 시작될 때 로딩 상태 초기화
+    //         setError(null);  // 에러 메시지도 초기화
 
-            try {
-                const data = await fetchPortfolioDetails(portfolioId, token);
-                setPortfolio(data); // 데이터를 상태에 저장
-            } catch (error) {
-                setError('포트폴리오 상세 정보를 불러오는 데 실패했습니다.');
-            } finally {
-                setIsLoading(false); // 로딩 완료
-            }
-        };
+    //         try {
+    //             const data = await fetchPortfolioDetails(portfolioId, token);
+    //             setPortfolio(data); // 데이터를 상태에 저장
+    //         } catch (error) {
+    //             setError('포트폴리오 상세 정보를 불러오는 데 실패했습니다.');
+    //         } finally {
+    //             setIsLoading(false); // 로딩 완료
+    //         }
+    //     };
 
-        if (portfolioId) { // 유효한 ID일 때만 API 호출 
-            loadPortfolioDetails();
-        }
-    }, [portfolioId, token]); // portfolioId가 바뀔 때마다 실행
+    //     if (portfolioId) { // 유효한 ID일 때만 API 호출 
+    //         loadPortfolioDetails();
+    //     }
+    // }, [portfolioId, token]); // portfolioId가 바뀔 때마다 실행
 
-    // 로딩 중, 오류 처리 및 데이터 표시
-    if (isLoading) {
-        return (
-            <ModalOverlay onClick={handleOverlayClick}>
-                <ModalContainer onClick={(e) => e.stopPropagation()}>
-                    <div style={{ padding: '20px', textAlign: 'center' }}>⏳ 로딩 중...</div>
-                </ModalContainer>
-            </ModalOverlay>
-        );
-    }
+    // // 로딩 중, 오류 처리 및 데이터 표시
+    // if (isLoading) {
+    //     return (
+    //         <ModalOverlay onClick={handleOverlayClick}>
+    //             <ModalContainer onClick={(e) => e.stopPropagation()}>
+    //                 <div style={{ padding: '20px', textAlign: 'center' }}>⏳ 로딩 중...</div>
+    //             </ModalContainer>
+    //         </ModalOverlay>
+    //     );
+    // }
 
-    if (error) {
-        return <div>{error}</div>;
-    }
+    // if (error) {
+    //     return <div>{error}</div>;
+    // }
 
     // 공유 버튼 클릭시
     const handleShareClick = async () => {
@@ -518,13 +525,10 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
                             </svg>
                         </SBGIconStyle>
                         {/* 수정, 삭제 버튼 */}
-                        {/* 본인 포트폴리오일 때만 수정, 삭제 버튼 표시 */}
-                        {user && portfolio && portfolio.ownerId === user.id && (
-                          <>
-                            <ModifyButton onClick={handleEditClick}>수정</ModifyButton>
-                            <DeleteButton onClick={handleDeleteClick} disabled={isDeleting}>삭제</DeleteButton>
-                          </>
-                        )}
+                        <ModifyButton onClick={handleEditClick}>수정</ModifyButton>
+                        <DeleteButton
+                        onClick={handleDeleteClick} 
+                        disabled={isDeleting}>삭제</DeleteButton>
                     </HeaderIconContainer>
                 </ModalHeaderContainer>
 
@@ -532,7 +536,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
                 <ModalBodyContainer>
                     {/* 이미지 */}
                     <ModalImageContainer>
-                        <img src={exampleImg} alt="썸네일" style={{ width: '100%', maxHeight: '447px' }} />
+                        <img src={portfolio && portfolio.coverImage ? portfolio.coverImage : exampleImg} alt="썸네일" style={{ width: '100%', maxHeight: '447px' }} />
                     </ModalImageContainer>
                     
                     {/* 사용자 정보 + 이미지 컨테이너 */}
@@ -557,15 +561,24 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
 
                         {/* 사용자 포트폴리오 이미지 컨테이너 */}
                         <UserPortfoliosContainer>
-                            <PortfolioImg>
-                                <img src={exampleImg} alt="포트폴리오1"/>
-                            </PortfolioImg>
-                            <PortfolioImg>
-                                <img src={exampleImg} alt="포트폴리오2"/>
-                            </PortfolioImg>
-                            <PortfolioImg>
-                                <img src={exampleImg} alt="포트폴리오3"/>
-                            </PortfolioImg>
+                            {portfolio && portfolio.attachments && portfolio.attachments.length > 0 ? (
+                                portfolio.attachments.slice(0, 3).map((item, index) => (
+                                    <PortfolioImg 
+                                        key={index}
+                                        onClick={() => navigate(`/portfolio/${portfolioId}`)}
+                                    >
+                                        <img 
+                                            src={typeof item === 'object' ? item.url : item} 
+                                            alt={`포트폴리오 ${index + 1}`} 
+                                        />
+                                    </PortfolioImg>
+                                ))
+                            ) : (
+                                // 첨부파일이 없을 경우 기본 예시 이미지로 대체
+                                <PortfolioImg onClick={() => navigate(`/portfolio/${portfolioId}`)}>
+                                    <img src={exampleImg} alt="포트폴리오 기본 이미지" />
+                                </PortfolioImg>
+                            )}
                         </UserPortfoliosContainer>
                     </UserInfoImageContainer>
                     
