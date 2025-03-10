@@ -18,6 +18,9 @@ export function AuthProvider({ children }) {
             if (response.token) {
                 setIsLoggedIn(true);
                 setToken(response.token);
+
+                localStorage.setItem('jwtToken', response.token); // 토큰을 localStorage에 저장
+                
                 console.log("로그인 성공:", response.message);
                 alert("로그인에 성공하였습니다.");
 

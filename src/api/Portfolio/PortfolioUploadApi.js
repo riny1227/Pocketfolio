@@ -4,10 +4,6 @@ import axios from 'axios';
 export const create = async (portfolioData, token) => {
     const url = "https://pocketfolio.co.kr/api/portfolio/create";
 
-    if (!token) {
-        throw new Error("유효하지 않은 토큰입니다. 로그인 후 다시 시도해 주세요.");
-    }
-
     // 필수 입력값
     const requiredFields = ["title", "durationStart", "durationEnd",
         "role", "job", "company"
@@ -37,11 +33,6 @@ export const create = async (portfolioData, token) => {
 // 포트폴리오 표지 이미지 업로드 API
 export const uploadCover = async (file, token) => {
     const url = "https://pocketfolio.co.kr/api/portfolio/upload-cover";
-    console.log("현재 토큰:", token);
-
-    if (!token) {
-        throw new Error("유효하지 않은 토큰입니다. 로그인 후 다시 시도해 주세요.");
-    }
 
     try {
         const formData = new FormData();
@@ -65,10 +56,6 @@ export const uploadCover = async (file, token) => {
 // 포트폴리오 첨부파일 업로드 API
 export const uploadAttachments = async (files, token) => {
     const url = "https://pocketfolio.co.kr/api/portfolio/upload-attachments";
-
-    if (!token) {
-        throw new Error("유효하지 않은 토큰입니다. 로그인 후 다시 시도해 주세요.");
-    }
 
     try {
         const formData = new FormData();
