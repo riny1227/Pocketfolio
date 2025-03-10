@@ -1,10 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, act } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import styled from "styled-components";
 import InputAndDropdown from '../components/share/InputAndDropdown';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import profileImage from '../imgs/Profile.png';
+import { useAuth } from '../context/AuthContext';
+import { getUserInfo, schoolList, deleteActivity, saveProfile } from '../api/MypageApi';
 
 // 전체 컴포넌트 감싸는 컨테이너
 const MypageDetailContainer = styled.div`
@@ -157,7 +160,7 @@ const ContentContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 32px;
+    gap: 20px;
     align-self: stretch;
 `;
 
@@ -305,6 +308,18 @@ const NumCount = styled.span`
     line-height: 24px;
 `;
 
+// 활동사항 삭제 버튼
+const DeleteButton = styled.button`
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    margin-left: 570px;
+`;
+
 // 프로필 정보 저장 버튼
 const SubmitButton = styled.button`
     display: flex;
@@ -329,32 +344,95 @@ const SubmitButton = styled.button`
     }
 `;
 
+// 기본값으로 하나의 활동사항 설정
+const defaultActivity = {
+    startDate: null,
+    endDate: null,
+    activityName: ""
+};
+
 export default function MypageDetail() {
-    const { id } = useParams();
+    const navigate = useNavigate();
+    const { token } = useAuth();
+    const [userId, setUserId] = useState("");
     // 이름과 소개 필드에 대한 상태
-    const [name, setName] = useState('');
-    const [intro, setIntro] = useState('');
+    const [name, setName] = useState("");
+    const [introduce, setIntroduce] = useState("");
     // 날짜에 대한 부분
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 70 }, (_, i) => (currentYear - i).toString());
     const endyears = ["현재", ...Array.from({ length: 70 }, (_, i) => (currentYear - i).toString())];
+    // 학력사항 관리
+    const [education, setEducation] = useState([]);
+    const [school, setSchool] = useState("");
+    const [eduStatus, setEduStatus] = useState("");
+    const [eduStartYear, setEduStartYear] = useState("");
+    const [eduEndYear, setEduEndYear] = useState("");
     const [selectedEducation, setSelectedEducation] = useState(""); // 학력 선택 상태
-    const [selectedStatus, setSelectedStatus] = useState(""); // 상태 선택 상태
+    const [schoolListData, setSchoolListData] = useState([]);
+    const [gubun, setGubun] = useState("");
+    const educationMapping = {
+        mid_list: '중학교',
+        high_list: '고등학교',
+        univ_list: '대학교'
+    };      
+    
+
+    // 학교 목록 가져오는 함수
+    const fetchSchoolList = async (searchSchulNm) => {
+        try {
+            if (!gubun) return;
+
+            const schools = await schoolList(gubun, searchSchulNm);
+            const schoolNames = schools.map((school) => school.name); // 학교명만 추출
+
+            setSchoolListData(schoolNames);
+        } catch (error) {
+            console.error('학교 목록을 불러오는 중 오류 발생:', error);
+        }
+    };
+
+    // 학교 검색어가 변경될 때마다 학교 목록을 API로 불러오기
+    useEffect(() => {
+        if (school) {
+            fetchSchoolList(school); // 학교 이름에 맞는 목록을 가져옴
+        }
+    }, [school, gubun]);
+
+    // 학력 선택에 따른 gubun 설정
+    const handleEducationChange = (selectedValue) => {
+        setSelectedEducation(selectedValue);
+
+        let gubunValue = '';
+        switch (selectedValue) {
+            case '중학교':
+                gubunValue = 'mid_list';
+                break;
+            case '고등학교':
+                gubunValue = 'high_list';
+                break;
+            case '대학교':
+                gubunValue = 'univ_list';
+                break;
+            default:
+                gubunValue = '';
+        }
+
+        setGubun(gubunValue); // 선택된 값에 따라 gubun 값을 업데이트
+    };
+
     // 활동사항 항목 관리
-    const [activityList, setActivityList] = useState([]); // 활동사항 목록
+    const [activities, setActivities] = useState([defaultActivity]); // 활동사항 목록
     const [startDate, setStartDate] = useState(null); // 시작일
     const [endDate, setEndDate] = useState(null); // 완료일
-    const [activityName, setActivityName] = useState(''); // 활동명
+    const [activityName, setActivityName] = useState(""); // 활동명
 
     const startDateRef = useRef(null);
     const endDateRef = useRef(null);
-    
-    // 저장하기 버튼 상태 관리
-    const isButtonDisabled = !name || !intro;
 
     const handleAddActivity = () => {
-        setActivityList([
-            ...activityList,
+        setActivities([
+            ...activities,
             { startDate, endDate, activityName } // 새로운 활동사항 항목 추가
         ]);
         // 입력 필드 초기화
@@ -362,6 +440,106 @@ export default function MypageDetail() {
         setEndDate(null);
         setActivityName('');
     };
+
+    // 활동 삭제 함수
+    const handleDeleteActivity = async (activityId, index) => {
+        console.log("삭제 요청: activityId =", activityId, "index =", index); // 디버깅 로그 추가
+
+        // 작성 중인 경우
+        if (!activityId) {
+            setActivities((prev) => prev.filter((_, i) => i !== index));
+            return;
+        }
+        
+        if (!window.confirm("정말 삭제하시겠습니까?")) return;
+        
+        try {
+            const response = await deleteActivity(activityId, token);
+            console.log("삭제 성공 응답:", response); // 성공 시 로그 확인
+            setActivities((prev) => prev.filter((_, i) => i !== index));
+        } catch (error) {
+            console.error("활동 삭제 오류:", error);
+        }  
+    };
+
+    useEffect(() => {
+        if (token) {
+            console.log("Fetched token:", token); // token 확인
+            const fetchData = async () => {
+                try {
+                    const userData = await getUserInfo(token);
+                    setUserId(userData.user_id);
+                    setName(userData.name);
+                    setIntroduce(userData.introduce);
+                    setEducation(userData.education);
+                    setActivities(userData.activities);
+
+                    // 학력사항 수정하는 경우
+                    if(userData.education){
+                        const { school, educationType, status, startDate, endDate } = userData.education;
+                        setSchool(school);
+                        // educationType 값 변환
+                        const displayEducation = educationMapping[educationType] || educationType;
+                        setGubun(displayEducation);
+                        setSelectedEducation(displayEducation);
+                        setEduStatus(status);
+                        setEduStartYear(startDate);
+                        setEduEndYear(endDate);
+                    }
+                } catch (error) {
+                    console.error("데이터 가져오기 실패", error);
+                }
+            };
+
+            fetchData();
+        }
+    }, [token]);
+
+    // 저장하기 버튼 상태 관리
+    const isButtonDisabled = !name || !introduce;
+
+    const handleSubmit = async () => {
+        // 필수 값 체크
+        if (!name || !introduce) {
+            alert("이름과 소개는 필수로 입력해주세요.");
+            return;
+        }
+
+        const profileData = {
+            userId,
+            name, 
+            introduce,
+
+            // education과 activities가 비어 있으면 제외하기
+            ...(school || gubun || eduStatus || eduStartYear || eduEndYear ? {
+                education: {
+                    school,
+                    educationType: gubun,
+                    status: eduStatus,
+                    startDate: eduStartYear,
+                    endDate: eduEndYear
+                }
+            } : {}),
+
+            ...(activities.length > 0 ? {
+                activities: activities.map((act) => ({
+                    activityId: act.activity_id,
+                    activityName: act.activityName,
+                    startDate: act.startDate,
+                    endDate: act.endDate
+                }))
+            } : {})
+        };        
+        
+        try {
+            await saveProfile(profileData, token);
+            alert("프로필 정보가 저장되었습니다!");
+            navigate("/mypage");
+        } catch (err) {
+            alert("프로필 저장에 실패했습니다. 다시 시도해주세요.");
+            console.error(err);
+        }
+    };          
 
     return (
         <MypageDetailContainer>
@@ -376,6 +554,7 @@ export default function MypageDetail() {
                                 <RightInputField
                                     placeholder="이름"
                                     value={name}
+                                    setValue={setName}
                                     onChange={(e) => setName(e.target.value)}
                                 />
                             </RightWrapper>
@@ -383,8 +562,9 @@ export default function MypageDetail() {
                                 <RightTitle>소개</RightTitle>
                                 <RightInputField
                                     placeholder="짧게 나를 소개하기"
-                                    value={intro}
-                                    onChange={(e) => setIntro(e.target.value)}
+                                    value={introduce}
+                                    setValue={setIntroduce}
+                                    onChange={(e) => setIntroduce(e.target.value)}
                                 />
                             </RightWrapper>   
                         </RightContainer>
@@ -393,8 +573,7 @@ export default function MypageDetail() {
                 
                 <DetailWrapper>
                     <TitleWrapper>
-                        <TitleText>학력사항</TitleText>  
-                        <AddButton>추가</AddButton>                      
+                        <TitleText>학력사항</TitleText>           
                     </TitleWrapper>
                     <Line/>
                     <ContentContainer>
@@ -403,14 +582,14 @@ export default function MypageDetail() {
                             <InputAndDropdown 
                                 placeholder="학교" 
                                 value={selectedEducation} 
-                                setValue={setSelectedEducation} 
-                                data={["중학교", "고등학교", "대학 (2,3년제)", "대학 (4년제)", "대학원"]} 
+                                setValue={handleEducationChange} 
+                                data={["중학교", "고등학교", "대학교"]} 
                                 width="235px"
                             />
                             <InputAndDropdown 
                                 placeholder="상태" 
-                                value={selectedStatus} 
-                                setValue={setSelectedStatus} 
+                                value={eduStatus} 
+                                setValue={setEduStatus} 
                                 data={["졸업", "재학", "중퇴"]} 
                                 width="235px"
                             />
@@ -421,16 +600,16 @@ export default function MypageDetail() {
                             <EducationPeriodWrapper>
                                 <InputAndDropdown 
                                     placeholder="년도" 
-                                    value={selectedEducation} 
-                                    setValue={setSelectedEducation} 
+                                    value={eduStartYear} 
+                                    setValue={setEduStartYear} 
                                     data={years}
                                     width="235px"
                                 />
                                 <TildeText>~</TildeText>
                                 <InputAndDropdown 
                                     placeholder="년도" 
-                                    value={selectedStatus} 
-                                    setValue={setSelectedStatus} 
+                                    value={eduEndYear} 
+                                    setValue={setEduEndYear} 
                                     data={endyears}
                                     width="235px"
                                 />
@@ -440,6 +619,9 @@ export default function MypageDetail() {
                             <InputWrapper>
                                 <InputAndDropdown
                                     placeholder="학교 찾아보기"
+                                    value={school}
+                                    setValue={setSchool}
+                                    data={schoolListData} 
                                     iconSvg={SearchIcon}
                                     hasToggle={false}
                                     width="504px"
@@ -457,135 +639,101 @@ export default function MypageDetail() {
                     </TitleWrapper>
                     <Line/>
                     <ContentContainer>
-                    {/* 추가된 활동사항 항목들을 렌더링 */}
-                    {activityList.map((activity, index) => (
-                        <div key={index} style={{ marginBottom: '20px' }}>
-                            <div style={{ marginBottom: '20px' }}>
-                                <ContentOneWrapper>
-                                    <ContentTitleText>활동기간</ContentTitleText>
-                                    <DatePickerContainer>
-                                        {/* 시작일 */}
-                                        <StyledDatePickerWrapper>
-                                            <StyledDatePicker
-                                                ref={startDateRef}
-                                                selected={activity.startDate}
-                                                onChange={(date) => {
-                                                    const newActivityList = [...activityList];
-                                                    newActivityList[index].startDate = date;
-                                                    setActivityList(newActivityList);
-                                                }}
-                                                dateFormat="yyyy.MM.dd"
-                                                placeholderText="시작일"
-                                            />
-                                            <IconStyle
-                                                onClick={() => startDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width="24"
-                                                height="24"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
-                                                    stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                            </IconStyle>
-                                        </StyledDatePickerWrapper>
-                                        <TildeText>~</TildeText>
-                                        {/* 완료일 */}
-                                        <StyledDatePickerWrapper>
-                                            <StyledDatePicker
-                                                ref={endDateRef}
-                                                selected={activity.endDate}
-                                                onChange={(date) => {
-                                                    const newActivityList = [...activityList];
-                                                    newActivityList[index].endDate = date;
-                                                    setActivityList(newActivityList);
-                                                }}
-                                                dateFormat="yyyy.MM.dd"
-                                                placeholderText="완료일"
-                                                minDate={activity.startDate} // 시작일 이후 날짜만 선택 가능
-                                            />
-                                            <IconStyle
-                                                onClick={() => endDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width="24"
-                                                height="24"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
-                                                    stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                            </IconStyle>
-                                        </StyledDatePickerWrapper>
-                                    </DatePickerContainer>
-                                </ContentOneWrapper>
+                        {/* 추가된 활동사항 항목들을 렌더링 */}
+                        {activities.map((activity, index) => (
+                            <div key={index}>
+                                <div style={{ marginBottom: '20px' }}>
+                                    <ContentOneWrapper>
+                                        <ContentTitleText>활동기간</ContentTitleText>
+                                        <DatePickerContainer>
+                                            {/* 시작일 */}
+                                            <StyledDatePickerWrapper>
+                                                <StyledDatePicker
+                                                    ref={startDateRef}
+                                                    selected={activity.startDate}
+                                                    onChange={(date) => {
+                                                        const newActivityList = [...activities];
+                                                        newActivityList[index].startDate = date;
+                                                        setActivities(newActivityList);
+                                                    }}
+                                                    dateFormat="yyyy-MM-dd"
+                                                    placeholderText="시작일"
+                                                />
+                                                <IconStyle
+                                                    onClick={() => startDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="24"
+                                                    height="24"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
+                                                        stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                </IconStyle>
+                                            </StyledDatePickerWrapper>
+                                            <TildeText>~</TildeText>
+                                            {/* 완료일 */}
+                                            <StyledDatePickerWrapper>
+                                                <StyledDatePicker
+                                                    ref={endDateRef}
+                                                    selected={activity.endDate}
+                                                    onChange={(date) => {
+                                                        const newActivityList = [...activities];
+                                                        newActivityList[index].endDate = date;
+                                                        setActivities(newActivityList);
+                                                    }}
+                                                    dateFormat="yyyy-MM-dd"
+                                                    placeholderText="완료일"
+                                                    minDate={activity.startDate} // 시작일 이후 날짜만 선택 가능
+                                                />
+                                                <IconStyle
+                                                    onClick={() => endDateRef.current.setFocus()} // 아이콘 클릭 시 달력 열기
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="24"
+                                                    height="24"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path d="M8 4.16797H7.2002C6.08009 4.16797 5.51962 4.16797 5.0918 4.38596C4.71547 4.5777 4.40973 4.88344 4.21799 5.25977C4 5.68759 4 6.24806 4 7.36816V8.16797M8 4.16797H16M8 4.16797V2.16797M16 4.16797H16.8002C17.9203 4.16797 18.4796 4.16797 18.9074 4.38596C19.2837 4.5777 19.5905 4.88344 19.7822 5.25977C20 5.68717 20 6.24696 20 7.36488V8.16797M16 4.16797V2.16797M4 8.16797V16.9682C4 18.0883 4 18.648 4.21799 19.0759C4.40973 19.4522 4.71547 19.7584 5.0918 19.9502C5.5192 20.168 6.07899 20.168 7.19691 20.168H16.8031C17.921 20.168 18.48 20.168 18.9074 19.9502C19.2837 19.7584 19.5905 19.4522 19.7822 19.0759C20 18.6484 20 18.0895 20 16.9715V8.16797M4 8.16797H20M16 16.168H16.002L16.002 16.17L16 16.1699V16.168ZM12 16.168H12.002L12.002 16.17L12 16.1699V16.168ZM8 16.168H8.002L8.00195 16.17L8 16.1699V16.168ZM16.002 12.168V12.17L16 12.1699V12.168H16.002ZM12 12.168H12.002L12.002 12.17L12 12.1699V12.168ZM8 12.168H8.002L8.00195 12.17L8 12.1699V12.168Z" 
+                                                        stroke="#989BA2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                </IconStyle>
+                                            </StyledDatePickerWrapper>
+                                        </DatePickerContainer>
+                                        <DeleteButton onClick={() => handleDeleteActivity(activity.activityId, index)}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                <circle cx="12" cy="11.999" r="9" stroke="#989BA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M9 12H15" stroke="#989BA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </DeleteButton>
+                                    </ContentOneWrapper>
+                                </div>
+                                <InfoLine />
+                                <div style={{ marginTop: '20px' }}>
+                                    <ContentOneWrapper>
+                                        <ContentTitleText>활동명</ContentTitleText>
+                                        <StyledActivityInput
+                                            type="text"
+                                            value={activity.activityName}
+                                            onChange={(e) => {
+                                                const newActivityList = [...activities];
+                                                newActivityList[index].activityName = e.target.value;
+                                                setActivities(newActivityList);
+                                            }}
+                                            maxLength={25} // 최대 글자 수 지정
+                                            placeholder="활동명"
+                                        />
+                                        <CharCount>
+                                            <NumCount>{activity.activityName.length}</NumCount> / 25
+                                        </CharCount>
+                                    </ContentOneWrapper>
+                                </div>
+                                <div style={{marginTop: '20px'}}><InfoLine /></div>
                             </div>
-                            <InfoLine />
-                            <div style={{ marginTop: '20px', marginBottom: '20px' }}>
-                                <ContentOneWrapper>
-                                    <ContentTitleText>활동명</ContentTitleText>
-                                    <StyledActivityInput
-                                        type="text"
-                                        value={activity.activityName}
-                                        onChange={(e) => {
-                                            const newActivityList = [...activityList];
-                                            newActivityList[index].activityName = e.target.value;
-                                            setActivityList(newActivityList);
-                                        }}
-                                        maxLength={25} // 최대 글자 수 지정
-                                        placeholder="활동명"
-                                    />
-                                    <CharCount>
-                                        <NumCount>{activity.activityName.length}</NumCount> / 25
-                                    </CharCount>
-                                </ContentOneWrapper>
-                            </div>
-                            <div style={{marginTop: '20px'}}><InfoLine /></div>
-                        </div>
-                    ))}
-                    
-                    {/* 입력 필드 */}
-                    <ContentOneWrapper>
-                        <ContentTitleText>활동기간</ContentTitleText>
-                        <DatePickerContainer>
-                            <StyledDatePickerWrapper>
-                                <StyledDatePicker
-                                    selected={startDate}
-                                    onChange={(date) => setStartDate(date)}
-                                    dateFormat="yyyy.MM.dd"
-                                    placeholderText="시작일"
-                                />
-                            </StyledDatePickerWrapper>
-                            <TildeText>~</TildeText>
-                            <StyledDatePickerWrapper>
-                                <StyledDatePicker
-                                    selected={endDate}
-                                    onChange={(date) => setEndDate(date)}
-                                    dateFormat="yyyy.MM.dd"
-                                    placeholderText="완료일"
-                                    minDate={startDate} // 시작일 이후 날짜만 선택 가능
-                                />
-                            </StyledDatePickerWrapper>
-                        </DatePickerContainer>
-                    </ContentOneWrapper>
-                    <InfoLine />
-                    <ContentOneWrapper>
-                        <ContentTitleText>활동명</ContentTitleText>
-                        <StyledActivityInput
-                            type="text"
-                            value={activityName}
-                            onChange={(e) => setActivityName(e.target.value)}
-                            maxLength={25} // 최대 글자 수 지정
-                            placeholder="활동명"
-                        />
-                        <CharCount>
-                            <NumCount>{activityName.length}</NumCount> / 25
-                        </CharCount>
-                    </ContentOneWrapper>
-                    <InfoLine />
+                        ))}
                 </ContentContainer>
                 </DetailWrapper>
             </DetailContainer>
 
             {/* 프로필 정보 저장하기 버튼 */}
-            <SubmitButton disabled={isButtonDisabled}>
+            <SubmitButton disabled={isButtonDisabled} onClick={handleSubmit}>
                 <span>프로필 정보 저장</span>
             </SubmitButton>
         </MypageDetailContainer>

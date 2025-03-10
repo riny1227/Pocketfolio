@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
+import { fetchPortfolioDetails } from '../../api/Portfolio/PortfolioDetailApi';
+import { deletePortfolio } from '../../api/Portfolio/PortfolioDeleteApi';
+import { useAuth } from '../../context/AuthContext';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../../imgs/example.png';
@@ -167,20 +171,21 @@ const SBGIconStyle = styled.button`
     };
 `;
 
-// 팔로우, 채팅하기 버튼 스타일
-const FollowChatwButton = styled.button`
+// 수정 버튼 스타일
+const ModifyButton = styled.button`
     display: flex;
     padding: 8px 32px;
     justify-content: center;
     align-items: center;
     gap: 10px;
     border-radius: 28px;
-    background: #464646;
+    border: 1px solid #E6E6E6;
+    background: #FFF;
     cursor: pointer;
     box-sizing: border-box;
 
     // 버튼 텍스트 스타일 
-    color: #FFF;
+    color: #464646;
     font-feature-settings: 'liga' off, 'clig' off;
 
     /* Body/Body1:SemiBold */
@@ -189,6 +194,40 @@ const FollowChatwButton = styled.button`
     font-style: normal;
     font-weight: 600;
     line-height: 24px; /* 133.333% */
+
+    &:hover{
+        border: 1px solid #E6E6E6;
+        background: #F8F8F8;
+    }
+`;
+
+// 삭제 버튼 스타일
+const DeleteButton = styled.button`
+    display: flex;
+    padding: 8px 32px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 28px;
+    border: 1px solid #FECDCA;
+    background: #FFFBFA;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    // 버튼 텍스트 스타일 
+    color: #F04438;
+    font-feature-settings: 'liga' off, 'clig' off;
+
+    /* Body/Body1:SemiBold */
+    font-family: 'Pretendard-Semibold';
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px; /* 133.333% */
+
+    &:hover{
+        background: #FEE4E2;
+    }
 `;
 
 // 모달 이미지 컨테이너
@@ -290,13 +329,14 @@ const SimpleIntroText = styled.div`
 
 // 사용자 포트폴리오 이미지 컨테이너 
 const UserPortfoliosContainer = styled.div`
-    width: 100%;
+    width: calc(3 * 288px + 2 * 16px);
     height: 200px;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 16px;
     margin-top: 68px;
     margin-left: 520px;
+    justify-content: flex-end;
 `;
 
 // 포트폴리오 이미지 스타일
@@ -332,13 +372,101 @@ const SimilarPortfolioContainer = styled.div`
     };
 `;
 
-const PortfolioDetailModal = ({ card, onClose }) => {
+const PortfolioDetailModal = ({ portfolioId, onClose }) => {
+    const { token } = useAuth();
+    const [portfolio, setPortfolio] = useState(null); // 포트폴리오 데이터 상태
+    const [isLoading, setIsLoading] = useState(true); // 로딩 상태
+    const [error, setError] = useState(null); // 오류 상태
+    const [isDeleting, setIsDeleting] = useState(false); // 삭제 상태
+    const navigate = useNavigate();
+
+    // 사용자 포트폴리오 데이터
+    const userPortfolios = [
+        { id: 1, image: exampleImg },
+        { id: 2, image: exampleImg },
+        { id: 3, image: exampleImg },
+    ]
 
     // 모달 아닌 부분 눌렀을 때, 닫히도록
     const handleOverlayClick = (e) => {
         if (e.target === e.currentTarget) {
           onClose();
         }
+    };
+
+    // 수정 버튼 클릭시
+    const handleEditClick = () => {
+        // 수정 페이지로 포트폴리오 정보를 전달하여 이동
+        navigate('/src/pages/WritePortfolio.jsx', { state: { portfolioId } });
+      };
+
+    // 삭제 버튼 클릭시 
+    const handleDeleteClick = async () => {
+        if (window.confirm('이 포트폴리오를 삭제하시겠습니까?')) {
+            setIsDeleting(true);
+            try {
+                const response = await deletePortfolio(portfolioId, token);
+                if (response) {
+                    alert('포트폴리오가 삭제되었습니다.');
+                    onClose();
+                }
+            } catch (error) {
+                setError('포트폴리오 삭제 중 오류가 발생했습니다.');
+            } finally {
+                setIsDeleting(false);
+            }
+        }
+    };
+
+    // 포트폴리오 데이터를 API에서 불러오는 useEffect
+    // useEffect(() => {
+    //     const loadPortfolioDetails = async () => {
+
+    //         setIsLoading(true);  // 새로운 요청이 시작될 때 로딩 상태 초기화
+    //         setError(null);  // 에러 메시지도 초기화
+
+    //         try {
+    //             const data = await fetchPortfolioDetails(portfolioId, token);
+    //             setPortfolio(data); // 데이터를 상태에 저장
+    //         } catch (error) {
+    //             setError('포트폴리오 상세 정보를 불러오는 데 실패했습니다.');
+    //         } finally {
+    //             setIsLoading(false); // 로딩 완료
+    //         }
+    //     };
+
+    //     if (portfolioId) { // 유효한 ID일 때만 API 호출 
+    //         loadPortfolioDetails();
+    //     }
+    // }, [portfolioId, token]); // portfolioId가 바뀔 때마다 실행
+
+    // // 로딩 중, 오류 처리 및 데이터 표시
+    // if (isLoading) {
+    //     return (
+    //         <ModalOverlay onClick={handleOverlayClick}>
+    //             <ModalContainer onClick={(e) => e.stopPropagation()}>
+    //                 <div style={{ padding: '20px', textAlign: 'center' }}>⏳ 로딩 중...</div>
+    //             </ModalContainer>
+    //         </ModalOverlay>
+    //     );
+    // }
+
+    // if (error) {
+    //     return <div>{error}</div>;
+    // }
+
+    // 공유 버튼 클릭시
+    const handleShareClick = async () => {
+        const shareUrl = `https://pocketfolio.co.kr/api/portfolio/${portfolioId}`;
+
+        navigator.clipboard.writeText(shareUrl) // 클립보드에 URL 복사
+            .then(() => {
+            alert('링크가 클립보드에 복사되었습니다!');
+            })
+            .catch(err => {
+            alert('링크 복사에 실패했습니다.');
+            console.error(err);
+            });
     };
 
     return (
@@ -379,7 +507,7 @@ const PortfolioDetailModal = ({ card, onClose }) => {
                     {/* 헤더 아이콘 컨테이너 */}
                     <HeaderIconContainer>
                         {/* 공유 아이콘 */}
-                        <SBGIconStyle>
+                        <SBGIconStyle onClick={handleShareClick}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                                 <path d="M3.33325 10.0003V16.667C3.33325 17.109 3.50885 17.5329 3.82141 17.8455C4.13397 18.1581 4.55789 18.3337 4.99992 18.3337H14.9999C15.4419 18.3337 15.8659 18.1581 16.1784 17.8455C16.491 17.5329 16.6666 17.109 16.6666 16.667V10.0003M13.3333 5.00033L9.99992 1.66699M9.99992 1.66699L6.66659 5.00033M9.99992 1.66699V12.5003" stroke="#909090" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
@@ -396,8 +524,11 @@ const PortfolioDetailModal = ({ card, onClose }) => {
                                 <path d="M17.5 6.6666C17.9444 6.6666 18.3333 6.83327 18.6666 7.1666C19 7.49994 19.1666 7.88883 19.1666 8.33327V9.99994C19.1666 10.0972 19.1561 10.2013 19.135 10.3124C19.1138 10.4235 19.0827 10.5277 19.0416 10.6249L16.5416 16.4999C16.4166 16.7777 16.2083 17.0138 15.9166 17.2083C15.625 17.4027 15.3194 17.4999 15 17.4999H8.33329C7.87496 17.4999 7.48274 17.3369 7.15663 17.0108C6.83051 16.6847 6.66718 16.2922 6.66663 15.8333V7.3541C6.66663 7.13188 6.7119 6.92022 6.80246 6.7191C6.89301 6.51799 7.0144 6.34077 7.16663 6.18744L11.6875 1.68744C11.8958 1.49299 12.1425 1.37494 12.4275 1.33327C12.7125 1.2916 12.9866 1.34022 13.25 1.4791C13.5133 1.61799 13.7044 1.81244 13.8233 2.06244C13.9422 2.31244 13.9663 2.56938 13.8958 2.83327L12.9583 6.6666H17.5ZM3.33329 17.4999C2.87496 17.4999 2.48274 17.3369 2.15663 17.0108C1.83051 16.6847 1.66718 16.2922 1.66663 15.8333V8.33327C1.66663 7.87494 1.82996 7.48272 2.15663 7.1566C2.48329 6.83049 2.87551 6.66716 3.33329 6.6666C3.79107 6.66605 4.18357 6.82938 4.51079 7.1566C4.83801 7.48383 5.00107 7.87605 4.99996 8.33327V15.8333C4.99996 16.2916 4.8369 16.6841 4.51079 17.0108C4.18468 17.3374 3.79218 17.5005 3.33329 17.4999Z" stroke="#909090" stroke-width="1.6"/>
                             </svg>
                         </SBGIconStyle>
-                        {/* 팔로우 버튼 */}
-                        <FollowChatwButton>팔로우</FollowChatwButton>
+                        {/* 수정, 삭제 버튼 */}
+                        <ModifyButton onClick={handleEditClick}>수정</ModifyButton>
+                        <DeleteButton
+                        onClick={handleDeleteClick} 
+                        disabled={isDeleting}>삭제</DeleteButton>
                     </HeaderIconContainer>
                 </ModalHeaderContainer>
 
@@ -405,7 +536,7 @@ const PortfolioDetailModal = ({ card, onClose }) => {
                 <ModalBodyContainer>
                     {/* 이미지 */}
                     <ModalImageContainer>
-                        <img src={exampleImg} alt="썸네일" style={{ width: '100%', maxHeight: '447px' }} />
+                        <img src={portfolio && portfolio.coverImage ? portfolio.coverImage : exampleImg} alt="썸네일" style={{ width: '100%', maxHeight: '447px' }} />
                     </ModalImageContainer>
                     
                     {/* 사용자 정보 + 이미지 컨테이너 */}
@@ -423,22 +554,31 @@ const PortfolioDetailModal = ({ card, onClose }) => {
                             {/* 사용자명 + 채팅하기 컨테이너 */}
                             <UserChatContainer>
                                 <UserNameText>사용자명</UserNameText>
-                                <FollowChatwButton>채팅하기</FollowChatwButton>
+                                {/* <FollowChatwButton>채팅하기</FollowChatwButton> */}
                             </UserChatContainer>
                             <SimpleIntroText>어제의 나보다 오늘의 내가 1%라도 더 나은 사람이기를..</SimpleIntroText>
                         </UserIntroContainer>
 
                         {/* 사용자 포트폴리오 이미지 컨테이너 */}
                         <UserPortfoliosContainer>
-                            <PortfolioImg>
-                                <img src={exampleImg} alt="포트폴리오1"/>
-                            </PortfolioImg>
-                            <PortfolioImg>
-                                <img src={exampleImg} alt="포트폴리오2"/>
-                            </PortfolioImg>
-                            <PortfolioImg>
-                                <img src={exampleImg} alt="포트폴리오3"/>
-                            </PortfolioImg>
+                            {portfolio && portfolio.attachments && portfolio.attachments.length > 0 ? (
+                                portfolio.attachments.slice(0, 3).map((item, index) => (
+                                    <PortfolioImg 
+                                        key={index}
+                                        onClick={() => navigate(`/portfolio/${portfolioId}`)}
+                                    >
+                                        <img 
+                                            src={typeof item === 'object' ? item.url : item} 
+                                            alt={`포트폴리오 ${index + 1}`} 
+                                        />
+                                    </PortfolioImg>
+                                ))
+                            ) : (
+                                // 첨부파일이 없을 경우 기본 예시 이미지로 대체
+                                <PortfolioImg onClick={() => navigate(`/portfolio/${portfolioId}`)}>
+                                    <img src={exampleImg} alt="포트폴리오 기본 이미지" />
+                                </PortfolioImg>
+                            )}
                         </UserPortfoliosContainer>
                     </UserInfoImageContainer>
                     

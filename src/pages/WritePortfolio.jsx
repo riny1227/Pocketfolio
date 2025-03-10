@@ -6,6 +6,9 @@ import "react-datepicker/dist/react-datepicker.css"; // CSS 파일 import
 import { registerLocale, setDefaultLocale } from "react-datepicker";
 import ko from "date-fns/locale/ko"; // 한국어 로케일 import
 import InputAndDropdown from "../components/share/InputAndDropdown";
+import { create, uploadAttachments, uploadCover } from "../api/Portfolio/PortfolioUploadApi";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 // 한국어 로케일 등록
 registerLocale("ko", ko);
@@ -516,6 +519,7 @@ const MemoInput = styled.input`
 `;
 
 export default function WritePortfolio() {
+    const { token } = useAuth();
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null); 
     const startDateRef = useRef(null);
@@ -529,7 +533,31 @@ export default function WritePortfolio() {
     const [url, setUrl] = useState('');
     const [memo, setMemo] = useState('');
     const [isFormComplete, setIsFormComplete] = useState(false);
+    const [coverImage, setCoverImage] = useState(null);
+    const [attachments, setAttachments] = useState([]);
+    const navigate = useNavigate();
+    const location = useLocation();
 
+    const { portfolioData } = location.state || {}; // PortfolioDetailModal에서 전달받은 데이터
+
+    useEffect(() => {
+        if (token) {
+            console.log("Fetched token:", token);
+            if (portfolioData) {
+                setTitle(portfolioData.title);
+                setRole(portfolioData.role);
+                setJob(portfolioData.job);
+                setCompany(portfolioData.company);
+                setUrl(portfolioData.url);
+                setMemo(portfolioData.description);
+                setStartDate(new Date(portfolioData.durationStart));
+                setEndDate(new Date(portfolioData.durationEnd));
+                setImagePreview(portfolioData.coverImage || exampleImage);
+                setFileName(portfolioData.attachments?.[0]?.name || '');
+            }
+        }
+    }, [token, portfolioData]);
+    
     useEffect(() => {
         // 모든 필드가 채워졌는지 확인(URL, 간단설명 제외)
         if (title && startDate && endDate && role && job && company && fileName) {
@@ -537,17 +565,69 @@ export default function WritePortfolio() {
         } else {
             setIsFormComplete(false);
         }
+        if (startDate && endDate && startDate > endDate) {
+            alert("시작일은 종료일보다 이전이어야 합니다.");
+        }
     }, [title, startDate, endDate, role, job, company, fileName]);
 
-    // 파일 업로드 핸들러
+    // 표지 이미지 업로드 핸들러
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImagePreview(reader.result); // 이미지 미리보기 URL 설정
+                setCoverImage(file);
             };
             reader.readAsDataURL(file); // 파일을 Data URL로 읽기
+        }
+    };
+
+    // 첨부파일 업로드 핸들러
+    const handleFileUpload = (e) => {
+        const files = Array.from(e.target.files);
+        setAttachments(files);
+        setFileName(e.target.files[0]?.name || '');
+    };
+
+    // 제출 핸들러
+    const handleSubmit = async () => {
+        try {
+            // 커버 이미지 
+            let coverResponse = null;
+            if (coverImage) {
+                coverResponse = await uploadCover(coverImage, token);
+            }
+
+            // 첨부파일 
+            let attachmentsResponse = null;
+            if (attachments.length > 0) {
+                attachmentsResponse = await uploadAttachments(attachments, token);
+            }
+
+            // 포트폴리오 내용 
+            const portfolioData = {
+                title,
+                durationStart: startDate,
+                durationEnd: endDate,
+                role,
+                job,
+                company,
+                description: memo,
+                url,
+                coverImage: coverResponse ? coverResponse.data : null,
+                attachments: attachmentsResponse ? attachmentsResponse.data : []
+            };
+
+            const response = await create(portfolioData, token);
+            alert("포트폴리오가 성공적으로 업로드 되었습니다.");
+            console.log(response);
+
+            // 포트폴리오 업로드 후 홈으로 이동
+            navigate('/');
+        } catch (error) {
+            console.error("포트폴리오 업로드 실패:", error);
+            alert(error.message);
         }
     };
     
@@ -556,9 +636,7 @@ export default function WritePortfolio() {
         <WritePortfolioContainer>
             
             {/* 이미지 미리보기 */}
-            <ThumbnailImage 
-            src={imagePreview} 
-            alt="Thumbnail" />
+            <ThumbnailImage src={imagePreview} alt="Thumbnail" />
 
             {/* 표지 이미지 업로드 버튼 */}
             <ImageUploadButton>
@@ -576,7 +654,7 @@ export default function WritePortfolio() {
             {/* 포트폴리오 업로드 + 게시하기 버튼 컨테이너 */}
             <UploadContainer>
                 <UploadText>포트폴리오 업로드</UploadText>
-                <PortfolioUploadButton disabled={!isFormComplete}>게시하기</PortfolioUploadButton>
+                <PortfolioUploadButton disabled={!isFormComplete} onClick={handleSubmit}>게시하기</PortfolioUploadButton>
             </UploadContainer>
 
             {/* 내용 작성칸 컨테이너 */}
@@ -712,8 +790,9 @@ export default function WritePortfolio() {
                                 id="file-upload"
                                 type="file"
                                 accept="*/*"
-                                //onChange={handleFileUpload}
-                                onChange={(e) => setFileName(e.target.files[0]?.name || '')}
+                                onChange={(e) => {
+                                    handleFileUpload(e); 
+                                    setFileName(e.target.files[0]?.name || ''); }}
                                 style={{ display: 'none' }} // 파일 선택 버튼 숨기기
                             />
                         </UploadButton>

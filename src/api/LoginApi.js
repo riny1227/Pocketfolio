@@ -13,6 +13,9 @@ export const login = async (email, password) => {
         console.log("로그인 성공:", message);
         console.log("발급된 토큰:", token);
 
+        // 토큰을 LocalStorage에 저장
+        localStorage.setItem("accessToken", token);
+
         // 로그인 성공 시 message와 token 반환
         return { message, token };
     } catch (error) {

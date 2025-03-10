@@ -126,6 +126,12 @@ export default function Login() {
         }
     };
 
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter" && !isDisabled) {
+            handleLogin();
+        }
+    };
+
     return (
         <LoginContainer>
             <CenterWrapper>
@@ -137,6 +143,7 @@ export default function Login() {
                         placeholder="아이디를 입력해주세요"
                         value={id} 
                         onChange={(e) => setId(e.target.value)} 
+                        onKeyDown={handleKeyDown}
                     />
 
                     {/* 비밀번호 입력 칸 */}
@@ -145,6 +152,7 @@ export default function Login() {
                         placeholder="비밀번호를 입력해주세요" 
                         value={password} 
                         onChange={(e) => setPassword(e.target.value)} 
+                        onKeyDown={handleKeyDown}
                     />
 
                     {/* 로그인 버튼 */}
