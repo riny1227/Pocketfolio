@@ -372,11 +372,10 @@ export default function MypageDetail() {
     const [schoolListData, setSchoolListData] = useState([]);
     const [gubun, setGubun] = useState("");
     const educationMapping = {
-        mid_list: '중학교',
+        midd_list: '중학교',
         high_list: '고등학교',
         univ_list: '대학교'
     };      
-    
 
     // 학교 목록 가져오는 함수
     const fetchSchoolList = async (searchSchulNm) => {
@@ -397,7 +396,7 @@ export default function MypageDetail() {
         if (school) {
             fetchSchoolList(school); // 학교 이름에 맞는 목록을 가져옴
         }
-    }, [school, gubun]);
+    }, [school]);
 
     // 학력 선택에 따른 gubun 설정
     const handleEducationChange = (selectedValue) => {
@@ -406,7 +405,7 @@ export default function MypageDetail() {
         let gubunValue = '';
         switch (selectedValue) {
             case '중학교':
-                gubunValue = 'mid_list';
+                gubunValue = 'midd_list';
                 break;
             case '고등학교':
                 gubunValue = 'high_list';
@@ -430,6 +429,7 @@ export default function MypageDetail() {
     const startDateRef = useRef(null);
     const endDateRef = useRef(null);
 
+    // 필드 추가
     const handleAddActivity = () => {
         setActivities([
             ...activities,
@@ -450,9 +450,7 @@ export default function MypageDetail() {
             setActivities((prev) => prev.filter((_, i) => i !== index));
             return;
         }
-        
-        if (!window.confirm("정말 삭제하시겠습니까?")) return;
-        
+          
         try {
             const response = await deleteActivity(activityId, token);
             console.log("삭제 성공 응답:", response); // 성공 시 로그 확인
@@ -464,7 +462,6 @@ export default function MypageDetail() {
 
     useEffect(() => {
         if (token) {
-            console.log("Fetched token:", token); // token 확인
             const fetchData = async () => {
                 try {
                     const userData = await getUserInfo(token);
@@ -472,19 +469,25 @@ export default function MypageDetail() {
                     setName(userData.name);
                     setIntroduce(userData.introduce);
                     setEducation(userData.education);
-                    setActivities(userData.activities);
 
                     // 학력사항 수정하는 경우
                     if(userData.education){
                         const { school, educationType, status, startDate, endDate } = userData.education;
                         setSchool(school);
+                        // 내부 값 그대로 저장
+                        setGubun(educationType);
                         // educationType 값 변환
                         const displayEducation = educationMapping[educationType] || educationType;
-                        setGubun(displayEducation);
                         setSelectedEducation(displayEducation);
                         setEduStatus(status);
                         setEduStartYear(startDate);
-                        setEduEndYear(endDate);
+                        setEduEndYear(endDate && !isNaN(endDate) ? endDate.toString() : "현재");
+                    }
+
+                    // 활동사항 수정하는 경우
+                    if (userData.activities && userData.activities.length > 0) {
+                        // 기존 활동사항을 상태에 반영
+                        setActivities(userData.activities);
                     }
                 } catch (error) {
                     console.error("데이터 가져오기 실패", error);
@@ -505,25 +508,27 @@ export default function MypageDetail() {
             return;
         }
 
+        const safeEduEndYear = eduEndYear && !isNaN(eduEndYear) ? eduEndYear : "현재";
+
         const profileData = {
             userId,
             name, 
             introduce,
 
             // education과 activities가 비어 있으면 제외하기
-            ...(school || gubun || eduStatus || eduStartYear || eduEndYear ? {
+            ...(school || gubun || eduStatus || eduStartYear || safeEduEndYear ? {
                 education: {
                     school,
                     educationType: gubun,
                     status: eduStatus,
                     startDate: eduStartYear,
-                    endDate: eduEndYear
+                    endDate: safeEduEndYear
                 }
             } : {}),
 
             ...(activities.length > 0 ? {
                 activities: activities.map((act) => ({
-                    activityId: act.activity_id,
+                    activity_id: act.activity_id,
                     activityName: act.activityName,
                     startDate: act.startDate,
                     endDate: act.endDate
@@ -697,7 +702,7 @@ export default function MypageDetail() {
                                                 </IconStyle>
                                             </StyledDatePickerWrapper>
                                         </DatePickerContainer>
-                                        <DeleteButton onClick={() => handleDeleteActivity(activity.activityId, index)}>
+                                        <DeleteButton onClick={() => handleDeleteActivity(activity.activity_id, index)}>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                                 <circle cx="12" cy="11.999" r="9" stroke="#989BA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                                 <path d="M9 12H15" stroke="#989BA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
