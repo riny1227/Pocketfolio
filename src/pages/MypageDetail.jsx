@@ -7,7 +7,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import profileImage from '../imgs/Profile.png';
 import { useAuth } from '../context/AuthContext';
-import { getUserInfo, schoolList, saveProfile } from '../api/MypageApi';
+import { getUserInfo, schoolList, deleteActivity, saveProfile } from '../api/MypageApi';
 
 // 전체 컴포넌트 감싸는 컨테이너
 const MypageDetailContainer = styled.div`
@@ -160,7 +160,7 @@ const ContentContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 32px;
+    gap: 20px;
     align-self: stretch;
 `;
 
@@ -308,6 +308,18 @@ const NumCount = styled.span`
     line-height: 24px;
 `;
 
+// 활동사항 삭제 버튼
+const DeleteButton = styled.button`
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    margin-left: 570px;
+`;
+
 // 프로필 정보 저장 버튼
 const SubmitButton = styled.button`
     display: flex;
@@ -337,7 +349,7 @@ const defaultActivity = {
     startDate: null,
     endDate: null,
     activityName: ""
-  };
+};
 
 export default function MypageDetail() {
     const navigate = useNavigate();
@@ -357,7 +369,6 @@ export default function MypageDetail() {
     const [eduStartYear, setEduStartYear] = useState("");
     const [eduEndYear, setEduEndYear] = useState("");
     const [selectedEducation, setSelectedEducation] = useState(""); // 학력 선택 상태
-    const [selectedStatus, setSelectedStatus] = useState(""); // 상태 선택 상태
     const [schoolListData, setSchoolListData] = useState([]);
     const [gubun, setGubun] = useState("");
 
@@ -406,16 +417,12 @@ export default function MypageDetail() {
 
     // 활동사항 항목 관리
     const [activities, setActivities] = useState([defaultActivity]); // 활동사항 목록
-    const [activityId, setActivityId] = useState("");
     const [startDate, setStartDate] = useState(null); // 시작일
     const [endDate, setEndDate] = useState(null); // 완료일
     const [activityName, setActivityName] = useState(""); // 활동명
 
     const startDateRef = useRef(null);
     const endDateRef = useRef(null);
-    
-    // 저장하기 버튼 상태 관리
-    const isButtonDisabled = !name || !introduce;
 
     const handleAddActivity = () => {
         setActivities([
@@ -426,6 +433,24 @@ export default function MypageDetail() {
         setStartDate(null);
         setEndDate(null);
         setActivityName('');
+    };
+
+    // 활동 삭제 함수 (API 호출 포함)
+    const handleDeleteActivity = async (activityId, index) => {
+        // 작성 중인 경우
+        if (!activityId) {
+            setActivities((prev) => prev.filter((_, i) => i !== index));
+            return;
+        }
+        
+        if (!window.confirm("정말 삭제하시겠습니까?")) return;
+        
+        try {
+            await deleteActivity(activityId, token);
+            setActivities((prev) => prev.filter((_, i) => i !== index));
+        } catch (error) {
+            console.error("활동 삭제 오류:", error);
+        }  
     };
 
     useEffect(() => {
@@ -457,6 +482,9 @@ export default function MypageDetail() {
         }
     }, [token]);
 
+    // 저장하기 버튼 상태 관리
+    const isButtonDisabled = !name || !introduce;
+
     const handleSubmit = async () => {
         // 필수 값 체크
         if (!name || !introduce) {
@@ -470,9 +498,10 @@ export default function MypageDetail() {
             introduce,
 
             // education과 activities가 비어 있으면 제외하기
-            ...(school || eduStatus || eduStartYear || eduEndYear ? {
+            ...(school || gubun || eduStatus || eduStartYear || eduEndYear ? {
                 education: {
                     school,
+                    educationType: gubun,
                     status: eduStatus,
                     startDate: eduStartYear,
                     endDate: eduEndYear
@@ -655,10 +684,16 @@ export default function MypageDetail() {
                                                 </IconStyle>
                                             </StyledDatePickerWrapper>
                                         </DatePickerContainer>
+                                        <DeleteButton onClick={() => handleDeleteActivity(activity.activityId, index)}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                <circle cx="12" cy="11.999" r="9" stroke="#989BA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M9 12H15" stroke="#989BA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </DeleteButton>
                                     </ContentOneWrapper>
                                 </div>
                                 <InfoLine />
-                                <div style={{ marginTop: '20px', marginBottom: '20px' }}>
+                                <div style={{ marginTop: '20px' }}>
                                     <ContentOneWrapper>
                                         <ContentTitleText>활동명</ContentTitleText>
                                         <StyledActivityInput
