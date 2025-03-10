@@ -1,10 +1,8 @@
 import axios from 'axios';
-const getToken = () => localStorage.getItem("token");
 
 // 포트폴리오 업로드 API
-export const create = async (portfolioData) => {
+export const create = async (portfolioData, token) => {
     const url = "https://pocketfolio.co.kr/api/portfolio/create";
-    const token = getToken();
 
     if (!token) {
         throw new Error("유효하지 않은 토큰입니다. 로그인 후 다시 시도해 주세요.");
@@ -37,9 +35,8 @@ export const create = async (portfolioData) => {
 };
 
 // 포트폴리오 표지 이미지 업로드 API
-export const uploadCover = async (file) => {
+export const uploadCover = async (file, token) => {
     const url = "https://pocketfolio.co.kr/api/portfolio/upload-cover";
-    const token = localStorage.getItem("token");
     console.log("현재 토큰:", token);
 
     if (!token) {
@@ -66,9 +63,8 @@ export const uploadCover = async (file) => {
 };
 
 // 포트폴리오 첨부파일 업로드 API
-export const uploadAttachments = async (files) => {
+export const uploadAttachments = async (files, token) => {
     const url = "https://pocketfolio.co.kr/api/portfolio/upload-attachments";
-    const token = getToken();
 
     if (!token) {
         throw new Error("유효하지 않은 토큰입니다. 로그인 후 다시 시도해 주세요.");
