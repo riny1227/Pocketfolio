@@ -310,7 +310,7 @@ export default function Header() {
     const handleSearch = async (event) => {
         if (event.key === "Enter" && searchText.trim() !== "") {
             try {
-                const result = await fetchSearch(searchText, "portfolio", 10); // 포트폴리오 검색 (type = "portfolio", limit = 10으로 고정)
+                const result = await fetchSearch(searchText, "portfolio"); // 포트폴리오 검색 (type = "portfolio"으로 고정)
                 navigate("/", { state: { searchResults: result, searchText } }); // 검색 결과를 Home으로 전달
             } catch (error) {
                 console.error("handleSearch 에러 발생 : ", error);
