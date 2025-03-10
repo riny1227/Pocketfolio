@@ -400,13 +400,13 @@ export default function Mypage() {
                     setActivities(userData.activities);
 
                     const portfolioList = await getPortfolioList(token);
-                    setPortfolioCards(portfolioList);
+                    setPortfolioCards(portfolioList.portfolios);
 
                     const bookmarkList = await getBookmarks(token);
-                    setBookmarkedCards(bookmarkList);
+                    setBookmarkedCards(bookmarkList.portfolios);
 
                     const likedList = await getLikes(token);
-                    setLikedCards(likedList);
+                    setLikedCards(likedList.portfolios);
                 } catch (error) {
                     console.error("데이터 가져오기 실패", error);
                 }
@@ -517,7 +517,7 @@ export default function Mypage() {
                                 {education && (
                                     <ProfileWrapper>
                                         <ProfileTopText>학력</ProfileTopText>
-                                        <ProfileBottomDateText>{education.startDate} ~ {education.endDate}</ProfileBottomDateText>
+                                        <ProfileBottomDateText>{education.startDate} ~ {education.endDate && !isNaN(new Date(education.endDate).getTime()) ? education.endDate : "ing"}</ProfileBottomDateText>
                                         <ProfileBottomText>{education.school} ({education.status})</ProfileBottomText>
                                     </ProfileWrapper>
                                 )}
@@ -585,7 +585,7 @@ export default function Mypage() {
                             <CardItem key={index} onClick={() => handleCardClick(card)}>
                                 <Card
                                     title={card.title}
-                                    image={exampleImg} // 예시 이미지 사용
+                                    image={card.coverImage ? card.coverImage : exampleImg}
                                     name={card.name}
                                     views={card.views}
                                     likes={card.likes}
