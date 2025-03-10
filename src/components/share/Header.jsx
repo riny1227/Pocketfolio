@@ -1,11 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styled from 'styled-components';
 import logo from '../../imgs/logo.png';
 import Chat from '../Chat';
 import profileImage from '../../imgs/Profile.png';
-import { fetchSearch } from "../../api/NavbarApi"; // 검색 API 불러오기
+import { fetchCheckStatus, fetchNotifications, fetchSearch } from "../../api/NavbarApi"; // 검색 API 불러오기
 
 // 헤더 컨테이너
 const HeaderContainer = styled.div`
@@ -273,7 +273,7 @@ const DropdownItem = styled.span`
 
 export default function Header() {
     const navigate = useNavigate();
-    const { isLoggedIn, logout } = useAuth(); 
+    const { isLoggedIn, logout, token } = useAuth(); 
     const [searchText, setSearchText] = useState('');
     const [isChatOpen, setChatOpen] = useState(false);
 
@@ -332,6 +332,35 @@ export default function Header() {
             }
         }
     };
+
+    useEffect(() => {
+        // 사용자 인증상태 확인 함수 - 테스트
+        const handleStatus = async () => {
+            if (isLoggedIn) {
+                try {
+                    const status = await fetchCheckStatus(token);
+                    console.log(status);
+                } catch (error) {
+                    console.error("handleStatus 에러 발생 : ", error);
+                }
+            }
+        }
+
+        // 알림 리스트 조회 함수 - 테스트
+        const handleNotifications = async () => {
+            if (isLoggedIn) {
+                try {
+                    const alarm = await fetchNotifications(token);
+                    console.log(alarm);
+                } catch (error) {
+                    console.error("handleNotifications 에러 발생 : ", error);
+                }
+            }
+        }
+
+        handleStatus();
+        handleNotifications();
+    }, [isLoggedIn]);
 
     return (
         <HeaderContainer>
