@@ -371,6 +371,12 @@ export default function MypageDetail() {
     const [selectedEducation, setSelectedEducation] = useState(""); // 학력 선택 상태
     const [schoolListData, setSchoolListData] = useState([]);
     const [gubun, setGubun] = useState("");
+    const educationMapping = {
+        mid_list: '중학교',
+        high_list: '고등학교',
+        univ_list: '대학교'
+    };      
+    
 
     // 학교 목록 가져오는 함수
     const fetchSchoolList = async (searchSchulNm) => {
@@ -435,8 +441,10 @@ export default function MypageDetail() {
         setActivityName('');
     };
 
-    // 활동 삭제 함수 (API 호출 포함)
+    // 활동 삭제 함수
     const handleDeleteActivity = async (activityId, index) => {
+        console.log("삭제 요청: activityId =", activityId, "index =", index); // 디버깅 로그 추가
+
         // 작성 중인 경우
         if (!activityId) {
             setActivities((prev) => prev.filter((_, i) => i !== index));
@@ -446,7 +454,8 @@ export default function MypageDetail() {
         if (!window.confirm("정말 삭제하시겠습니까?")) return;
         
         try {
-            await deleteActivity(activityId, token);
+            const response = await deleteActivity(activityId, token);
+            console.log("삭제 성공 응답:", response); // 성공 시 로그 확인
             setActivities((prev) => prev.filter((_, i) => i !== index));
         } catch (error) {
             console.error("활동 삭제 오류:", error);
@@ -467,8 +476,12 @@ export default function MypageDetail() {
 
                     // 학력사항 수정하는 경우
                     if(userData.education){
-                        const { school, status, startDate, endDate } = userData.education;
+                        const { school, educationType, status, startDate, endDate } = userData.education;
                         setSchool(school);
+                        // educationType 값 변환
+                        const displayEducation = educationMapping[educationType] || educationType;
+                        setGubun(displayEducation);
+                        setSelectedEducation(displayEducation);
                         setEduStatus(status);
                         setEduStartYear(startDate);
                         setEduEndYear(endDate);
@@ -510,7 +523,7 @@ export default function MypageDetail() {
 
             ...(activities.length > 0 ? {
                 activities: activities.map((act) => ({
-                    activityId: act.activityId,
+                    activityId: act.activity_id,
                     activityName: act.activityName,
                     startDate: act.startDate,
                     endDate: act.endDate

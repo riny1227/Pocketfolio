@@ -541,19 +541,22 @@ export default function WritePortfolio() {
     const { portfolioData } = location.state || {}; // PortfolioDetailModal에서 전달받은 데이터
 
     useEffect(() => {
-        if (portfolioData) {
-            setTitle(portfolioData.title);
-            setRole(portfolioData.role);
-            setJob(portfolioData.job);
-            setCompany(portfolioData.company);
-            setUrl(portfolioData.url);
-            setMemo(portfolioData.description);
-            setStartDate(new Date(portfolioData.durationStart));
-            setEndDate(new Date(portfolioData.durationEnd));
-            setImagePreview(portfolioData.coverImage || exampleImage);
-            setFileName(portfolioData.attachments?.[0]?.name || '');
+        if (token) {
+            console.log("Fetched token:", token);
+            if (portfolioData) {
+                setTitle(portfolioData.title);
+                setRole(portfolioData.role);
+                setJob(portfolioData.job);
+                setCompany(portfolioData.company);
+                setUrl(portfolioData.url);
+                setMemo(portfolioData.description);
+                setStartDate(new Date(portfolioData.durationStart));
+                setEndDate(new Date(portfolioData.durationEnd));
+                setImagePreview(portfolioData.coverImage || exampleImage);
+                setFileName(portfolioData.attachments?.[0]?.name || '');
+            }
         }
-    }, [portfolioData]);
+    }, [token, portfolioData]);
     
     useEffect(() => {
         // 모든 필드가 채워졌는지 확인(URL, 간단설명 제외)
