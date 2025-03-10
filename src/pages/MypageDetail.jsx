@@ -371,6 +371,12 @@ export default function MypageDetail() {
     const [selectedEducation, setSelectedEducation] = useState(""); // 학력 선택 상태
     const [schoolListData, setSchoolListData] = useState([]);
     const [gubun, setGubun] = useState("");
+    const educationMapping = {
+        mid_list: '중학교',
+        high_list: '고등학교',
+        univ_list: '대학교'
+    };      
+    
 
     // 학교 목록 가져오는 함수
     const fetchSchoolList = async (searchSchulNm) => {
@@ -448,7 +454,7 @@ export default function MypageDetail() {
         if (!window.confirm("정말 삭제하시겠습니까?")) return;
         
         try {
-            await deleteActivity(activityId, token);
+            const response = await deleteActivity(activityId, token);
             console.log("삭제 성공 응답:", response); // 성공 시 로그 확인
             setActivities((prev) => prev.filter((_, i) => i !== index));
         } catch (error) {
@@ -472,7 +478,10 @@ export default function MypageDetail() {
                     if(userData.education){
                         const { school, educationType, status, startDate, endDate } = userData.education;
                         setSchool(school);
-                        setGubun(educationType);
+                        // educationType 값 변환
+                        const displayEducation = educationMapping[educationType] || educationType;
+                        setGubun(displayEducation);
+                        setSelectedEducation(displayEducation);
                         setEduStatus(status);
                         setEduStartYear(startDate);
                         setEduEndYear(endDate);
@@ -573,7 +582,7 @@ export default function MypageDetail() {
                             <InputAndDropdown 
                                 placeholder="학교" 
                                 value={selectedEducation} 
-                                setValue={setGubun} 
+                                setValue={handleEducationChange} 
                                 data={["중학교", "고등학교", "대학교"]} 
                                 width="235px"
                             />
