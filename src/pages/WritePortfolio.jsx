@@ -8,6 +8,7 @@ import ko from "date-fns/locale/ko"; // 한국어 로케일 import
 import InputAndDropdown from "../components/share/InputAndDropdown";
 import { create, uploadAttachments, uploadCover } from "../api/Portfolio/PortfolioUploadApi";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 // 한국어 로케일 등록
 registerLocale("ko", ko);
@@ -518,6 +519,7 @@ const MemoInput = styled.input`
 `;
 
 export default function WritePortfolio() {
+    const { token } = useAuth();
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null); 
     const startDateRef = useRef(null);
@@ -591,13 +593,13 @@ export default function WritePortfolio() {
             // 커버 이미지 
             let coverResponse = null;
             if (coverImage) {
-                coverResponse = await uploadCover(coverImage);
+                coverResponse = await uploadCover(coverImage, token);
             }
 
             // 첨부파일 
             let attachmentsResponse = null;
             if (attachments.length > 0) {
-                attachmentsResponse = await uploadAttachments(attachments);
+                attachmentsResponse = await uploadAttachments(attachments, token);
             }
 
             // 포트폴리오 내용 
@@ -614,7 +616,7 @@ export default function WritePortfolio() {
                 attachments: attachmentsResponse ? attachmentsResponse.data : []
             };
 
-            const response = await create(portfolioData);
+            const response = await create(portfolioData, token);
             alert("포트폴리오가 성공적으로 업로드 되었습니다.");
             console.log(response);
 
