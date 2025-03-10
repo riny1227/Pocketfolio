@@ -435,8 +435,10 @@ export default function MypageDetail() {
         setActivityName('');
     };
 
-    // 활동 삭제 함수 (API 호출 포함)
+    // 활동 삭제 함수
     const handleDeleteActivity = async (activityId, index) => {
+        console.log("삭제 요청: activityId =", activityId, "index =", index); // 디버깅 로그 추가
+
         // 작성 중인 경우
         if (!activityId) {
             setActivities((prev) => prev.filter((_, i) => i !== index));
@@ -447,6 +449,7 @@ export default function MypageDetail() {
         
         try {
             await deleteActivity(activityId, token);
+            console.log("삭제 성공 응답:", response); // 성공 시 로그 확인
             setActivities((prev) => prev.filter((_, i) => i !== index));
         } catch (error) {
             console.error("활동 삭제 오류:", error);
@@ -467,8 +470,9 @@ export default function MypageDetail() {
 
                     // 학력사항 수정하는 경우
                     if(userData.education){
-                        const { school, status, startDate, endDate } = userData.education;
+                        const { school, educationType, status, startDate, endDate } = userData.education;
                         setSchool(school);
+                        setGubun(educationType);
                         setEduStatus(status);
                         setEduStartYear(startDate);
                         setEduEndYear(endDate);
@@ -510,7 +514,7 @@ export default function MypageDetail() {
 
             ...(activities.length > 0 ? {
                 activities: activities.map((act) => ({
-                    activityId: act.activityId,
+                    activityId: act.activity_id,
                     activityName: act.activityName,
                     startDate: act.startDate,
                     endDate: act.endDate
@@ -569,7 +573,7 @@ export default function MypageDetail() {
                             <InputAndDropdown 
                                 placeholder="학교" 
                                 value={selectedEducation} 
-                                setValue={handleEducationChange} 
+                                setValue={setGubun} 
                                 data={["중학교", "고등학교", "대학교"]} 
                                 width="235px"
                             />
