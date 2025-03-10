@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 import { fetchPortfolioDetails } from '../../api/Portfolio/PortfolioDetailApi';
 import { deletePortfolio } from '../../api/Portfolio/PortfolioDeleteApi';
+import { useAuth } from '../../context/AuthContext';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../../imgs/example.png';
@@ -371,7 +372,8 @@ const SimilarPortfolioContainer = styled.div`
     };
 `;
 
-const PortfolioDetailModal = ({ portfolioId, onClose, token }) => {
+const PortfolioDetailModal = ({ portfolioId, onClose }) => {
+    const { token, user } = useAuth();
     const [portfolio, setPortfolio] = useState(null); // 포트폴리오 데이터 상태
     const [isLoading, setIsLoading] = useState(true); // 로딩 상태
     const [error, setError] = useState(null); // 오류 상태
@@ -410,41 +412,41 @@ const PortfolioDetailModal = ({ portfolioId, onClose, token }) => {
     };
 
     // 포트폴리오 데이터를 API에서 불러오는 useEffect
-    // useEffect(() => {
-    //     const loadPortfolioDetails = async () => {
+    useEffect(() => {
+        const loadPortfolioDetails = async () => {
 
-    //         setIsLoading(true);  // 🔹 새로운 요청이 시작될 때 로딩 상태 초기화
-    //         setError(null);  // 🔹 에러 메시지도 초기화
+            setIsLoading(true);  // 새로운 요청이 시작될 때 로딩 상태 초기화
+            setError(null);  // 에러 메시지도 초기화
 
-    //         try {
-    //             const data = await fetchPortfolioDetails(portfolioId);
-    //             setPortfolio(data); // 데이터를 상태에 저장
-    //         } catch (error) {
-    //             setError('포트폴리오 상세 정보를 불러오는 데 실패했습니다.');
-    //         } finally {
-    //             setIsLoading(false); // 로딩 완료
-    //         }
-    //     };
+            try {
+                const data = await fetchPortfolioDetails(portfolioId, token);
+                setPortfolio(data); // 데이터를 상태에 저장
+            } catch (error) {
+                setError('포트폴리오 상세 정보를 불러오는 데 실패했습니다.');
+            } finally {
+                setIsLoading(false); // 로딩 완료
+            }
+        };
 
-    //     if (portfolioId) { // 유효한 ID일 때만 API 호출 
-    //         loadPortfolioDetails();
-    //     }
-    // }, [portfolioId]); // portfolioId가 바뀔 때마다 실행
+        if (portfolioId) { // 유효한 ID일 때만 API 호출 
+            loadPortfolioDetails();
+        }
+    }, [portfolioId, token]); // portfolioId가 바뀔 때마다 실행
 
-    // // 로딩 중, 오류 처리 및 데이터 표시
-    // if (isLoading) {
-    //     return (
-    //         <ModalOverlay onClick={handleOverlayClick}>
-    //             <ModalContainer onClick={(e) => e.stopPropagation()}>
-    //                 <div style={{ padding: '20px', textAlign: 'center' }}>⏳ 로딩 중...</div>
-    //             </ModalContainer>
-    //         </ModalOverlay>
-    //     );
-    // }
+    // 로딩 중, 오류 처리 및 데이터 표시
+    if (isLoading) {
+        return (
+            <ModalOverlay onClick={handleOverlayClick}>
+                <ModalContainer onClick={(e) => e.stopPropagation()}>
+                    <div style={{ padding: '20px', textAlign: 'center' }}>⏳ 로딩 중...</div>
+                </ModalContainer>
+            </ModalOverlay>
+        );
+    }
 
-    // if (error) {
-    //     return <div>{error}</div>;
-    // }
+    if (error) {
+        return <div>{error}</div>;
+    }
 
     // 공유 버튼 클릭시
     const handleShareClick = async () => {
@@ -516,10 +518,13 @@ const PortfolioDetailModal = ({ portfolioId, onClose, token }) => {
                             </svg>
                         </SBGIconStyle>
                         {/* 수정, 삭제 버튼 */}
-                        <ModifyButton onClick={handleEditClick}>수정</ModifyButton>
-                        <DeleteButton
-                        onClick={handleDeleteClick} 
-                        disabled={isDeleting}>삭제</DeleteButton>
+                        {/* 본인 포트폴리오일 때만 수정, 삭제 버튼 표시 */}
+                        {user && portfolio && portfolio.ownerId === user.id && (
+                          <>
+                            <ModifyButton onClick={handleEditClick}>수정</ModifyButton>
+                            <DeleteButton onClick={handleDeleteClick} disabled={isDeleting}>삭제</DeleteButton>
+                          </>
+                        )}
                     </HeaderIconContainer>
                 </ModalHeaderContainer>
 
