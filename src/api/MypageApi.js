@@ -132,3 +132,28 @@ export const schoolList = async (gubun, searchSchulNm) => {
       throw error;
     }
 };
+
+// 활동 삭제 API
+export const deleteActivity = async (activityId, token) => {
+    if (!token) {
+        throw new Error('Token not found');
+    }
+    if (!activityId) {
+        throw new Error('Activity ID is required');
+    }
+
+    const url = `https://pocketfolio.co.kr/api/mypage/activitydelete?activity_id=${activityId}`;
+
+    const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+    };
+
+    try {
+        const response = await axios.delete(url, { headers });
+        return response.data;  // 삭제 성공 메시지 반환
+    } catch (error) {
+        console.error('Error deleting activity:', error);
+        throw error;
+    }
+};
