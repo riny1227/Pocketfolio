@@ -5,7 +5,7 @@ const BASE_URL = 'https://pocketfolio.co.kr/api';
 // 추천 포트폴리오 조회
 export const fetchRecommendPortfolios = async () => {
     try {
-        const response = await axios.get(`${BASE_URL}/home/portfolios/recommend`);
+        const response = await axios.get(`${BASE_URL}/home/portfolios/recommended`);
         console.log('응답 상태 코드 : ', response.status);
         return response.data;
     } catch (error) {
@@ -14,22 +14,10 @@ export const fetchRecommendPortfolios = async () => {
     }
 }
 
-// 최근 업로드된 포트폴리오 목록 조회
-export const fetchRecentPortfolios = async () => {
-    try {
-        const response = await axios.get(`${BASE_URL}/home/portfolios/recent`);
-        console.log('응답 상태 코드 : ', response.status);
-        return response.data;
-    } catch (error) {
-        console.log('fetchRecentPortfolios(최근 업로드된 포트폴리오 목록 조회) 에러 발생 : ', error);
-        throw error;
-    }
-}
-
-// 직군 리스트 조회
+// 직군(회사) 리스트 조회
 export const fetchJobList = async () => {
     try {
-        const response = await axios.get(`${BASE_URL}/home/jobs`);
+        const response = await axios.get(`${BASE_URL}/home/jobs/categories`);
         console.log('응답 상태 코드 : ', response.status);
         return response.data;
     } catch (error) {
@@ -38,26 +26,48 @@ export const fetchJobList = async () => {
     }
 }
 
-// 인기 태그 조회
-export const fetchPopularTags = async () => {
+// 포트폴리오 필터링
+export const fetchFilteredPortfolios = async (tag, company, dateRange) => {
     try {
-        const response = await axios.get(`${BASE_URL}/home/tags/popular`);
+        const response = await axios.get(`${BASE_URL}/home/portfolios/filter`, {
+            params: {
+                tag: tag,  // 필터링할 태그
+                company: company,  // 필터링할 회사명
+                dateRange: dateRange  // 기간 조건 (1주일, 1달, 6개월, 1년, 3년)
+            }
+        });
         console.log('응답 상태 코드 : ', response.status);
         return response.data;
     } catch (error) {
-        console.log('fetchPopularTags(인기 태그 조회) 에러 발생 : ', error);
+        console.log('fetchFilteredPortfolios(포트폴리오 필터링) 에러 발생 : ', error);
         throw error;
     }
 }
 
-// 포트폴리오 필터 및 정렬 - 수정 필요함
-export const fetchFilteredPortfolios = async () => {
+// 정렬된 포트폴리오 조회
+export const fetchPortfolios = async (sort) => {
     try {
-        const response = await axios.get(`${BASE_URL}/home/portfolios`);
+        const response = await axios.get(`${BASE_URL}/home/portfolios`, {
+            params: {
+                sort: sort  // likes, views, createdAt(기본값)
+            }
+        });
         console.log('응답 상태 코드 : ', response.status);
         return response.data;
     } catch (error) {
-        console.log('fetchFilteredPortfolios(포트폴리오 필터 및 정렬) 에러 발생 : ', error);
+        console.log('fetchFilteredPortfolios(포트폴리오 필터링) 에러 발생 : ', error);
         throw error;
     }
 }
+
+// 인기 태그 조회
+// export const fetchPopularTags = async () => {
+//     try {
+//         const response = await axios.get(`${BASE_URL}/home/tags/popular`);
+//         console.log('응답 상태 코드 : ', response.status);
+//         return response.data;
+//     } catch (error) {
+//         console.log('fetchPopularTags(인기 태그 조회) 에러 발생 : ', error);
+//         throw error;
+//     }
+// }

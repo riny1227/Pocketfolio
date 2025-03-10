@@ -4,7 +4,7 @@ import styled from "styled-components";
 import Card from '../components/share/Card';
 import Carousel from '../components/share/Carousel';
 import Filter from '../components/Filter';
-import { fetchRecommendPortfolios, fetchRecentPortfolios, fetchJobList, fetchPopularTags, fetchFilteredPortfolios } from '../api/HomeApi';
+import { fetchRecommendPortfolios, fetchJobList, fetchFilteredPortfolios, fetchPortfolios } from '../api/HomeApi';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../imgs/example.png'
@@ -76,27 +76,27 @@ export default function Home() {
         );
     };
 
-    // 추천 포트폴리오 조회 api 연결 - 테스트 (404)
-    // useEffect(() => {
-    //     const getRecommendPortfolios = async () => {
-    //         try {
-    //             const data = await fetchRecommendPortfolios();
-    //             console.log('추천 포트폴리오 조회 data : ', data);
-    //         } catch (error) {
-    //             console.error('getRecommendPortfolios 에러 발생 : ', error)
-    //         }
-    //     };
+    // 추천 포트폴리오 조회 api 연결 - 테스트
+    useEffect(() => {
+        const getRecommendPortfolios = async () => {
+            try {
+                const data = await fetchRecommendPortfolios();
+                console.log('추천 포트폴리오 조회 data : ', data);
+            } catch (error) {
+                console.error('getRecommendPortfolios 에러 발생 : ', error)
+            }
+        };
 
-    //     getRecommendPortfolios();
-    // }, []);
+        getRecommendPortfolios();
+    }, []);
 
     // 검색 api 실행 결과 가져오기
     useEffect(() => {
         if (Array.isArray(location.state?.searchResults)) {
             setCards(location.state.searchResults);
+            console.log("검색 api 실행 성공")
         }
     }, [location.state]);
-    
 
     return (
         <HomeContainer>
