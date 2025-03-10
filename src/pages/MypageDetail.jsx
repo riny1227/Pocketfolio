@@ -438,7 +438,7 @@ export default function MypageDetail() {
     // 활동 삭제 함수
     const handleDeleteActivity = async (activityId, index) => {
         console.log("삭제 요청: activityId =", activityId, "index =", index); // 디버깅 로그 추가
-        
+
         // 작성 중인 경우
         if (!activityId) {
             setActivities((prev) => prev.filter((_, i) => i !== index));
@@ -449,6 +449,7 @@ export default function MypageDetail() {
         
         try {
             await deleteActivity(activityId, token);
+            console.log("삭제 성공 응답:", response); // 성공 시 로그 확인
             setActivities((prev) => prev.filter((_, i) => i !== index));
         } catch (error) {
             console.error("활동 삭제 오류:", error);
