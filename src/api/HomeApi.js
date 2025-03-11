@@ -18,7 +18,7 @@ export const fetchRecommendPortfolios = async () => {
 export const fetchJobList = async (query) => {
     try {
         const response = await axios.get(`${BASE_URL}/jobs/categories`, {
-            params: { q: query }
+            params: { q: encodeURIComponent(query) }
         });
 
         console.log("fetchJobList 응답 데이터:", response.data);
