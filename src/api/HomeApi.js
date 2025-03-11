@@ -15,16 +15,21 @@ export const fetchRecommendPortfolios = async () => {
 }
 
 // 직군(회사) 리스트 조회
-export const fetchJobList = async () => {
+export const fetchJobList = async (query) => {
     try {
-        const response = await axios.get(`${BASE_URL}/home/jobs/categories`);
-        console.log('응답 상태 코드 : ', response.status);
-        return response.data;
+        const response = await axios.get(`${BASE_URL}/jobs/categories`, {
+            params: { q: query }
+        });
+
+        console.log("fetchJobList 응답 데이터:", response.data);
+
+        // 응답이 객체이고, data 키가 배열인지 확인 후 반환
+        return Array.isArray(response.data.data) ? response.data.data : [];
     } catch (error) {
-        console.log('fetchJobList(직군 리스트 조회) 에러 발생 : ', error);
-        throw error;
+        console.error('fetchJobList(직군 리스트 조회) 에러 발생 : ', error);
+        return []; // 에러 발생 시 빈 배열 반환
     }
-}
+};
 
 // 포트폴리오 필터링
 export const fetchFilteredPortfolios = async (tag, company, dateRange) => {
