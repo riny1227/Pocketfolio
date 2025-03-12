@@ -1,11 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styled from 'styled-components';
 import logo from '../../imgs/logo.png';
 import Chat from '../Chat';
 import profileImage from '../../imgs/Profile.png';
-import { fetchSearch } from "../../api/NavbarApi"; // 검색 API 불러오기
+import { fetchCheckStatus, fetchNotifications, fetchSearch } from "../../api/NavbarApi"; // 검색 API 불러오기
 
 // 헤더 컨테이너
 const HeaderContainer = styled.div`
@@ -273,7 +273,7 @@ const DropdownItem = styled.span`
 
 export default function Header() {
     const navigate = useNavigate();
-    const { isLoggedIn, logout } = useAuth(); 
+    const { isLoggedIn, logout, token } = useAuth(); 
     const [searchText, setSearchText] = useState('');
     const [isChatOpen, setChatOpen] = useState(false);
 
@@ -325,13 +325,42 @@ export default function Header() {
     const handleSearch = async (event) => {
         if (event.key === "Enter" && searchText.trim() !== "") {
             try {
-                const result = await fetchSearch(searchText, "portfolio", 10); // 포트폴리오 검색 (type = "portfolio", limit = 10으로 고정)
+                const result = await fetchSearch(searchText, "portfolio"); // 포트폴리오 검색 (type = "portfolio"으로 고정)
                 navigate("/", { state: { searchResults: result, searchText } }); // 검색 결과를 Home으로 전달
             } catch (error) {
                 console.error("handleSearch 에러 발생 : ", error);
             }
         }
     };
+
+    useEffect(() => {
+        // 사용자 인증상태 확인 함수 - 테스트
+        const handleStatus = async () => {
+            if (isLoggedIn) {
+                try {
+                    const status = await fetchCheckStatus(token);
+                    console.log(status);
+                } catch (error) {
+                    console.error("handleStatus 에러 발생 : ", error);
+                }
+            }
+        }
+
+        // 알림 리스트 조회 함수 - 테스트
+        const handleNotifications = async () => {
+            if (isLoggedIn) {
+                try {
+                    const alarm = await fetchNotifications(token);
+                    console.log(alarm);
+                } catch (error) {
+                    console.error("handleNotifications 에러 발생 : ", error);
+                }
+            }
+        }
+
+        handleStatus();
+        handleNotifications();
+    }, [isLoggedIn]);
 
     return (
         <HeaderContainer>

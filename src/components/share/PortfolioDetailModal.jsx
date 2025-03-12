@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { fetchPortfolioDetails } from '../../api/Portfolio/PortfolioDetailApi';
 import { deletePortfolio } from '../../api/Portfolio/PortfolioDeleteApi';
 import { useAuth } from '../../context/AuthContext';
+import { fetchLikeToPortfoilo } from '../../api/Portfolio/PortfolioLikesApi';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../../imgs/example.png';
@@ -378,20 +379,28 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
     const [isLoading, setIsLoading] = useState(true); // 로딩 상태
     const [error, setError] = useState(null); // 오류 상태
     const [isDeleting, setIsDeleting] = useState(false); // 삭제 상태
+    const [$isLiked, setIsLiked] = useState(false); // 좋아요 상태 
     const navigate = useNavigate();
-
-    // 사용자 포트폴리오 데이터
-    const userPortfolios = [
-        { id: 1, image: exampleImg },
-        { id: 2, image: exampleImg },
-        { id: 3, image: exampleImg },
-    ]
 
     // 모달 아닌 부분 눌렀을 때, 닫히도록
     const handleOverlayClick = (e) => {
         if (e.target === e.currentTarget) {
           onClose();
         }
+    };
+
+    // 공유 버튼 클릭시
+    const handleShareClick = async () => {
+        const shareUrl = `https://pocketfolio.co.kr/api/portfolio/${portfolioId}`;
+
+        navigator.clipboard.writeText(shareUrl) // 클립보드에 URL 복사
+            .then(() => {
+            alert('링크가 클립보드에 복사되었습니다!');
+            })
+            .catch(err => {
+            alert('링크 복사에 실패했습니다.');
+            console.error(err);
+            });
     };
 
     // 수정 버튼 클릭시
@@ -418,27 +427,44 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
         }
     };
 
+    // 좋아요 버튼 클릭시
+    const handleLikeClick = async () => {
+        try {
+            // 좋아요 추가/취소 API 호출
+            await fetchLikeToPortfoilo(portfolioId, token);
+            // API 호출 성공시 상태 토글
+            setIsLiked(prev => !prev);
+        } catch (error) {
+            console.error("좋아요 처리 중 오류:", error);
+            alert("좋아요 처리 중 오류가 발생했습니다.");
+        }
+    };
+
     // 포트폴리오 데이터를 API에서 불러오는 useEffect
-    // useEffect(() => {
-    //     const loadPortfolioDetails = async () => {
+    useEffect(() => {
+        const loadPortfolioDetails = async () => {
 
-    //         setIsLoading(true);  // 새로운 요청이 시작될 때 로딩 상태 초기화
-    //         setError(null);  // 에러 메시지도 초기화
+            setIsLoading(true);  // 새로운 요청이 시작될 때 로딩 상태 초기화
+            setError(null);  // 에러 메시지도 초기화
 
-    //         try {
-    //             const data = await fetchPortfolioDetails(portfolioId, token);
-    //             setPortfolio(data); // 데이터를 상태에 저장
-    //         } catch (error) {
-    //             setError('포트폴리오 상세 정보를 불러오는 데 실패했습니다.');
-    //         } finally {
-    //             setIsLoading(false); // 로딩 완료
-    //         }
-    //     };
+            try {
+                const data = await fetchPortfolioDetails(portfolioId, token);
+                setPortfolio(data); // 데이터를 상태에 저장
+                // 포트폴리오 데이터에 좋아요(isLiked)가 있다면 초기값 설정
+                if (data && typeof data.$isLiked !== 'undefined') {
+                    setIsLiked(data.$isLiked);
+                }
+            } catch (error) {
+                setError('포트폴리오 상세 정보를 불러오는 데 실패했습니다.');
+            } finally {
+                setIsLoading(false); // 로딩 완료
+            }
+        };
 
-    //     if (portfolioId) { // 유효한 ID일 때만 API 호출 
-    //         loadPortfolioDetails();
-    //     }
-    // }, [portfolioId, token]); // portfolioId가 바뀔 때마다 실행
+        if (portfolioId) { // 유효한 ID일 때만 API 호출 
+            loadPortfolioDetails();
+        }
+    }, [portfolioId, token]); // portfolioId가 바뀔 때마다 실행
 
     // // 로딩 중, 오류 처리 및 데이터 표시
     // if (isLoading) {
@@ -454,20 +480,6 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
     // if (error) {
     //     return <div>{error}</div>;
     // }
-
-    // 공유 버튼 클릭시
-    const handleShareClick = async () => {
-        const shareUrl = `https://pocketfolio.co.kr/api/portfolio/${portfolioId}`;
-
-        navigator.clipboard.writeText(shareUrl) // 클립보드에 URL 복사
-            .then(() => {
-            alert('링크가 클립보드에 복사되었습니다!');
-            })
-            .catch(err => {
-            alert('링크 복사에 실패했습니다.');
-            console.error(err);
-            });
-    };
 
     return (
         <ModalOverlay onClick={handleOverlayClick}>
@@ -519,7 +531,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
                             </svg>
                         </SBGIconStyle>
                         {/* 좋아요 아이콘 */}
-                        <SBGIconStyle>
+                        <SBGIconStyle onClick={handleLikeClick}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                                 <path d="M17.5 6.6666C17.9444 6.6666 18.3333 6.83327 18.6666 7.1666C19 7.49994 19.1666 7.88883 19.1666 8.33327V9.99994C19.1666 10.0972 19.1561 10.2013 19.135 10.3124C19.1138 10.4235 19.0827 10.5277 19.0416 10.6249L16.5416 16.4999C16.4166 16.7777 16.2083 17.0138 15.9166 17.2083C15.625 17.4027 15.3194 17.4999 15 17.4999H8.33329C7.87496 17.4999 7.48274 17.3369 7.15663 17.0108C6.83051 16.6847 6.66718 16.2922 6.66663 15.8333V7.3541C6.66663 7.13188 6.7119 6.92022 6.80246 6.7191C6.89301 6.51799 7.0144 6.34077 7.16663 6.18744L11.6875 1.68744C11.8958 1.49299 12.1425 1.37494 12.4275 1.33327C12.7125 1.2916 12.9866 1.34022 13.25 1.4791C13.5133 1.61799 13.7044 1.81244 13.8233 2.06244C13.9422 2.31244 13.9663 2.56938 13.8958 2.83327L12.9583 6.6666H17.5ZM3.33329 17.4999C2.87496 17.4999 2.48274 17.3369 2.15663 17.0108C1.83051 16.6847 1.66718 16.2922 1.66663 15.8333V8.33327C1.66663 7.87494 1.82996 7.48272 2.15663 7.1566C2.48329 6.83049 2.87551 6.66716 3.33329 6.6666C3.79107 6.66605 4.18357 6.82938 4.51079 7.1566C4.83801 7.48383 5.00107 7.87605 4.99996 8.33327V15.8333C4.99996 16.2916 4.8369 16.6841 4.51079 17.0108C4.18468 17.3374 3.79218 17.5005 3.33329 17.4999Z" stroke="#909090" stroke-width="1.6"/>
                             </svg>
