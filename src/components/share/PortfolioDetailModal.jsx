@@ -406,7 +406,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
     // 수정 버튼 클릭시
     const handleEditClick = () => {
         // 수정 페이지로 포트폴리오 정보를 전달하여 이동
-        navigate('/src/pages/WritePortfolio.jsx', { state: { portfolioId } });
+        navigate('https://pocketfolio.co.kr/api/portfolio/write-portfolio', { state: { portfolioId } });
       };
 
     // 삭제 버튼 클릭시 
@@ -442,6 +442,9 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
 
     // 포트폴리오 데이터를 API에서 불러오는 useEffect
     useEffect(() => {
+        // 모달이 열릴 때 스크롤 막기
+        document.body.style.overflow = "hidden";
+
         const loadPortfolioDetails = async () => {
 
             setIsLoading(true);  // 새로운 요청이 시작될 때 로딩 상태 초기화
@@ -463,6 +466,11 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
 
         if (portfolioId) { // 유효한 ID일 때만 API 호출 
             loadPortfolioDetails();
+        }
+
+        return () => {
+            // 모달이 닫힐 때 스크롤 복원
+            document.body.style.overflow = "auto";
         }
     }, [portfolioId, token]); // portfolioId가 바뀔 때마다 실행
 
