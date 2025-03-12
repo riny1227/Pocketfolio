@@ -588,7 +588,7 @@ export default function Mypage() {
                                     image={card.coverImage ? card.coverImage : exampleImg}
                                     name={card.name}
                                     views={card.views}
-                                    likes={card.likes}
+                                    likes={card.likesCount}
                                     hoverMode={activeTab === "portfolio" ? "mypage" : "home"}
                                     isBookmarked={card.isBookmarked}
                                     onBookmarkChange={() => handleBookmarkToggle(card.id)}
@@ -598,7 +598,7 @@ export default function Mypage() {
                     </CardsContainer>
 
                     {/* 포트폴리오 상세 페이지 모달 */}
-                    {selectedCard && <PortfolioDetailModal card={selectedCard} onClose={closeModal} />}
+                    {selectedCard && <PortfolioDetailModal portfolioId={selectedCard.id} onClose={closeModal} />}
                 </MypageRightContainer>
             </MypageItemContainer>
 
