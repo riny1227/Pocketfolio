@@ -4,7 +4,7 @@ import styled from "styled-components";
 import Card from '../components/share/Card';
 import Carousel from '../components/share/Carousel';
 import Filter from '../components/Filter';
-import { fetchRecommendPortfolios, fetchJobList, fetchFilteredPortfolios, fetchPortfolios } from '../api/HomeApi';
+import { fetchJobList, fetchFilteredPortfolios, fetchPortfolios } from '../api/HomeApi';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../imgs/example.png'
@@ -48,14 +48,65 @@ export default function Home() {
     const [selectedCard, setSelectedCard] = useState(null);
 
     // 카드 데이터와 북마크 상태
-    const [cards, setCards] = useState([
-        { id: 1, title: "포트폴리오 1", name: "1", views: 1234, likes: 567, isBookmarked: false },
-        { id: 2, title: "포트폴리오 2", name: "2", views: 5678, likes: 890, isBookmarked: false },
-        { id: 3, title: "포트폴리오 3", name: "3", views: 910, likes: 123, isBookmarked: false },
-        { id: 4, title: "포트폴리오 4", name: "4", views: 1234, likes: 567, isBookmarked: false },
-        { id: 5, title: "포트폴리오 5", name: "5", views: 5678, likes: 890, isBookmarked: false },
-        { id: 6, title: "포트폴리오 6", name: "6", views: 910, likes: 123, isBookmarked: false },
-    ]);
+    const [cards, setCards] = useState([]);
+
+    // 임시 카드 데이터
+    const exampleCards = [
+        {
+            id: 301,
+            title: "포트폴리오 A",
+            thumbnail: "",
+            userName: "사용자1",
+            views: 320,
+            likes: 50,
+            isBookmarked: false
+        },
+        {
+            id: 302,
+            title: "포트폴리오 B",
+            thumbnail: "",
+            userName: "사용자2",
+            views: 275,
+            likes: 45,
+            isBookmarked: false
+        },
+        {
+            id: 303,
+            title: "포트폴리오 C",
+            thumbnail: "",
+            userName: "사용자3",
+            views: 210,
+            likes: 40,
+            isBookmarked: false
+        },
+        {
+            id: 304,
+            title: "포트폴리오 D",
+            thumbnail: "",
+            userName: "사용자4",
+            views: 190,
+            likes: 38,
+            isBookmarked: false
+        },
+        {
+            id: 305,
+            title: "포트폴리오 E",
+            thumbnail: "",
+            userName: "사용자5",
+            views: 200,
+            likes: 35,
+            isBookmarked: false
+        },
+        {
+            id: 306,
+            title: "포트폴리오 F",
+            thumbnail: "",
+            userName: "사용자6",
+            views: 180,
+            likes: 30,
+            isBookmarked: false
+        }
+    ];
 
     const handleCardClick = (card) => {
         setSelectedCard(card);
@@ -76,18 +127,20 @@ export default function Home() {
         );
     };
 
-    // 추천 포트폴리오 조회 api 연결 - 테스트
+    // 정렬된 포트폴리오 조회 결과 가져오기 (기본 - 최신순)
     useEffect(() => {
-        const getRecommendPortfolios = async () => {
+        const getPortfolios = async () => {
             try {
-                const data = await fetchRecommendPortfolios();
-                console.log('추천 포트폴리오 조회 data : ', data);
+                const response = await fetchPortfolios();
+                const data = response?.data || []; // API 응답 구조에 맞게 수정
+                setCards(data.length > 0 ? data : exampleCards); // 데이터가 없으면 예시 데이터 사용
             } catch (error) {
-                console.error('getRecommendPortfolios 에러 발생 : ', error)
+                console.error("getPortfolios 에러 발생 : ", error);
+                setCards(exampleCards); // API 요청 실패 시 예시 데이터 사용
             }
-        };
+        }
 
-        getRecommendPortfolios();
+        getPortfolios();
     }, []);
 
     // 검색 api 실행 결과 가져오기
@@ -104,7 +157,7 @@ export default function Home() {
             <Carousel />
 
             {/* 필터 */}
-            <Filter />
+            <Filter setCards={setCards}/>
 
             {/* 카드 */}
             <CardsContainer>
@@ -112,8 +165,8 @@ export default function Home() {
                     <CardItem key={index} onClick={() => handleCardClick(card)}>
                         <Card
                             title={card.title}
-                            image={card.thumnail || exampleImg} // 썸네일 없다면 예시 이미지 사용
-                            name={card.name}
+                            image={card.thumbnail || exampleImg} // 썸네일 없다면 예시 이미지 사용
+                            name={card.userName} // API 명세서에 맞게 변경
                             views={card.views}
                             likes={card.likes}
                             hoverMode={hoverMode}

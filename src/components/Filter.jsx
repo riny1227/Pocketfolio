@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import InputAndDropdown from "./share/InputAndDropdown";
-import { fetchJobList } from "../api/HomeApi";
+import { fetchJobList, fetchFilteredPortfolios, fetchPortfolios } from "../api/HomeApi";
 
 // 직군 선택 목록
 const jobHierarchy = {
@@ -10,7 +10,7 @@ const jobHierarchy = {
 };
 
 // 정렬 목록
-const sortHierarchy = ['인기순', '최신순', '좋아요순', '조회순'];
+const sortHierarchy = ['최신순', '인기순', '좋아요순', '조회순'];
 
 // 날짜 목록
 const dateHierarchy = ['1주일', '1개월', '6개월', '1년', '3년'];
@@ -315,12 +315,14 @@ const SortSelector = styled.button`
     }
 `;
 
-export default function Filter() {
+export default function Filter({ setCards }) {
     const [isJopVisible, setJopVisible] = useState(false); // 직군선택 드롭다운 표시 -> true일 때 보임, false일 때 안보임
     const [selectedJobs, setSelectedJobs] = useState([]); // 선택된 직군들 저장
     const [parentState, setParentState] = useState([]); // 부모 input(개발자, 디자이너) 상태 저장 - checked, indeterminate, unchecked
+
     const [isSortVisible, setSortVisible] = useState(false); // 정렬 드롭다운 표시 -> true일 때 보임, false일 때 안보임
     const [selectedSort, setSelectedSort] = useState(sortHierarchy[0]); // 선택된 정렬 방식 저장
+
     const [isFilterVisible, setFilterVisible] = useState(false); // 상세 필터 목록 표시 -> true일 때 보임, false일 때 안보임
     
     const [companyQuery, setCompanyQuery] = useState(""); // 기업 검색어 저장
@@ -332,17 +334,19 @@ export default function Filter() {
     const [filters, setFilters] = useState({
         tag: "",
         company: "",
-        date: "",
+        dateRange: "",
     });
 
     // 기업 드롭다운 표시 -> true일 때 보임, false일 때 안보임
     // const [isCompanyVisible, setCompanyVisible] = useState(false);
 
+    /* -----필터 버튼 관련----- */
     // 필터 버튼 클릭하면 상세 필터 목록 나타나거나 사라지도록 하는 함수
     const clickFilterButton = () => {
         setFilterVisible((prevState) => !prevState);
     };
 
+    /* -----직무선택 관련----- */
     // 직무선택 버튼 클릭하면 버튼 디자인 변경하고 정렬 드롭다운 보여주는 함수
     const clickJobButton = () => {
         setJopVisible((prevState) => !prevState);
@@ -395,6 +399,40 @@ export default function Filter() {
         return `${selected[0]} 외 ${selected.length - 1}`;
     };
 
+    /* -----정렬 관련----- */
+    // 선택한 정렬 기준을 API 정렬값으로 변환
+    const getSortParam = (sortOption) => {
+        switch (sortOption) {
+            case '최신순':
+                return 'createdAt'; // 기본값
+            case '좋아요순':
+                return 'likes';
+            case '조회순':
+                return 'views';
+            case '인기순': // 임시
+                return 'views';
+            default:
+                return 'createdAt';
+        }
+    };
+
+    // 정렬 변경 시 API 호출
+    useEffect(() => {
+        const getSortedPortfolios = async () => {
+            try {
+                const sortParam = getSortParam(selectedSort);
+                const response = await fetchPortfolios(sortParam);
+                const data = response?.data || []; // API 응답 구조에 맞게 수정
+                setCards(data);
+            } catch (error) {
+                console.error("getSortedPortfolios 에러 발생 : ", error);
+            }
+        };
+
+        getSortedPortfolios();
+    }, [selectedSort, setCards]);
+
+
     // 정렬 버튼 클릭하면 버튼 디자인 변경하고 정렬 드롭다운 보여주는 함수
     const clickSortButton = () => {
         setSortVisible((prevState) => !prevState);
@@ -406,6 +444,7 @@ export default function Filter() {
         setSortVisible(false); // 선택 후 드롭다운 닫기
     };
 
+    /* -----상세 필터 관련----- */
     // 상세 필터 state 값을 관리하는 함수
     const handleFilterChange = (key, value) => {
         setFilters((prevFilters) => ({
@@ -416,6 +455,21 @@ export default function Filter() {
 
     // 적용된 필터 개수 계산 (빈 값은 카운트X)
     const filterCount = Object.values(filters).filter((value) => value !== "").length;
+
+    // 상세 필터 값에 따라 필터링된 포트폴리오 목록 조회 (1초 후 조회)
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(async () => {
+            try {
+                const response = await fetchFilteredPortfolios(filters.tag, filters.company, filters.dateRange);
+                const data = response?.data || [];
+                setCards(data);
+            } catch (error) {
+                console.error("getFilteredPortfolios 에러 발생 : ", error);
+            }
+        }, 1000);
+    
+        return () => clearTimeout(delayDebounceFn); // 이전 타이머 제거
+    }, [filters]);
 
     // 기업 필터에서 검색어를 이용해 기업 검색
     // **********api 연결할 때는 백엔드 방식에 맞춰서 코드 변경 (현재는 프론트에서 필터링 하도록 되어있음)************
@@ -513,6 +567,9 @@ export default function Filter() {
 
         fetchData(); // 페이지 로드 시 실행
     }, []); // 빈 배열을 전달하여 마운트 시 한 번만 실행
+
+    // 정렬된 포트폴리오 조회 api 연결
+
 
     return (
         <>

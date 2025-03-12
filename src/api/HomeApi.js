@@ -17,7 +17,7 @@ export const fetchRecommendPortfolios = async () => {
 // 직군(회사) 리스트 조회
 export const fetchJobList = async (query) => {
     try {
-        const response = await axios.get(`${BASE_URL}/jobs/categories`, {
+        const response = await axios.get(`${BASE_URL}/home/jobs/categories`, {
             params: { q: encodeURIComponent(query) }
         });
 

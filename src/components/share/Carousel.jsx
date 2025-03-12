@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import example from '../../imgs/example.png';
+import { fetchRecommendPortfolios } from '../../api/HomeApi';
 
 // 캐러셀 컨테이너
 const CarouselContainer = styled.div`
@@ -20,11 +21,11 @@ const SlideContainer = styled.div`
 const Slide = styled.div`
     width: 100%;
     flex-shrink: 0;
-    height: 240px; // 고정된 높이 설정
+    height: 240px;
     img {
         width: 100%;
-        height: 100%; // 부모의 높이에 맞춤
-        object-fit: cover; // 이미지 비율 유지하면서 컨테이너 채우기
+        height: 100%;
+        object-fit: cover;
     }
 `;
 
@@ -35,7 +36,7 @@ const DotsContainer = styled.div`
     gap: 8px;
     justify-content: center;
     position: absolute;
-    bottom: 16px; // 캐러셀 하단에서 16px 위에 배치
+    bottom: 16px;
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
@@ -57,19 +58,32 @@ const Dot = styled.button`
     }
 `;
 
-const images = [example, example, example, example, example];
-
 export default function Carousel() {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [recommendedData, setRecommendedData] = useState([]);
 
-    // 자동 슬라이드 (5초마다)
+    // 추천 포트폴리오 조회 api 연결
+    useEffect(() => {
+        const getRecommendPortfolios = async () => {
+            try {
+                const response = await fetchRecommendPortfolios();
+                if (response && response.data) {
+                    setRecommendedData(response.data);
+                }
+            } catch (error) {
+                console.error('getRecommendPortfolios 에러 발생 : ', error);
+            }
+        };
+        getRecommendPortfolios();
+    }, []);
+
+    // 자동 슬라이드 (5초마다 변경)
     useEffect(() => {
         const interval = setInterval(() => {
-            setCurrentIndex(prevIndex => (prevIndex + 1) % images.length);
-        }, 5000); // 5초마다 슬라이드 변경
-
-        return () => clearInterval(interval); // 컴포넌트가 unmount 될 때 interval 정리
-    }, []);
+            setCurrentIndex(prevIndex => (prevIndex + 1) % (recommendedData.length || 1));
+        }, 5000);
+        return () => clearInterval(interval);
+    }, [recommendedData]);
 
     // 슬라이드 이동 함수
     const goToSlide = (index) => {
@@ -77,25 +91,19 @@ export default function Carousel() {
     };
 
     return (
-        <div>
-            <CarouselContainer>
-                <SlideContainer style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
-                    {images.map((img, index) => (
-                        <Slide key={index}>
-                            <img src={img} alt={`Slide ${index + 1}`} />
-                        </Slide>
-                    ))}
-                </SlideContainer>
-                <DotsContainer>
-                {images.map((_, index) => (
-                    <Dot
-                        key={index}
-                        active={index === currentIndex}
-                        onClick={() => goToSlide(index)}
-                    />
+        <CarouselContainer>
+            <SlideContainer style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+                {(recommendedData.length > 0 ? recommendedData : [{ coverImage: example }]).map((item, index) => (
+                    <Slide key={index}>
+                        <img src={item.coverImage || example} alt={`Slide ${index + 1}`} />
+                    </Slide>
+                ))}
+            </SlideContainer>
+            <DotsContainer>
+                {(recommendedData.length > 0 ? recommendedData : [{ coverImage: example }]).map((_, index) => (
+                    <Dot key={index} active={index === currentIndex} onClick={() => goToSlide(index)} />
                 ))}
             </DotsContainer>
-            </CarouselContainer>
-        </div>
+        </CarouselContainer>
     );
 }
