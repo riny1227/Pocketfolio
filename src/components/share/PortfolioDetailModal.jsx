@@ -5,6 +5,7 @@ import { fetchPortfolioDetails } from '../../api/Portfolio/PortfolioDetailApi';
 import { deletePortfolio } from '../../api/Portfolio/PortfolioDeleteApi';
 import { useAuth } from '../../context/AuthContext';
 import { fetchLikeToPortfoilo } from '../../api/Portfolio/PortfolioLikesApi';
+import { getPortfolioList } from '../../api/MypageApi';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../../imgs/example.png';
@@ -375,12 +376,68 @@ const SimilarPortfolioContainer = styled.div`
 
 const PortfolioDetailModal = ({ portfolioId, onClose }) => {
     const { token } = useAuth();
+    const [currentPortfolioId, setCurrentPortfolioId] = useState(portfolioId);
     const [portfolio, setPortfolio] = useState(null); // 포트폴리오 데이터 상태
     const [isLoading, setIsLoading] = useState(true); // 로딩 상태
     const [error, setError] = useState(null); // 오류 상태
     const [isDeleting, setIsDeleting] = useState(false); // 삭제 상태
     const [$isLiked, setIsLiked] = useState(false); // 좋아요 상태 
     const navigate = useNavigate();
+
+    // 포트폴리오 목록을 불러와서 currentPortfolioId를 설정
+    useEffect(() => {
+        const loadPortfolioList = async () => {
+        try {
+            const list = await getPortfolioList(token);
+            // 목록의 첫 번째 포트폴리오의 ID를 사용
+            if (list && list.length > 0) {
+                setCurrentPortfolioId(list[0].id);
+            }
+        } catch (err) {
+            console.error('포트폴리오 목록을 불러오는데 실패했습니다:', err);
+            setError('포트폴리오 목록을 불러오는데 실패했습니다.');
+        }
+        };
+        loadPortfolioList();
+    }, [token]);
+
+    // 포트폴리오 데이터를 API에서 불러오는 useEffect
+    useEffect(() => {
+        // 모달이 열릴 때 스크롤 막기
+        document.body.style.overflow = "hidden";
+
+        const loadPortfolioDetails = async () => {
+            console.log('currentPortfolioId:', currentPortfolioId); // 현재 id 확인
+            setIsLoading(true);  // 새로운 요청이 시작될 때 로딩 상태 초기화
+            setError(null);  // 에러 메시지도 초기화
+
+            try {
+                const data = await fetchPortfolioDetails(currentPortfolioId, token);
+                console.log('포트폴리오 데이터:', data);
+
+                if (data) {
+                    setPortfolio(data);
+                    // 예시: likes 값이 0보다 크면 좋아요가 적용된 것으로 간주
+                    setIsLiked(data.likes > 0);
+                } else {
+                    setError('포트폴리오 데이터가 없습니다.');
+                }
+            } catch (error) {
+                setError('포트폴리오 상세 정보를 불러오는 데 실패했습니다.');
+            } finally {
+                setIsLoading(false); // 로딩 완료
+            }
+        };
+
+        if (currentPortfolioId) { // 유효한 ID일 때만 API 호출 
+            loadPortfolioDetails();
+        }
+
+        return () => {
+            // 모달이 닫힐 때 스크롤 복원
+            document.body.style.overflow = "auto";
+        }
+    }, [currentPortfolioId, token]); // portfolioId가 바뀔 때마다 실행
 
     // 모달 아닌 부분 눌렀을 때, 닫히도록
     const handleOverlayClick = (e) => {
@@ -391,7 +448,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
 
     // 공유 버튼 클릭시
     const handleShareClick = async () => {
-        const shareUrl = `https://pocketfolio.co.kr/api/portfolio/${portfolioId}`;
+        const shareUrl = `https://pocketfolio.co.kr/api/portfolio/${currentPortfolioId}`;
 
         navigator.clipboard.writeText(shareUrl) // 클립보드에 URL 복사
             .then(() => {
@@ -406,18 +463,18 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
     // 수정 버튼 클릭시
     const handleEditClick = () => {
         // 수정 페이지로 포트폴리오 정보를 전달하여 이동
-        navigate('/src/pages/WritePortfolio.jsx', { state: { portfolioId } });
-      };
+        navigate('/src/pages/WritePortfolio.jsx', { state: { portfolioId: currentPortfolioId } });
+    };
 
     // 삭제 버튼 클릭시 
     const handleDeleteClick = async () => {
         if (window.confirm('이 포트폴리오를 삭제하시겠습니까?')) {
             setIsDeleting(true);
             try {
-                const response = await deletePortfolio(portfolioId, token);
+                const response = await deletePortfolio(currentPortfolioId, token);
                 if (response) {
                     alert('포트폴리오가 삭제되었습니다.');
-                    onClose();
+                    window.location.reload();
                 }
             } catch (error) {
                 setError('포트폴리오 삭제 중 오류가 발생했습니다.');
@@ -431,7 +488,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
     const handleLikeClick = async () => {
         try {
             // 좋아요 추가/취소 API 호출
-            await fetchLikeToPortfoilo(portfolioId, token);
+            await fetchLikeToPortfoilo(currentPortfolioId, token);
             // API 호출 성공시 상태 토글
             setIsLiked(prev => !prev);
         } catch (error) {
@@ -440,46 +497,20 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
         }
     };
 
-    // 포트폴리오 데이터를 API에서 불러오는 useEffect
-    useEffect(() => {
-        const loadPortfolioDetails = async () => {
+    // 로딩 중, 오류 처리 및 데이터 표시
+    if (isLoading) {
+        return (
+            <ModalOverlay onClick={handleOverlayClick}>
+                <ModalContainer onClick={(e) => e.stopPropagation()}>
+                    <div style={{ padding: '20px', textAlign: 'center' }}>⏳ 로딩 중...</div>
+                </ModalContainer>
+            </ModalOverlay>
+        );
+    }
 
-            setIsLoading(true);  // 새로운 요청이 시작될 때 로딩 상태 초기화
-            setError(null);  // 에러 메시지도 초기화
-
-            try {
-                const data = await fetchPortfolioDetails(portfolioId, token);
-                setPortfolio(data); // 데이터를 상태에 저장
-                // 포트폴리오 데이터에 좋아요(isLiked)가 있다면 초기값 설정
-                if (data && typeof data.$isLiked !== 'undefined') {
-                    setIsLiked(data.$isLiked);
-                }
-            } catch (error) {
-                setError('포트폴리오 상세 정보를 불러오는 데 실패했습니다.');
-            } finally {
-                setIsLoading(false); // 로딩 완료
-            }
-        };
-
-        if (portfolioId) { // 유효한 ID일 때만 API 호출 
-            loadPortfolioDetails();
-        }
-    }, [portfolioId, token]); // portfolioId가 바뀔 때마다 실행
-
-    // // 로딩 중, 오류 처리 및 데이터 표시
-    // if (isLoading) {
-    //     return (
-    //         <ModalOverlay onClick={handleOverlayClick}>
-    //             <ModalContainer onClick={(e) => e.stopPropagation()}>
-    //                 <div style={{ padding: '20px', textAlign: 'center' }}>⏳ 로딩 중...</div>
-    //             </ModalContainer>
-    //         </ModalOverlay>
-    //     );
-    // }
-
-    // if (error) {
-    //     return <div>{error}</div>;
-    // }
+    if (error) {
+        return <div>{error}</div>;
+    }
 
     return (
         <ModalOverlay onClick={handleOverlayClick}>
@@ -504,15 +535,14 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
 
                         {/* 기본 정보 텍스트 컨테이너 */}
                         <InfoTextContainer>
-                            <ProjectNameText>프로젝트명</ProjectNameText>
-
+                            <ProjectNameText>{portfolio ? portfolio.title : '프로젝트명'}</ProjectNameText>
                             {/* 정보 텍스트 컨테이너(이름, 직군, 경력, 지원 기업) */}
                             <ProjectInfoContainer>
-                                <InfoText style={{ color: '#1570ef' }}>이름</InfoText>
-                                <InfoText>직군</InfoText>
-                                <InfoText>경력</InfoText>
-                                <InfoText>지원 기업</InfoText>
-                            </ProjectInfoContainer>   
+                                <InfoText style={{ color: '#1570ef' }}>{portfolio ? portfolio.user_name : '이름'}</InfoText>
+                                <InfoText>{portfolio ? portfolio.job : '직군'}</InfoText>
+                                <InfoText>{portfolio ? portfolio.experience : '경력'}</InfoText>
+                                <InfoText>{portfolio ? portfolio.applied_company : '지원 기업'}</InfoText>
+                            </ProjectInfoContainer>  
                         </InfoTextContainer>                 
                     </ProjectUserInfoContainer>
 
