@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import InputAndDropdown from "./share/InputAndDropdown";
+import { fetchJobList } from "../api/HomeApi";
 
 // 직군 선택 목록
 const jobHierarchy = {
@@ -321,11 +322,12 @@ export default function Filter() {
     const [isSortVisible, setSortVisible] = useState(false); // 정렬 드롭다운 표시 -> true일 때 보임, false일 때 안보임
     const [selectedSort, setSelectedSort] = useState(sortHierarchy[0]); // 선택된 정렬 방식 저장
     const [isFilterVisible, setFilterVisible] = useState(false); // 상세 필터 목록 표시 -> true일 때 보임, false일 때 안보임
-    const [companyOptions, setCompanyOptions] = useState([]); // 필터링된 기업 리스트
-    const [isCompanyVisible, setCompanyVisible] = useState(false); // 기업 드롭다운 표시 여부
+    
     const [companyQuery, setCompanyQuery] = useState(""); // 기업 검색어 저장
     const [isCompanySelected, setCompanySelected] = useState(false); // 기업 선택 여부
-
+    const [companyOptions, setCompanyOptions] = useState([]); // 필터링된 기업 리스트
+    const [isCompanyVisible, setCompanyVisible] = useState(false); // 기업 드롭다운 표시 여부
+    
     // 각 상세 필터 값 저장
     const [filters, setFilters] = useState({
         tag: "",
@@ -417,40 +419,100 @@ export default function Filter() {
 
     // 기업 필터에서 검색어를 이용해 기업 검색
     // **********api 연결할 때는 백엔드 방식에 맞춰서 코드 변경 (현재는 프론트에서 필터링 하도록 되어있음)************
-    const searchCompanies = async (query) => {
-        if (!query) {
-            setCompanyOptions([]); // 검색어 없으면 리스트 초기화
-            setCompanyVisible(false); // 드롭다운 숨기기
-            return;
-        }
+    // const searchCompanies = async (query) => {
+    //     if (!query) {
+    //         setCompanyOptions([]); // 검색어 없으면 리스트 초기화
+    //         setCompanyVisible(false); // 드롭다운 숨기기
+    //         return;
+    //     }
 
-        try {
-            const response = await fetch("/mockdata/Companies.json"); // JSON 파일에서 기업 리스트 불러오기
-            const data = await response.json();
+    //     try {
+    //         const response = await fetch("/mockdata/Companies.json"); // JSON 파일에서 기업 리스트 불러오기
+    //         const data = await response.json();
 
-            // 검색어를 포함하는 기업 필터링
-            const filteredCompanies = data.companies
-                .map((company) => company.companyName) // 기업명만 추출
-                .filter((name) => name.includes(query)); // 검색어 포함 여부 확인
+    //         // 검색어를 포함하는 기업 필터링
+    //         const filteredCompanies = data.companies
+    //             .map((company) => company.companyName) // 기업명만 추출
+    //             .filter((name) => name.includes(query)); // 검색어 포함 여부 확인
 
-            setCompanyOptions(filteredCompanies);
-            setCompanyVisible(true); // 입력 시 드롭다운 열기
-        } catch (error) {
-            console.error("기업 데이터 로드 실패:", error);
-            setCompanyOptions([]);
-        }
-    };
+    //         setCompanyOptions(filteredCompanies);
+    //         setCompanyVisible(true); // 입력 시 드롭다운 열기
+    //     } catch (error) {
+    //         console.error("기업 데이터 로드 실패:", error);
+    //         setCompanyOptions([]);
+    //     }
+    // };
 
-    // 검색어 입력 시 동작 (드롭다운 표시 + 기업 검색)
+    // const searchCompanies = async (query) => {
+    //     try {
+    //         const data = await fetchJobList(query);
+
+    //         setCompanyOptions(data);
+    //         setCompanyVisible(true); // 입력 시 드롭다운 열기
+    //     } catch (error) {
+    //         console.error("searchCompanies 에러 발생 : ", error);
+    //         setCompanyOptions([]);
+    //     }
+    // }
+
+    // 검색어 변경 시 API 요청 (0.5초 지연)
+    // useEffect(() => {
+    //     if (!companyQuery.trim()) {
+    //         setCompanyOptions([]);
+    //         setCompanyVisible(false);
+    //         return;
+    //     }
+
+    //     const delayDebounceFn = setTimeout(async () => {
+    //         try {
+    //             const data = await fetchJobList(companyQuery);
+
+    //             console.log("API 응답 데이터:", data); // 응답 데이터 로그 출력
+
+    //             // API 응답이 객체라면 jobs 배열이 있는지 확인
+    //             const jobList = Array.isArray(data) ? data : data.jobs || [];
+
+    //             setCompanyOptions(jobList);
+    //             setCompanyVisible(jobList.length > 0); // 검색 결과 있으면 드롭다운 표시
+    //         } catch (error) {
+    //             console.error("searchCompanies 에러 발생 : ", error);
+    //             setCompanyOptions([]);
+    //         }
+    //     }, 500);
+
+    //     return () => clearTimeout(delayDebounceFn); // 이전 타이머 제거
+    // }, [companyQuery]);
+
+    // 검색어 입력 처리
     const handleCompanyInputChange = (value) => {
         setCompanyQuery(value);
-        // setCompanySelected(false); // 기업 선택 해제 (새로운 검색 가능하도록)
-        searchCompanies(value);
-
-        if (isCompanySelected === true) {
-            setFilters(prev => ({ ...prev, company: value }))
-        }
+        setCompanySelected(false);
     };
+
+    // // 검색어 입력 시 동작 (드롭다운 표시 + 기업 검색)
+    // const handleCompanyInputChange = (value) => {
+    //     setCompanyQuery(value);
+    //     // setCompanySelected(false); // 기업 선택 해제 (새로운 검색 가능하도록)
+    //     searchCompanies(value);
+
+    //     if (isCompanySelected === true) {
+    //         setFilters(prev => ({ ...prev, company: value }))
+    //     }
+    // };
+
+    // 직군 리스트 api 테스트
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await fetchJobList("삼성"); // "삼성" 키워드로 직군 리스트 조회
+                console.log("API에서 받아온 직군 리스트:", data);
+            } catch (error) {
+                console.error("API 요청 중 에러 발생:", error);
+            }
+        };
+
+        fetchData(); // 페이지 로드 시 실행
+    }, []); // 빈 배열을 전달하여 마운트 시 한 번만 실행
 
     return (
         <>

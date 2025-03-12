@@ -577,7 +577,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
                                 portfolio.attachments.slice(0, 3).map((item, index) => (
                                     <PortfolioImg 
                                         key={index}
-                                        onClick={() => navigate(`/portfolio/${portfolioId}`)}
+                                        onClick={() => navigate(`https://pocketfolio.co.kr/api/portfolio/${portfolioId}`)}
                                     >
                                         <img 
                                             src={typeof item === 'object' ? item.url : item} 
@@ -587,7 +587,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
                                 ))
                             ) : (
                                 // 첨부파일이 없을 경우 기본 예시 이미지로 대체
-                                <PortfolioImg onClick={() => navigate(`/portfolio/${portfolioId}`)}>
+                                <PortfolioImg onClick={() => navigate(`https://pocketfolio.co.kr/api/portfolio/${portfolioId}`)}>
                                     <img src={exampleImg} alt="포트폴리오 기본 이미지" />
                                 </PortfolioImg>
                             )}
