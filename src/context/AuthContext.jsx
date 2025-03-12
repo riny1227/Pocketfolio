@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 import { login as loginApi } from "../api/LoginApi";
 import { logout as logoutApi } from "../api/LogoutApi";
@@ -8,7 +8,19 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [token, setToken] = useState(localStorage.getItem('jwtToken') || null);
+    const [token, setToken] = useState(null);
+
+    // 로컬 스토리지에서 초기 토큰을 불러와서 로그인 상태 체크
+    useEffect(() => {
+        const savedToken = localStorage.getItem('jwtToken');
+        if (savedToken) {
+            setIsLoggedIn(true);
+            setToken(savedToken);
+        } else {
+            setIsLoggedIn(false);
+            setToken(null);
+        }
+    }, []);
 
     // 로그인 함수
     const login = async (email, password) => {
@@ -18,12 +30,10 @@ export function AuthProvider({ children }) {
             if (response.token) {
                 setIsLoggedIn(true);
                 setToken(response.token);
-
                 localStorage.setItem('jwtToken', response.token); // 토큰을 localStorage에 저장
                 
                 console.log("로그인 성공:", response.message);
                 alert("로그인에 성공하였습니다.");
-
                 navigate("/"); // 메인 화면으로 이동
             }
         } catch (error) {
