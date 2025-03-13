@@ -36,11 +36,12 @@ const DetailWrapper = styled.div`
 // 타이틀 + 추가 버튼
 const TitleWrapper = styled.div`
     display: flex;
-    width: 1280px;
+    width: 1264px;
     justify-content: space-between;
     align-items: center;
     align-self: stretch;
     margin-top: 99px;
+    padding: 0 8px;
 `;
 
 // 항목 타이틀 텍스트
@@ -60,7 +61,6 @@ const AddButton = styled.button`
     padding: 7px 20px;
     justify-content: center;
     align-items: center;
-    gap: 10px;
     border-radius: 8px;
     border: 1px solid #E6E6E6;
     background: #F8F8F8;
@@ -308,16 +308,30 @@ const NumCount = styled.span`
     line-height: 24px;
 `;
 
-// 활동사항 삭제 버튼
+// 삭제 버튼 스타일
 const DeleteButton = styled.button`
-    width: 24px;
-    height: 24px;
-    flex-shrink: 0;
-    background-color: transparent;
-    border: none;
-    padding: 0;
+    padding: 7px 20px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    border: 1px solid #FECDCA;
+    background: #FEF3F2;
     cursor: pointer;
-    margin-left: 570px;
+    box-sizing: border-box;
+    margin-left: 1200px;
+
+    // 버튼 텍스트 스타일 
+    color: #F04438;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: 'Pretendard-Regular';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+
+    &:hover{
+        background: #FEE4E2;
+    }
 `;
 
 // 프로필 정보 저장 버튼
@@ -647,7 +661,7 @@ export default function MypageDetail() {
                         {/* 추가된 활동사항 항목들을 렌더링 */}
                         {activities.map((activity, index) => (
                             <div key={index}>
-                                <div style={{ marginBottom: '20px' }}>
+                                <div>
                                     <ContentOneWrapper>
                                         <ContentTitleText>활동기간</ContentTitleText>
                                         <DatePickerContainer>
@@ -702,16 +716,10 @@ export default function MypageDetail() {
                                                 </IconStyle>
                                             </StyledDatePickerWrapper>
                                         </DatePickerContainer>
-                                        <DeleteButton onClick={() => handleDeleteActivity(activity.activity_id, index)}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                                <circle cx="12" cy="11.999" r="9" stroke="#989BA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                <path d="M9 12H15" stroke="#989BA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                        </DeleteButton>
                                     </ContentOneWrapper>
                                 </div>
-                                <InfoLine />
-                                <div style={{ marginTop: '20px' }}>
+                                <DeleteButton onClick={() => handleDeleteActivity(activity.activity_id, index)}>삭제</DeleteButton>
+                                <div>
                                     <ContentOneWrapper>
                                         <ContentTitleText>활동명</ContentTitleText>
                                         <StyledActivityInput
