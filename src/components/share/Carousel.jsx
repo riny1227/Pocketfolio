@@ -71,7 +71,7 @@ export default function Carousel() {
                     setRecommendedData(response.data);
                 }
             } catch (error) {
-                console.error('getRecommendPortfolios 에러 발생 : ', error);
+                // console.error('getRecommendPortfolios 에러 발생 : ', error);
             }
         };
         getRecommendPortfolios();

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
+import profileImage from "../../imgs/Profile.png";
 
 // 카드 컴포넌트 컨테이너
 const CardContainer = styled.div`
@@ -158,7 +159,7 @@ const LikesInfo = styled.div`
     }
 `;
 
-export default function Card ({ image, title, userImage, name, views, likes, hoverMode, isBookmarked, onBookmarkChange }){
+export default function Card ({ image, title, userImage = profileImage, name, views, likes, hoverMode, isBookmarked, onBookmarkChange }){
     const handleBookmarkClick = (e) => {
         e.stopPropagation();  // 이벤트 전파 방지
         onBookmarkChange();   // 북마크 상태 변경

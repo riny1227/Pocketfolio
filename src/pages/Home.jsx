@@ -135,7 +135,7 @@ export default function Home() {
                 const data = response?.data || []; // API 응답 구조에 맞게 수정
                 setCards(data.length > 0 ? data : exampleCards); // 데이터가 없으면 예시 데이터 사용
             } catch (error) {
-                console.error("getPortfolios 에러 발생 : ", error);
+                // console.error("getPortfolios 에러 발생 : ", error);
                 setCards(exampleCards); // API 요청 실패 시 예시 데이터 사용
             }
         }
