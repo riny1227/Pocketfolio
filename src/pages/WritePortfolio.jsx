@@ -9,6 +9,8 @@ import InputAndDropdown from "../components/share/InputAndDropdown";
 import { create, uploadAttachments, uploadCover } from "../api/Portfolio/PortfolioUploadApi";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { getCompanies } from "../api/Portfolio/PortfolioUploadApi";
+import debounce from "lodash.debounce";
 
 // 한국어 로케일 등록
 registerLocale("ko", ko);
@@ -360,8 +362,8 @@ const CompanyInput = styled.input`
     }
 `;
 
-// 첨부 파일 컨테이너
-const FileContainer = styled.div`
+// 이미지 첨부 컨테이너
+const ImageFileContainer = styled.div`
     display: flex;
     align-items: center;
     align-self: stretch;
@@ -369,8 +371,8 @@ const FileContainer = styled.div`
     height: 56px;
 `;
 
-// 첨부 파일 업로드 + 버튼 컨테이너
-const UploadFileContainer = styled.div`
+// 이미지 파일 업로드 + 버튼 컨테이너
+const UploadImageContainer = styled.div`
     display: flex;
     width: 100%;
     height: 56px;
@@ -385,8 +387,8 @@ const UploadFileContainer = styled.div`
     position: relative;
 `;
 
-// "첨부파일 업로드" 텍스트
-const FileUploadText = styled.span`
+// "이미지 파일 업로드" 텍스트
+const ImageFileUploadText = styled.span`
     color: #909090;
     width: 1020px;
     font-family: "Pretendard-regular";
@@ -394,6 +396,17 @@ const FileUploadText = styled.span`
     font-style: normal;
     font-weight: 400;
     line-height: 24px; /* 162.5% */
+    letter-spacing: -0.096px;
+`;
+
+// 업로드된 파일 이름용 컴포넌트 (파일이 있을 때)
+const UploadedFileName = styled.span`
+    color: #222;
+    width: 1020px;
+    font-family: "Pretendard-regular";
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
     letter-spacing: -0.096px;
 `;
 
@@ -535,14 +548,30 @@ export default function WritePortfolio() {
     const [isFormComplete, setIsFormComplete] = useState(false);
     const [coverImage, setCoverImage] = useState(null);
     const [attachments, setAttachments] = useState([]);
+    const [companyList, setCompanyList] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
 
     const { portfolioData } = location.state || {}; // PortfolioDetailModal에서 전달받은 데이터
 
+    // API 호출 (디바운스 적용)
+    const fetchCompanies = debounce(async (query) => {
+        if (!query) {
+            setCompanyList([]); // 입력값이 없을 경우 리스트 초기화
+            return;
+        }
+        
+        try {
+            const results = await getCompanies(query, token);
+            setCompanyList(results);
+        } catch (error) {
+            console.error("기업 검색 실패:", error);
+        }
+    }, 300); // 300ms 지연 후 실행
+
     useEffect(() => {
         if (token) {
-            console.log("Fetched token:", token);
+            // console.log("Fetched token:", token);
             if (portfolioData) {
                 setTitle(portfolioData.title);
                 setRole(portfolioData.role);
@@ -554,9 +583,11 @@ export default function WritePortfolio() {
                 setEndDate(new Date(portfolioData.durationEnd));
                 setImagePreview(portfolioData.coverImage || exampleImage);
                 setFileName(portfolioData.attachments?.[0]?.name || '');
+                fetchCompanies(company);
+                console.log("현재 기업 리스트:", companyList);
             }
         }
-    }, [token, portfolioData]);
+    }, [token, portfolioData, company, fetchCompanies, companyList]);
     
     useEffect(() => {
         // 모든 필드가 채워졌는지 확인(URL, 간단설명 제외)
@@ -583,12 +614,47 @@ export default function WritePortfolio() {
         }
     };
 
-    // 첨부파일 업로드 핸들러
+    // 이미지 파일 업로드 핸들러
     const handleFileUpload = (e) => {
-        const files = Array.from(e.target.files);
+        let files = Array.from(e.target.files);
+        if (files.length > 10) {
+            alert("최대 10개까지만 첨부할 수 있습니다.");
+            files = files.slice(0, 10);
+        }
         setAttachments(files);
-        setFileName(e.target.files[0]?.name || '');
+        if (files.length === 1) {
+            setFileName(files[0].name);
+        } else if (files.length > 1) {
+            setFileName(`${files[0].name} 외 ${files.length - 1}개의 파일이 선택됨`);
+        } else {
+            setFileName('');
+        }
     };
+
+     // 브라우저의 기본 드래그 동작 막기
+    const handleDragOver = (e) => {
+        e.preventDefault();
+    };
+
+    // 드래그 앤 드롭으로 이미지 첨부 
+    const handleDrop = (e) => {
+        e.preventDefault();
+        let files = Array.from(e.dataTransfer.files);
+        
+        if (files.length > 10) {
+            alert("최대 10개까지만 첨부할 수 있습니다.");
+            files = files.slice(0, 10);
+        }
+        
+        setAttachments(files);
+        if (files.length === 1) {
+            setFileName(files[0].name);
+        } else if (files.length > 1) {
+            setFileName(`${files[0].name} 외 ${files.length - 1}개의 파일이 선택됨`);
+        } else {
+            setFileName('');
+        }
+      };
 
     // 제출 핸들러
     const handleSubmit = async () => {
@@ -773,12 +839,45 @@ export default function WritePortfolio() {
                     </CompanyInputContainer>
                 </CompanyContainer>
 
-                {/* 첨부파일 컨테이너 */}
-                <FileContainer>
-                    <ContentText style={{  }}>첨부 파일</ContentText>
+                {/* 지원 기업 컨테이너 */}
+                {/* <JobContainer>
+                    <ContentText style={{  }}>지원 기업</ContentText>
                     <ContentText style={{ color: '#1570EF', marginRight: '15px'}}>*</ContentText>
-                    <UploadFileContainer>
-                        <FileUploadText>{fileName || '첨부파일 업로드'}</FileUploadText> {/* 업로드한 파일 이름 표시 */}
+                    <JobWrapper>
+                        <InputAndDropdown
+                            readOnly={false}
+                            placeholder="기업명 검색"
+                            value={company}
+                            setValue={(value) => {
+                                setCompany(value);
+                                fetchCompanies(value);
+                            }}
+                            width="561px"
+                            data={companyList}
+                            iconSvg={null}
+                            hasToggle={false} // 토글 버튼 활성화
+                            placeholderSize="16px"  // placeholder 크기를 16px로 설정
+                            fontSize="16px"
+                            height="56px"  // height 값을 56px로 설정
+                        />
+                        <IconStyle style={{top: "16px"}}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M21 21L15.0001 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="#989BA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </IconStyle>
+                    </JobWrapper>
+                </JobContainer>                */}
+
+                {/* 이미지 파일 첨부 컨테이너 */}
+                <ImageFileContainer>
+                    <ContentText style={{  }}>이미지</ContentText>
+                    <ContentText style={{ color: '#1570EF', marginRight: '34px'}}>*</ContentText>
+                    <UploadImageContainer onDragOver={handleDragOver} onDrop={handleDrop}>
+                        {fileName ? (
+                            <UploadedFileName>{fileName}</UploadedFileName>
+                        ) : (
+                            <ImageFileUploadText>이미지 파일 업로드 (이미지 파일들을 드래그 하거나 업로드 버튼을 클릭하세요)</ImageFileUploadText>
+                        )}
                         <UploadButton>
                             <label htmlFor="file-upload" style={{cursor: 'pointer'}}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -790,14 +889,14 @@ export default function WritePortfolio() {
                                 id="file-upload"
                                 type="file"
                                 accept="*/*"
+                                multiple
                                 onChange={(e) => {
-                                    handleFileUpload(e); 
-                                    setFileName(e.target.files[0]?.name || ''); }}
+                                    handleFileUpload(e); }}
                                 style={{ display: 'none' }} // 파일 선택 버튼 숨기기
                             />
                         </UploadButton>
-                    </UploadFileContainer>
-                </FileContainer>
+                    </UploadImageContainer>
+                </ImageFileContainer>
 
                 {/* URL 컨테이너 */}
                 <URLContainer>

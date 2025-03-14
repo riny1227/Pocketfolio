@@ -1,3 +1,4 @@
+// 포트폴리오 상세 조회 API
 export const fetchPortfolioDetails = async (portfolioId, token) => {
     try {
         console.log("Fetching portfolio details for ID:", portfolioId);
@@ -11,28 +12,30 @@ export const fetchPortfolioDetails = async (portfolioId, token) => {
         });
 
         console.log("API Response:", response);
-
+    
         if (!response.ok) {
-            throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+            throw new Error('포트폴리오 상세 조회에 실패했습니다. 다시 시도해 주세요.');
         }
 
         const data = await response.json();
-        console.log("Fetched Data:", data);
 
         return {
-            id: data.id || 0,
-            title: data.title || "제목 없음",
-            user_name: data.user_name || "알 수 없음",
-            cover_image: data.cover_image || "",
-            likes: data.likes || 0,
-            views: data.views || 0,
-            description: data.description || "설명이 없습니다.",
-            attachments: data.attachments || [],
-            tags: data.tags || [],
-            comments: data.comments || []
+            id: data.id,
+            title: data.title,
+            role: data.role,
+            job: data.job,
+            company: data.company,
+            cover_image: data.cover_image,
+            likes: data.likes,
+            views: data.views,
+            description: data.description,
+            attachments: data.attachments,
+            url: data.url,
+            tags: data.tags,
+            comments: data.comments,
         };
     } catch (error) {
-        console.error("Error fetching portfolio details:", error);
+        console.error('포트폴리오 상세 조회 에러:', error);
         throw error;
     }
 };
