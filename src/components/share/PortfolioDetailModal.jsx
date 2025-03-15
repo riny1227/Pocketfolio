@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 import { fetchPortfolioDetails } from '../../api/Portfolio/PortfolioDetailApi';
@@ -6,6 +6,8 @@ import { deletePortfolio } from '../../api/Portfolio/PortfolioDeleteApi';
 import { useAuth } from '../../context/AuthContext';
 import { fetchLikeToPortfoilo } from '../../api/Portfolio/PortfolioLikesApi';
 import { getPortfolioList } from '../../api/MypageApi';
+import { getUserInfo } from '../../api/MypageApi';
+import { fetchRecommendPortfolios } from '../../api/HomeApi';
 
 // 대체 이미지 사진 사용
 import exampleImg from '../../imgs/example.png';
@@ -162,14 +164,15 @@ const SBGIconStyle = styled.button`
     justify-content: center;
     align-items: center;
     border-radius: 20px;
-    border: 1.25px solid #D5D5D5;
-    background: #FFF;
+    border: 1.25px solid ${props => props.active ? "none" : "#D5D5D5"};
+    background: ${props => props.active ? "#E8F1FD" : "#FFF"};
     cursor: pointer;
 
     svg {
         width: 20px;
         height: 20px;
         flex-shrink: 0;
+        fill: ${props => props.active ? "#1570EF" : "none"};
     };
 `;
 
@@ -246,6 +249,45 @@ const ModalImageContainer = styled.div`
     img {
         object-fit: cover; // 이미지 비율 유지하면서 컨테이너 채우기
     }
+`;
+
+// URL + 간단 설명 컨테이너
+const UrlMemoContainer = styled.div`
+    position: relative;
+    width: calc(100% - 208px);
+    height: auto;
+    flex-shrink: 0;
+    left: 50%;  // 부모 요소에서 수평 중앙 정렬
+    transform: translateX(-50%);  // 50%만큼 왼쪽으로 이동시켜서 정확히 중앙에 배치
+    box-sizing: border-box;
+`;
+
+const UrlLinkContainer = styled.div`
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+`;
+
+// 링크 아이콘 
+const LinkIconStyle = styled.div`
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    aspect-ratio: 1/1;
+`;
+
+// URL 텍스트 스타일
+const UrlTextStyle = styled.div`
+    color: #6C6C6C;
+
+    /* Title/Title4 */
+    font-family: 'Pretendard-Semibold';
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px; /* 120% */
+
+    cursor: pointer;
 `;
 
 // 사용자 정보 + 이미지 컨테이너
@@ -329,16 +371,39 @@ const SimpleIntroText = styled.div`
     line-height: 24px; /* 150% */
 `;
 
-// 사용자 포트폴리오 이미지 컨테이너 
-const UserPortfoliosContainer = styled.div`
-    width: calc(3 * 288px + 2 * 16px);
-    height: 200px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
+// 드래그 가능한 컨테이너
+const PortfolioImgsWrapper = styled.div`
+    // width: calc(3 * 288px + 2 * 16px);
+    width: 100%;
+    overflow: hidden;
     margin-top: 68px;
     margin-left: 520px;
-    justify-content: flex-end;
+`;
+
+// 첨부한 이미지 컨테이너  
+const PortfolioImgsContainer = styled.div`
+    // width: calc(3 * 288px + 2 * 16px);
+    // height: 200px;
+    // display: flex;
+    // align-items: center;
+    // gap: 16px;
+    // margin-top: 68px;
+    // margin-left: 520px;
+    // justify-content: flex-end;
+    display: flex;
+    gap: 16px;
+    cursor: grab;
+    scroll-behavior: smooth;
+    justify-content: ${props => props.alignRight ? 'flex-end' : 'flex-start'};
+
+    &.active {
+        cursor: grabbing;
+    }
+
+    /* 스크롤바 숨기기 */
+    &::-webkit-scrollbar {
+        display: none;
+    }
 `;
 
 // 포트폴리오 이미지 스타일
@@ -381,16 +446,62 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
     const [isLoading, setIsLoading] = useState(true); // 로딩 상태
     const [error, setError] = useState(null); // 오류 상태
     const [isDeleting, setIsDeleting] = useState(false); // 삭제 상태
-    const [$isLiked, setIsLiked] = useState(false); // 좋아요 상태 
+    const [isLiked, setIsLiked] = useState(false); // 좋아요 상태 
     const navigate = useNavigate();
+    const [name, setName] = useState("");
+    const [introduce, setIntroduce] = useState("");
+    const [job, setJob] = useState("");
+    const [company, setCompany] = useState("");
+    const [recommendPortfolios, setRecommendPortfolios] = useState([]);
+
+    // 드래그 관련 ref와 이벤트 핸들러
+    const sliderRef = useRef(null);
+    const isDown = useRef(false);
+    const startX = useRef(0);
+    const scrollLeftRef = useRef(0);
+
+    const handleMouseDown = (e) => {
+        isDown.current = true;
+        sliderRef.current.classList.add("active");
+        startX.current = e.pageX - sliderRef.current.offsetLeft;
+        scrollLeftRef.current = sliderRef.current.scrollLeft;
+    };
+
+    const handleMouseLeave = () => {
+        isDown.current = false;
+        sliderRef.current.classList.remove("active");
+    };
+
+    const handleMouseUp = () => {
+        isDown.current = false;
+        sliderRef.current.classList.remove("active");
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isDown.current) return;
+        e.preventDefault();
+        const x = e.pageX - sliderRef.current.offsetLeft;
+        const walk = (x - startX.current) * 1; // 드래그 감도 조절 가능
+        sliderRef.current.scrollLeft = scrollLeftRef.current - walk;
+    };
 
     // 포트폴리오 목록을 불러와서 currentPortfolioId를 설정
     useEffect(() => {
         const loadPortfolioList = async () => {
         try {
+            const userData = await getUserInfo(token);
+            setName(userData.name);
+            setIntroduce(userData.introduce);
+            setJob(userData.job);
+            setCompany(userData.company);
+            getRecommendPortfolios();
+
+            if (portfolioId) {
+                setCurrentPortfolioId(portfolioId);
+            }
             const list = await getPortfolioList(token);
             // 목록의 첫 번째 포트폴리오의 ID를 사용
-            if (list && list.length > 0) {
+            if (list && list.length > 0 && !currentPortfolioId) {
                 setCurrentPortfolioId(list[0].id);
             }
         } catch (err) {
@@ -399,7 +510,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
         }
         };
         loadPortfolioList();
-    }, [token]);
+    }, [currentPortfolioId, portfolioId, token]);
 
     // 포트폴리오 데이터를 API에서 불러오는 useEffect
     useEffect(() => {
@@ -417,7 +528,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
 
                 if (data) {
                     setPortfolio(data);
-                    // 예시: likes 값이 0보다 크면 좋아요가 적용된 것으로 간주
+                    // likes 값이 0보다 크면 좋아요가 적용된 것으로 간주
                     setIsLiked(data.likes > 0);
                 } else {
                     setError('포트폴리오 데이터가 없습니다.');
@@ -446,6 +557,16 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
         }
     };
 
+    // 추천 포트폴리오를 가져오는 함수
+    const getRecommendPortfolios = async () => {
+        try {
+            const data = await fetchRecommendPortfolios();
+            setRecommendPortfolios(data); // API 응답 데이터를 상태에 저장
+        } catch (error) {
+            console.error('추천 포트폴리오 로딩 실패:', error);
+        }
+    };
+
     // 공유 버튼 클릭시
     const handleShareClick = async () => {
         const shareUrl = `https://pocketfolio.co.kr/api/portfolio/${currentPortfolioId}`;
@@ -463,7 +584,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
     // 수정 버튼 클릭시
     const handleEditClick = () => {
         // 수정 페이지로 포트폴리오 정보를 전달하여 이동
-        navigate('/src/pages/WritePortfolio.jsx', { state: { portfolioId: currentPortfolioId } });
+        window.location.href = `https://pocketfolio.co.kr/portfolio/write-portfolio?portfolioId=${currentPortfolioId}`;
     };
 
     // 삭제 버튼 클릭시 
@@ -486,6 +607,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
 
     // 좋아요 버튼 클릭시
     const handleLikeClick = async () => {
+        const previousLikedState = isLiked; // 기존 상태 저장
         try {
             // 좋아요 추가/취소 API 호출
             await fetchLikeToPortfoilo(currentPortfolioId, token);
@@ -494,6 +616,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
         } catch (error) {
             console.error("좋아요 처리 중 오류:", error);
             alert("좋아요 처리 중 오류가 발생했습니다.");
+            setIsLiked(previousLikedState); // 실패 시 원래 상태로 복구
         }
     };
 
@@ -538,10 +661,10 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
                             <ProjectNameText>{portfolio ? portfolio.title : '프로젝트명'}</ProjectNameText>
                             {/* 정보 텍스트 컨테이너(이름, 직군, 경력, 지원 기업) */}
                             <ProjectInfoContainer>
-                                <InfoText style={{ color: '#1570ef' }}>{portfolio ? portfolio.user_name : '이름'}</InfoText>
-                                <InfoText>{portfolio ? portfolio.job : '직군'}</InfoText>
-                                <InfoText>{portfolio ? portfolio.experience : '경력'}</InfoText>
-                                <InfoText>{portfolio ? portfolio.applied_company : '지원 기업'}</InfoText>
+                                <InfoText style={{ color: '#1570ef' }}>{portfolio ? name : '이름'}</InfoText>
+                                <InfoText>{portfolio ? job : '직군'}</InfoText>
+                                {/* <InfoText>{portfolio ? portfolio.experience : '경력'}</InfoText> */}
+                                <InfoText>{portfolio ? company : '지원 기업'}</InfoText>
                             </ProjectInfoContainer>  
                         </InfoTextContainer>                 
                     </ProjectUserInfoContainer>
@@ -561,7 +684,7 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
                             </svg>
                         </SBGIconStyle>
                         {/* 좋아요 아이콘 */}
-                        <SBGIconStyle onClick={handleLikeClick}>
+                        <SBGIconStyle active = {isLiked} onClick={handleLikeClick}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                                 <path d="M17.5 6.6666C17.9444 6.6666 18.3333 6.83327 18.6666 7.1666C19 7.49994 19.1666 7.88883 19.1666 8.33327V9.99994C19.1666 10.0972 19.1561 10.2013 19.135 10.3124C19.1138 10.4235 19.0827 10.5277 19.0416 10.6249L16.5416 16.4999C16.4166 16.7777 16.2083 17.0138 15.9166 17.2083C15.625 17.4027 15.3194 17.4999 15 17.4999H8.33329C7.87496 17.4999 7.48274 17.3369 7.15663 17.0108C6.83051 16.6847 6.66718 16.2922 6.66663 15.8333V7.3541C6.66663 7.13188 6.7119 6.92022 6.80246 6.7191C6.89301 6.51799 7.0144 6.34077 7.16663 6.18744L11.6875 1.68744C11.8958 1.49299 12.1425 1.37494 12.4275 1.33327C12.7125 1.2916 12.9866 1.34022 13.25 1.4791C13.5133 1.61799 13.7044 1.81244 13.8233 2.06244C13.9422 2.31244 13.9663 2.56938 13.8958 2.83327L12.9583 6.6666H17.5ZM3.33329 17.4999C2.87496 17.4999 2.48274 17.3369 2.15663 17.0108C1.83051 16.6847 1.66718 16.2922 1.66663 15.8333V8.33327C1.66663 7.87494 1.82996 7.48272 2.15663 7.1566C2.48329 6.83049 2.87551 6.66716 3.33329 6.6666C3.79107 6.66605 4.18357 6.82938 4.51079 7.1566C4.83801 7.48383 5.00107 7.87605 4.99996 8.33327V15.8333C4.99996 16.2916 4.8369 16.6841 4.51079 17.0108C4.18468 17.3374 3.79218 17.5005 3.33329 17.4999Z" stroke="#909090" stroke-width="1.6"/>
                             </svg>
@@ -580,6 +703,26 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
                     <ModalImageContainer>
                         <img src={portfolio && portfolio.coverImage ? portfolio.coverImage : exampleImg} alt="썸네일" style={{ width: '100%', maxHeight: '447px' }} />
                     </ModalImageContainer>
+
+                    {/* URL + 간단설명 컨테이너*/}
+                    <UrlMemoContainer>
+                        <UrlLinkContainer>
+                            {/* URL 아이콘 */}
+                            {portfolio.url && (
+                            <LinkIconStyle>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M8 12H16M9 8H6C4.93913 8 3.92172 8.42143 3.17157 9.17157C2.42143 9.92172 2 10.9391 2 12C2 13.0609 2.42143 14.0783 3.17157 14.8284C3.92172 15.5786 4.93913 16 6 16H9M15 8H18C19.0609 8 20.0783 8.42143 20.8284 9.17157C21.5786 9.92172 22 10.9391 22 12C22 13.0609 21.5786 14.0783 20.8284 14.8284C20.0783 15.5786 19.0609 16 18 16H15" stroke="#1570EF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </LinkIconStyle>
+                            )}
+                            {/* URL 링크 */}
+                            <UrlTextStyle style={{marginLeft: '8px'}}>{portfolio.url}</UrlTextStyle>
+                        </UrlLinkContainer>
+                        
+                        {/* 간단 설명 */}
+                        {portfolio.description && (
+                        <UrlTextStyle style={{color: '#222', marginBottom: '64px'}}>{portfolio.description}</UrlTextStyle>)}
+                    </UrlMemoContainer>
                     
                     {/* 사용자 정보 + 이미지 컨테이너 */}
                     <UserInfoImageContainer>
@@ -593,49 +736,54 @@ const PortfolioDetailModal = ({ portfolioId, onClose }) => {
                                 </svg>
                             </BiggerProfileIcon>
 
-                            {/* 사용자명 + 채팅하기 컨테이너 */}
+                            {/* 사용자명 + 한줄소개 컨테이너 */}
                             <UserChatContainer>
-                                <UserNameText>사용자명</UserNameText>
+                                <UserNameText>{name}</UserNameText>
                                 {/* <FollowChatwButton>채팅하기</FollowChatwButton> */}
                             </UserChatContainer>
-                            <SimpleIntroText>어제의 나보다 오늘의 내가 1%라도 더 나은 사람이기를..</SimpleIntroText>
+                            {/* 한줄소개 컨테이너 */}
+                            <SimpleIntroText>{introduce}</SimpleIntroText>
                         </UserIntroContainer>
 
-                        {/* 사용자 포트폴리오 이미지 컨테이너 */}
-                        <UserPortfoliosContainer>
-                            {portfolio && portfolio.attachments && portfolio.attachments.length > 0 ? (
-                                portfolio.attachments.slice(0, 3).map((item, index) => (
-                                    <PortfolioImg 
-                                        key={index}
-                                        onClick={() => navigate(`https://pocketfolio.co.kr/api/portfolio/${portfolioId}`)}
-                                    >
-                                        <img 
-                                            src={typeof item === 'object' ? item.url : item} 
-                                            alt={`포트폴리오 ${index + 1}`} 
-                                        />
-                                    </PortfolioImg>
-                                ))
-                            ) : (
-                                // 첨부파일이 없을 경우 기본 예시 이미지로 대체
-                                <PortfolioImg onClick={() => navigate(`https://pocketfolio.co.kr/api/portfolio/${portfolioId}`)}>
-                                    <img src={exampleImg} alt="포트폴리오 기본 이미지" />
-                                </PortfolioImg>
+                        {/* 첨부한 이미지 컨테이너 */}
+                        <PortfolioImgsWrapper>
+                            {portfolio && portfolio.attachments && portfolio.attachments.length > 0 && (
+                                <PortfolioImgsContainer
+                                    ref={sliderRef}
+                                    onMouseDown={handleMouseDown}
+                                    onMouseMove={handleMouseMove}
+                                    onMouseUp={handleMouseUp}
+                                    onMouseLeave={handleMouseLeave}
+                                    alignRight={portfolio.attachments.length < 3}
+                                >
+                                    {portfolio.attachments.slice(0, 10).map((item, index) => (
+                                        <PortfolioImg 
+                                            key={index} 
+                                            onClick={() => window.open(item, '_blank')}
+                                        >
+                                            <img src={item} alt={`첨부파일 ${index + 1}`} />
+                                        </PortfolioImg>
+                                    ))}
+                                </PortfolioImgsContainer>
                             )}
-                        </UserPortfoliosContainer>
+                        </PortfolioImgsWrapper>
                     </UserInfoImageContainer>
                     
-                    {/* 비슷한 포트폴리오 */}
-                    <ProjectNameText style={{ position: 'relative', left: '104px', marginTop: '64px'}}>비슷한 포트폴리오</ProjectNameText>
-                    {/* 비슷한 포트폴리오 이미지 컨테이너 */}
+                    {/* 추천 포트폴리오 */}
+                    <ProjectNameText style={{ position: 'relative', left: '104px', marginTop: '64px'}}>추천 포트폴리오</ProjectNameText>
+                    {/* 추천 포트폴리오 이미지 컨테이너 */}
                     <SimilarPortfolioContainer>
-                        <img src={exampleImg} alt="포트폴리오1"/>
-                        <img src={exampleImg} alt="포트폴리오2"/>
-                        <img src={exampleImg} alt="포트폴리오3"/>
-                        <img src={exampleImg} alt="포트폴리오4"/>
-                        <img src={exampleImg} alt="포트폴리오5"/>
-                        <img src={exampleImg} alt="포트폴리오6"/>
-                        <img src={exampleImg} alt="포트폴리오7"/>
-                        <img src={exampleImg} alt="포트폴리오8"/>
+                        {recommendPortfolios.length > 0 ? (
+                            recommendPortfolios.map((portfolio, index) => (
+                                <img 
+                                    key={index} 
+                                    src={portfolio.imageUrl || exampleImg} // 실제 이미지 URL을 portfolio.imageUrl로 설정
+                                    alt={`포트폴리오${index + 1}`}
+                                />
+                            ))
+                        ) : (
+                            <SimpleIntroText>추천 포트폴리오가 없습니다.</SimpleIntroText>
+                        )}
                     </SimilarPortfolioContainer>
                     
                 </ModalBodyContainer>

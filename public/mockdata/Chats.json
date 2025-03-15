@@ -3,71 +3,71 @@
         "id": 1,
         "name": "사용자1",
         "profileImage": "https://via.placeholder.com/48",
-        "lastMessage": "안녕하세요!",
-        "lastMessageTime": "08:24",
-        "unread" : 1
+        "lastMessage": "프로젝트 완성까지는 3달 정도, 포트폴리오는 정리만 한 거라 4-5일 정도에 끝낸 것 같습니다.",
+        "lastMessageTime": "09:39",
+        "unread" : 2
     }, {
         "id": 2,
         "name": "사용자2",
         "profileImage": "https://via.placeholder.com/48",
-        "lastMessage": "채팅 미리보기 한줄 작성 동해물과 백두산이 마르고 닳도록",
+        "lastMessage": "안녕하세요!",
         "lastMessageTime": "12:15",
-        "unread" : 2
+        "unread" : 0
     }, {
         "id": 3,
         "name": "사용자3",
         "profileImage": "https://via.placeholder.com/48",
-        "lastMessage": "채팅 미리보기 한줄 작성 동해물과 백두산이 마르고 닳도록",
+        "lastMessage": "안녕하세요!",
         "lastMessageTime": "16:57",
-        "unread" : 3
+        "unread" : 0
     }, {
         "id": 4,
         "name": "사용자4",
         "profileImage": "https://via.placeholder.com/48",
-        "lastMessage": "채팅 미리보기 한줄 작성 동해물과 백두산이 마르고 닳도록",
+        "lastMessage": "안녕하세요!",
         "lastMessageTime": "09:45",
-        "unread" : 4
+        "unread" : 0
     }, {
         "id": 5,
         "name": "사용자5",
         "profileImage": "https://via.placeholder.com/48",
-        "lastMessage": "채팅 미리보기 한줄 작성 동해물과 백두산이 마르고 닳도록",
+        "lastMessage": "안녕하세요!",
         "lastMessageTime": "14:30",
-        "unread" : 5
+        "unread" : 0
     }, {
         "id": 6,
         "name": "사용자6",
         "profileImage": "https://via.placeholder.com/48",
-        "lastMessage": "채팅 미리보기 한줄 작성 동해물과 백두산이 마르고 닳도록",
+        "lastMessage": "안녕하세요!",
         "lastMessageTime": "11:20",
-        "unread" : 6
+        "unread" : 0
     }, {
         "id": 7,
         "name": "사용자7",
         "profileImage": "https://via.placeholder.com/48",
-        "lastMessage": "채팅 미리보기 한줄 작성 동해물과 백두산이 마르고 닳도록",
+        "lastMessage": "안녕하세요!",
         "lastMessageTime": "18:05",
-        "unread" : 7
+        "unread" : 0
     }, {
         "id": 8,
         "name": "사용자8",
         "profileImage": "https://via.placeholder.com/48",
-        "lastMessage": "채팅 미리보기 한줄 작성 동해물과 백두산이 마르고 닳도록",
+        "lastMessage": "안녕하세요!",
         "lastMessageTime": "20:10",
-        "unread" : 8
+        "unread" : 0
     }, {
         "id": 9,
         "name": "사용자9",
         "profileImage": "https://via.placeholder.com/48",
-        "lastMessage": "채팅 미리보기 한줄 작성 동해물과 백두산이 마르고 닳도록",
+        "lastMessage": "안녕하세요!",
         "lastMessageTime": "22:45",
-        "unread" : 9
+        "unread" : 0
     }, {
         "id": 10,
         "name": "사용자10",
         "profileImage": "https://via.placeholder.com/48",
-        "lastMessage": "채팅 미리보기 한줄 작성 동해물과 백두산이 마르고 닳도록",
+        "lastMessage": "안녕하세요!",
         "lastMessageTime": "07:30",
-        "unread" : 10
+        "unread" : 0
     }
 ]
