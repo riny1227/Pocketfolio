@@ -562,8 +562,8 @@ export default function WritePortfolio() {
         }
         
         try {
-            const results = await getCompanies(query, token);
-            setCompanyList(results);
+            const companies = await getCompanies(query, token);
+            setCompanyList(companies);
         } catch (error) {
             console.error("기업 검색 실패:", error);
         }
@@ -826,7 +826,7 @@ export default function WritePortfolio() {
                 </JobContainer>               
 
                 {/* 지원 기업 컨테이너 */}
-                <CompanyContainer>
+                {/* <CompanyContainer>
                     <ContentText style={{  }}>지원 기업</ContentText>
                     <ContentText style={{ color: '#1570EF', marginRight: '15px'}}>*</ContentText>       
                     <CompanyInputContainer>
@@ -837,10 +837,10 @@ export default function WritePortfolio() {
                             </svg>
                         </SearchIconStyle>
                     </CompanyInputContainer>
-                </CompanyContainer>
+                </CompanyContainer> */}
 
                 {/* 지원 기업 컨테이너 */}
-                {/* <JobContainer>
+                <JobContainer>
                     <ContentText style={{  }}>지원 기업</ContentText>
                     <ContentText style={{ color: '#1570EF', marginRight: '15px'}}>*</ContentText>
                     <JobWrapper>
@@ -866,7 +866,7 @@ export default function WritePortfolio() {
                             </svg>
                         </IconStyle>
                     </JobWrapper>
-                </JobContainer>                */}
+                </JobContainer>               
 
                 {/* 이미지 파일 첨부 컨테이너 */}
                 <ImageFileContainer>

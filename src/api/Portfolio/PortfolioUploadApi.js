@@ -82,7 +82,7 @@ export const uploadAttachments = async (files, token) => {
 
 // 회사 조회 API
 export const getCompanies = async (query = "메리츠자산운용", token) => {
-    const url = "https://pocketfolio.co.kr/api/companies"; // 실제 회사 정보 조회 API URL로 변경
+    const url = "https://pocketfolio.co.kr/api/portfolio/companies";
 
     try {
         const response = await axios.get(url, {
