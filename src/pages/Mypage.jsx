@@ -161,6 +161,7 @@ const EditButton = styled.button`
     border-radius: 50px;
     border: none;
     background: #1570EF;
+    cursor: pointer;
 
     div{
         display: flex;
