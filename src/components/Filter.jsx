@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import InputAndDropdown from "./share/InputAndDropdown";
-import { fetchJobList } from "../api/HomeApi";
+import CompanyDropdown from "./CompanyDropdown";
+import { fetchFilteredPortfolios, fetchPortfolios } from "../api/HomeApi";
 
 // 직군 선택 목록
 const jobHierarchy = {
@@ -10,7 +11,7 @@ const jobHierarchy = {
 };
 
 // 정렬 목록
-const sortHierarchy = ['인기순', '최신순', '좋아요순', '조회순'];
+const sortHierarchy = ['최신순', '인기순', '좋아요순', '조회순'];
 
 // 날짜 목록
 const dateHierarchy = ['1주일', '1개월', '6개월', '1년', '3년'];
@@ -315,34 +316,25 @@ const SortSelector = styled.button`
     }
 `;
 
-export default function Filter() {
+export default function Filter({ setCards }) {
     const [isJopVisible, setJopVisible] = useState(false); // 직군선택 드롭다운 표시 -> true일 때 보임, false일 때 안보임
     const [selectedJobs, setSelectedJobs] = useState([]); // 선택된 직군들 저장
     const [parentState, setParentState] = useState([]); // 부모 input(개발자, 디자이너) 상태 저장 - checked, indeterminate, unchecked
+
     const [isSortVisible, setSortVisible] = useState(false); // 정렬 드롭다운 표시 -> true일 때 보임, false일 때 안보임
     const [selectedSort, setSelectedSort] = useState(sortHierarchy[0]); // 선택된 정렬 방식 저장
+
     const [isFilterVisible, setFilterVisible] = useState(false); // 상세 필터 목록 표시 -> true일 때 보임, false일 때 안보임
-    
-    const [companyQuery, setCompanyQuery] = useState(""); // 기업 검색어 저장
-    const [isCompanySelected, setCompanySelected] = useState(false); // 기업 선택 여부
-    const [companyOptions, setCompanyOptions] = useState([]); // 필터링된 기업 리스트
-    const [isCompanyVisible, setCompanyVisible] = useState(false); // 기업 드롭다운 표시 여부
-    
-    // 각 상세 필터 값 저장
-    const [filters, setFilters] = useState({
-        tag: "",
-        company: "",
-        date: "",
-    });
+    const [filters, setFilters] = useState({ tag: "", company: "", dateRange: "" });  // 각 상세 필터 값 저장
+    const [company, setCompany] = useState("");  // 기업을 드롭다운에서 선택하기 전에 검색 단계의 값을 저장
 
-    // 기업 드롭다운 표시 -> true일 때 보임, false일 때 안보임
-    // const [isCompanyVisible, setCompanyVisible] = useState(false);
-
+    /* -----필터 버튼 관련----- */
     // 필터 버튼 클릭하면 상세 필터 목록 나타나거나 사라지도록 하는 함수
     const clickFilterButton = () => {
         setFilterVisible((prevState) => !prevState);
     };
 
+    /* -----직무선택 관련----- */
     // 직무선택 버튼 클릭하면 버튼 디자인 변경하고 정렬 드롭다운 보여주는 함수
     const clickJobButton = () => {
         setJopVisible((prevState) => !prevState);
@@ -395,6 +387,40 @@ export default function Filter() {
         return `${selected[0]} 외 ${selected.length - 1}`;
     };
 
+    /* -----정렬 관련----- */
+    // 선택한 정렬 기준을 API 정렬값으로 변환
+    const getSortParam = (sortOption) => {
+        switch (sortOption) {
+            case '최신순':
+                return 'createdAt'; // 기본값
+            case '좋아요순':
+                return 'likes';
+            case '조회순':
+                return 'views';
+            case '인기순': // 임시
+                return 'views';
+            default:
+                return 'createdAt';
+        }
+    };
+
+    // 정렬 변경 시 API 호출
+    useEffect(() => {
+        const getSortedPortfolios = async () => {
+            try {
+                const sortParam = getSortParam(selectedSort);
+                const response = await fetchPortfolios(sortParam);
+                const data = response?.data || []; // API 응답 구조에 맞게 수정
+                setCards(data);
+            } catch (error) {
+                // console.error("getSortedPortfolios 에러 발생 : ", error);
+            }
+        };
+
+        getSortedPortfolios();
+    }, [selectedSort, setCards]);
+
+
     // 정렬 버튼 클릭하면 버튼 디자인 변경하고 정렬 드롭다운 보여주는 함수
     const clickSortButton = () => {
         setSortVisible((prevState) => !prevState);
@@ -406,6 +432,7 @@ export default function Filter() {
         setSortVisible(false); // 선택 후 드롭다운 닫기
     };
 
+    /* -----상세 필터 관련----- */
     // 상세 필터 state 값을 관리하는 함수
     const handleFilterChange = (key, value) => {
         setFilters((prevFilters) => ({
@@ -417,102 +444,26 @@ export default function Filter() {
     // 적용된 필터 개수 계산 (빈 값은 카운트X)
     const filterCount = Object.values(filters).filter((value) => value !== "").length;
 
-    // 기업 필터에서 검색어를 이용해 기업 검색
-    // **********api 연결할 때는 백엔드 방식에 맞춰서 코드 변경 (현재는 프론트에서 필터링 하도록 되어있음)************
-    // const searchCompanies = async (query) => {
-    //     if (!query) {
-    //         setCompanyOptions([]); // 검색어 없으면 리스트 초기화
-    //         setCompanyVisible(false); // 드롭다운 숨기기
-    //         return;
-    //     }
-
-    //     try {
-    //         const response = await fetch("/mockdata/Companies.json"); // JSON 파일에서 기업 리스트 불러오기
-    //         const data = await response.json();
-
-    //         // 검색어를 포함하는 기업 필터링
-    //         const filteredCompanies = data.companies
-    //             .map((company) => company.companyName) // 기업명만 추출
-    //             .filter((name) => name.includes(query)); // 검색어 포함 여부 확인
-
-    //         setCompanyOptions(filteredCompanies);
-    //         setCompanyVisible(true); // 입력 시 드롭다운 열기
-    //     } catch (error) {
-    //         console.error("기업 데이터 로드 실패:", error);
-    //         setCompanyOptions([]);
-    //     }
-    // };
-
-    // const searchCompanies = async (query) => {
-    //     try {
-    //         const data = await fetchJobList(query);
-
-    //         setCompanyOptions(data);
-    //         setCompanyVisible(true); // 입력 시 드롭다운 열기
-    //     } catch (error) {
-    //         console.error("searchCompanies 에러 발생 : ", error);
-    //         setCompanyOptions([]);
-    //     }
-    // }
-
-    // 검색어 변경 시 API 요청 (0.5초 지연)
-    // useEffect(() => {
-    //     if (!companyQuery.trim()) {
-    //         setCompanyOptions([]);
-    //         setCompanyVisible(false);
-    //         return;
-    //     }
-
-    //     const delayDebounceFn = setTimeout(async () => {
-    //         try {
-    //             const data = await fetchJobList(companyQuery);
-
-    //             console.log("API 응답 데이터:", data); // 응답 데이터 로그 출력
-
-    //             // API 응답이 객체라면 jobs 배열이 있는지 확인
-    //             const jobList = Array.isArray(data) ? data : data.jobs || [];
-
-    //             setCompanyOptions(jobList);
-    //             setCompanyVisible(jobList.length > 0); // 검색 결과 있으면 드롭다운 표시
-    //         } catch (error) {
-    //             console.error("searchCompanies 에러 발생 : ", error);
-    //             setCompanyOptions([]);
-    //         }
-    //     }, 500);
-
-    //     return () => clearTimeout(delayDebounceFn); // 이전 타이머 제거
-    // }, [companyQuery]);
-
-    // 검색어 입력 처리
-    const handleCompanyInputChange = (value) => {
-        setCompanyQuery(value);
-        setCompanySelected(false);
-    };
-
-    // // 검색어 입력 시 동작 (드롭다운 표시 + 기업 검색)
-    // const handleCompanyInputChange = (value) => {
-    //     setCompanyQuery(value);
-    //     // setCompanySelected(false); // 기업 선택 해제 (새로운 검색 가능하도록)
-    //     searchCompanies(value);
-
-    //     if (isCompanySelected === true) {
-    //         setFilters(prev => ({ ...prev, company: value }))
-    //     }
-    // };
-
-    // 직군 리스트 api 테스트
+    // 상세 필터 값에 따라 필터링된 포트폴리오 목록 조회 (1초 후 조회)
     useEffect(() => {
-        const fetchData = async () => {
+        const delayDebounceFn = setTimeout(async () => {
             try {
-                const data = await fetchJobList("삼성"); // "삼성" 키워드로 직군 리스트 조회
-                console.log("API에서 받아온 직군 리스트:", data);
+                const response = await fetchFilteredPortfolios(filters.tag, filters.company, filters.dateRange);
+                const data = response?.data || [];
+                setCards(data);
             } catch (error) {
-                console.error("API 요청 중 에러 발생:", error);
+                // console.error("getFilteredPortfolios 에러 발생 : ", error);
             }
-        };
+        }, 1000);
+    
+        return () => clearTimeout(delayDebounceFn); // 이전 타이머 제거
+    }, [filters]);
 
-        fetchData(); // 페이지 로드 시 실행
-    }, []); // 빈 배열을 전달하여 마운트 시 한 번만 실행
+    // Clear 버튼 클릭 시 실행
+    const handleClear = () => {
+        handleFilterChange("company", ""); // 필터 값 초기화
+        setCompany("");
+    };
 
     return (
         <>
@@ -609,32 +560,19 @@ export default function Filter() {
                 </FilterOptionWrapper>
 
                 {/* 기업 필터 */}
-                {/* <FilterOptionWrapper>
-                    <FilterOptionName>기업</FilterOptionName>
-                    <InputAndDropdown 
-                        readOnly={false}
-                        placeholder="선택"
-                        value={filters.company}
-                        setValue={(newValue) => setFilters(prev => ({ ...prev, company: newValue }))}
-                        // data={dateHierarchy}
-                        width="389px"
-                        iconSvg={<svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
-                            <path d="M3.33337 21H21.3334M9.33337 8H10.3334M9.33337 12H10.3334M9.33337 16H10.3334M14.3334 8H15.3334M14.3334 12H15.3334M14.3334 16H15.3334M5.33337 21V5C5.33337 4.46957 5.54409 3.96086 5.91916 3.58579C6.29423 3.21071 6.80294 3 7.33337 3H17.3334C17.8638 3 18.3725 3.21071 18.7476 3.58579C19.1227 3.96086 19.3334 4.46957 19.3334 5V21" stroke="#909090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>}
-                    />
-                </FilterOptionWrapper> */}
                 <FilterOptionWrapper>
-                    <FilterOptionName>기업</FilterOptionName>
-                    <InputAndDropdown 
-                        readOnly={false} // 기업 선택 후 입력 불가능
+                    <NameAndClearBtn>
+                        <FilterOptionName>기업</FilterOptionName>
+                        <FilterOptionClear onClick={handleClear}>clear</FilterOptionClear>
+                    </NameAndClearBtn>
+                    <CompanyDropdown
                         placeholder="선택"
-                        value={companyQuery} // 검색어 상태 반영
-                        setValue={handleCompanyInputChange} // 검색어 변경 시 필터링
-                        data={isCompanyVisible ? companyOptions : []} // 드롭다운 데이터 설정
-                        width="389px"
+                        value={company}
+                        setValue={(newValue) => setCompany(newValue)}
+                        setCompany={(newValue) => handleFilterChange("company", newValue)}
                         iconSvg={
                             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
-                                <path d="M3.33337 21H21.3334M9.33337 8H10.3334M9.33337 12H10.3334M9.33337 16H10.3334M14.3334 8H15.3334M14.3334 12H15.3334M14.3334 16H15.3334M5.33337 21V5C5.33337 4.46957 5.54409 3.96086 5.91916 3.58579C6.29423 3.21071 6.80294 3 7.33337 3H17.3334C17.8638 3 18.3725 3.21071 18.7476 3.58579C19.1227 3.96086 19.3334 4.46957 19.3334 5V21" stroke="#909090" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M3.33325 21H21.3333M9.33325 8H10.3333M9.33325 12H10.3333M9.33325 16H10.3333M14.3333 8H15.3333M14.3333 12H15.3333M14.3333 16H15.3333M5.33325 21V5C5.33325 4.46957 5.54397 3.96086 5.91904 3.58579C6.29411 3.21071 6.80282 3 7.33325 3H17.3333C17.8637 3 18.3724 3.21071 18.7475 3.58579C19.1225 3.96086 19.3333 4.46957 19.3333 5V21" stroke="#909090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         }
                     />
@@ -644,13 +582,13 @@ export default function Filter() {
                 <FilterOptionWrapper>
                     <NameAndClearBtn>
                         <FilterOptionName>날짜</FilterOptionName>
-                        <FilterOptionClear onClick={() => setFilters(prev => ({ ...prev, date: "" }))}>clear</FilterOptionClear>
+                        <FilterOptionClear onClick={() => setFilters(prev => ({ ...prev, dateRange: "" }))}>clear</FilterOptionClear>
                     </NameAndClearBtn>
                     <InputAndDropdown 
                         readOnly={true}
                         placeholder="선택"
-                        value={filters.date}
-                        setValue={(newValue) => setFilters(prev => ({ ...prev, date: newValue }))}
+                        value={filters.dateRange}
+                        setValue={(newValue) => handleFilterChange("dateRange", newValue)}
                         data={dateHierarchy}
                         width="389px"
                         iconSvg={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
