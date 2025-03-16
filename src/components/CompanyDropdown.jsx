@@ -131,7 +131,7 @@ export default function CompanyDropdown({ placeholder, value, setValue, width, i
         const delayDebounceFn = setTimeout(async () => {
             try {
                 const response = await fetchJobList(value);
-                const companyNames = [...new Set(response.map(company => company.corpNm))]; // 회사명만 남기고 중복 제거
+                const companyNames = [...new Set(response.map(item => item.corpNm))]; // 회사명만 남기고 중복 제거
                 setCompanyOptions(companyNames);
 
                 if (!isReadOnly) {
@@ -141,7 +141,7 @@ export default function CompanyDropdown({ placeholder, value, setValue, width, i
             } catch (error) {
                 console.error("delayDebounceFn 에러 발생 : ", error);
             }
-        }, 500);
+        });
     
         return () => clearTimeout(delayDebounceFn);
     }, [value]);
