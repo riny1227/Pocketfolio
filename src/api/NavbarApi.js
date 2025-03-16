@@ -3,20 +3,20 @@ import axios from 'axios';
 const BASE_URL = 'https://pocketfolio.co.kr/api';
 
 // 사용자 인증 상태 확인
-export const fetchCheckStatus = async (token) => {
-    try {
-        const response = await axios.get(`${BASE_URL}/nav/auth/status`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        console.log('응답 상태 코드 : ', response.status);
-        return response.data;
-    } catch (error) {
-        // console.log('fetchCheckStatus(사용자 인증 상태 확인) 에러 발생 : ', error);
-        throw error;
-    }
-};
+// export const fetchCheckStatus = async (token) => {
+//     try {
+//         const response = await axios.get(`${BASE_URL}/nav/auth/status`, {
+//             headers: {
+//                 'Authorization': `Bearer ${token}`
+//             }
+//         });
+//         console.log('응답 상태 코드 : ', response.status);
+//         return response.data;
+//     } catch (error) {
+//         // console.log('fetchCheckStatus(사용자 인증 상태 확인) 에러 발생 : ', error);
+//         throw error;
+//     }
+// };
 
 // 검색 API
 export const fetchSearch = async (query, type) => {

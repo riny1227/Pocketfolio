@@ -322,22 +322,6 @@ export default function Header() {
         }
     };
 
-    useEffect(() => {
-        // 사용자 인증상태 확인 함수 - 테스트
-        const handleStatus = async () => {
-            if (isLoggedIn) {
-                try {
-                    const status = await fetchCheckStatus(token);
-                    console.log(status);
-                } catch (error) {
-                    // console.error("handleStatus 에러 발생 : ", error);
-                }
-            }
-        }
-
-        handleStatus();
-    }, [isLoggedIn]);
-
     return (
         <HeaderContainer>
             {/* 로고 + 검색창 + 아티클 컨테이너 */}
