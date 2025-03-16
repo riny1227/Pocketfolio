@@ -17,17 +17,12 @@ export const fetchRecommendPortfolios = async () => {
 // 직군(회사) 리스트 조회
 export const fetchJobList = async (query) => {
     try {
-        // 서버 수정 후 이 코드로 바꾸기
-        // const response = await axios.get(`${BASE_URL}/home/jobs/categories`, {
-        //     params: { q: encodeURIComponent(query) }
-        // });
-        // console.log("fetchJobList 응답 데이터:", response.data);
-        // return Array.isArray(response.data.data) ? response.data.data : [];  // 응답이 객체이고, data 키가 배열인지 확인 후 반환
-
-        const response = await axios.get('/mockdata/Companies.json');
+        const response = await axios.get(`${BASE_URL}/companies`, {
+            params: { query: query }
+        });
         return response.data;
     } catch (error) {
-        // console.error('fetchJobList(직군 리스트 조회) 에러 발생 : ', error);
+        console.error('fetchJobList(직군 리스트 조회) 에러 발생 : ', error);
         return []; // 에러 발생 시 빈 배열 반환
     }
 };
@@ -65,15 +60,3 @@ export const fetchPortfolios = async (sort) => {
         throw error;
     }
 }
-
-// 인기 태그 조회
-// export const fetchPopularTags = async () => {
-//     try {
-//         const response = await axios.get(`${BASE_URL}/home/tags/popular`);
-//         console.log('응답 상태 코드 : ', response.status);
-//         return response.data;
-//     } catch (error) {
-//         console.log('fetchPopularTags(인기 태그 조회) 에러 발생 : ', error);
-//         throw error;
-//     }
-// }

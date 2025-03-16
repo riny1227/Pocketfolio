@@ -117,12 +117,12 @@ const DropdownSelector = styled.button`
 export default function CompanyDropdown({ placeholder, value, setValue, width, iconSvg, backIcon = false, hasToggle = true, placeholderSize, height, fontSize, setCompany }) {
     const [isVisible, setVisible] = useState(false);
     const [isReadOnly, setReadOnly] = useState(false);
-    const [jobOptions, setJobOptions] = useState([]); // API에서 받아온 직군 리스트
+    const [companyOptions, setCompanyOptions] = useState([]); // API에서 받아온 직군 리스트
 
     // 검색어 변경 시 API 요청 (디바운스 적용)
     useEffect(() => {
         if (!value || value.trim() === "") {
-            setJobOptions([]);
+            setCompanyOptions([]);
             setVisible(false);
             setReadOnly(false);
             return;
@@ -131,24 +131,20 @@ export default function CompanyDropdown({ placeholder, value, setValue, width, i
         const delayDebounceFn = setTimeout(async () => {
             try {
                 const response = await fetchJobList(value);
-                // console.log("API 응답:", response);
-    
-                if (response.data && Array.isArray(response.data)) {
-                    setJobOptions(response.data);
-                    if (!isReadOnly) {
-                        setVisible(response.data.length > 0);
-                    }
-                } else {
-                    setJobOptions([]);
-                    setVisible(false);
+                const companyNames = [...new Set(response.map(company => company.corpNm))]; // 회사명만 남기고 중복 제거
+                setCompanyOptions(companyNames);
+
+                if (!isReadOnly) {
+                    setVisible(companyNames.length > 0);
                 }
+                
             } catch (error) {
-                console.error("delayDebounceFn 에러 발생 :", error);
+                console.error("delayDebounceFn 에러 발생 : ", error);
             }
         }, 500);
     
         return () => clearTimeout(delayDebounceFn);
-    }, [value]); // clearTrigger 제거
+    }, [value]);
     
 
     // 직군 선택 시 input 값을 고정
@@ -185,8 +181,8 @@ export default function CompanyDropdown({ placeholder, value, setValue, width, i
                 </ToggleIcon>
             )}
             <DropdownWrapper $isVisible={isVisible}>
-                {jobOptions.length > 0 ? (
-                    jobOptions.map((option, index) => (
+                {companyOptions.length > 0 ? (
+                    companyOptions.map((option, index) => (
                         <DropdownSelector key={index} onClick={() => handleOptionSelect(option)}>
                             {option}
                         </DropdownSelector>
