@@ -9,7 +9,7 @@ import InputAndDropdown from "../components/share/InputAndDropdown";
 import { create, uploadAttachments, uploadCover } from "../api/Portfolio/PortfolioUploadApi";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { getCompanies } from "../api/Portfolio/PortfolioUploadApi";
+import { fetchJobList } from "../api/HomeApi";
 import debounce from "lodash.debounce";
 
 // 한국어 로케일 등록
@@ -307,61 +307,6 @@ const JobWrapper = styled.div`
     }
 `;
 
-// 검색 아이콘 스타일
-const SearchIconStyle = styled.svg`
-    position: absolute;
-    right: 20px;
-    width: 24px;
-    height: 24px;
-    fill: none;
-    stroke: #b1b1b1;
-    cursor: pointer;
-`;
-
-// 지원 기업 컨테이너
-const CompanyContainer = styled.div`
-    display: flex;
-    align-items: center;
-    align-self: stretch;
-    width: 100%;
-`;
-
-// 기업명 검색 필드 + 아이콘 컨테이너
-const CompanyInputContainer = styled.div`
-    display: flex;
-    align-items: center;
-    position: relative;
-    width: 561px;
-`;
-
-// 기업명 검색 필드 스타일
-const CompanyInput = styled.input`
-    display: flex;
-    height: 56px;
-    box-sizing: border-box;
-    width: 100%;
-    align-items: center;
-    gap: 54px;
-    flex: 1 0 0;
-    padding-left: 20px;
-    padding-right: 44px;
-    border-radius: 8px;
-    border: 1px solid #d5d5d5;
-    font-family: 'Pretendard-regular';
-    font-size: 16px;
-    font-weight: 400;
-    color: #909090;
-
-    &:focus {
-        color: #222;
-    }
-
-    /* 포커스를 벗어난 후에도 텍스트 색상을 검은색으로 유지 */
-    &:not(:focus):valid {
-        color: #222;
-    }
-`;
-
 // 이미지 첨부 컨테이너
 const ImageFileContainer = styled.div`
     display: flex;
@@ -548,26 +493,13 @@ export default function WritePortfolio() {
     const [isFormComplete, setIsFormComplete] = useState(false);
     const [coverImage, setCoverImage] = useState(null);
     const [attachments, setAttachments] = useState([]);
-    const [companyList, setCompanyList] = useState([]);
+    const [companyOptions, setCompanyOptions] = useState([]); // API에서 받아온 직군 리스트
+    const [isVisible, setVisible] = useState(false);
+    const [isReadOnly, setReadOnly] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
     const { portfolioData } = location.state || {}; // PortfolioDetailModal에서 전달받은 데이터
-
-    // API 호출 (디바운스 적용)
-    const fetchCompanies = debounce(async (query) => {
-        if (!query) {
-            setCompanyList([]); // 입력값이 없을 경우 리스트 초기화
-            return;
-        }
-        
-        try {
-            const companies = await getCompanies(query, token);
-            setCompanyList(companies);
-        } catch (error) {
-            console.error("기업 검색 실패:", error);
-        }
-    }, 300); // 300ms 지연 후 실행
 
     useEffect(() => {
         if (token) {
@@ -583,11 +515,36 @@ export default function WritePortfolio() {
                 setEndDate(new Date(portfolioData.durationEnd));
                 setImagePreview(portfolioData.coverImage || exampleImage);
                 setFileName(portfolioData.attachments?.[0]?.name || '');
-                fetchCompanies(company);
-                console.log("현재 기업 리스트:", companyList);
             }
         }
-    }, [token, portfolioData, company, fetchCompanies, companyList]);
+    }, [token, portfolioData, company]);
+
+    // 검색어 변경 시 API 요청 (디바운스 적용)
+        useEffect(() => {
+            if (!company || company.trim() === "") {
+                setCompanyOptions([]);
+                setVisible(false);
+                setReadOnly(false);
+                return;
+            }
+        
+            const delayDebounceFn = setTimeout(async () => {
+                try {
+                    const response = await fetchJobList(company);
+                    const companyNames = [...new Set(response.map(item => item.corpNm))]; // 회사명만 남기고 중복 제거
+                    setCompanyOptions(companyNames);
+    
+                    if (!isReadOnly) {
+                        setVisible(companyNames.length > 0);
+                    }
+                    
+                } catch (error) {
+                    console.error("delayDebounceFn 에러 발생 : ", error);
+                }
+            });
+        
+            return () => clearTimeout(delayDebounceFn);
+        }, [company]);
     
     useEffect(() => {
         // 모든 필드가 채워졌는지 확인(URL, 간단설명 제외)
@@ -850,10 +807,9 @@ export default function WritePortfolio() {
                             value={company}
                             setValue={(value) => {
                                 setCompany(value);
-                                fetchCompanies(value);
                             }}
                             width="561px"
-                            data={companyList}
+                            data={companyOptions}
                             iconSvg={null}
                             hasToggle={false} // 토글 버튼 활성화
                             placeholderSize="16px"  // placeholder 크기를 16px로 설정
